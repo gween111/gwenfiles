@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination B1: Unit 21, 24, 27 Vocabulary Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .explain-fade {
+            animation: fadeInExplain 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInExplain {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Container -->
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden min-h-[600px] flex flex-col relative">
+        
+        <!-- Header -->
+        <div class="bg-indigo-600 p-6 text-white text-center flex justify-between items-center relative z-10">
+            <div>
+                <h1 class="text-xl font-bold text-left"><i class="fas fa-book-open mr-2"></i>Destination B1</h1>
+                <p class="text-indigo-200 text-xs mt-1 text-left">Units 21, 24, 27 Review (120+ Questions)</p>
+            </div>
+            <div id="score-display" class="hidden bg-indigo-700 px-4 py-2 rounded-lg text-sm font-bold">
+                Score: 0/0
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 p-6 flex flex-col" id="app-content">
+            <!-- Content will be injected here via JS -->
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-3 text-center text-gray-400 text-xs border-t">
+            Interactive Vocabulary & Grammar Quiz
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Database of Questions for Units 21, 24, 27
+        const questionBank = [
+            // --- UNIT 21: Sending and Receiving ---
+            { q: "Please put the letter in an ______ before you post it.", options: ["envelope", "email", "address", "internet"], a: "envelope", explain: "'Envelope' là phong bì thư.", unit: "Unit 21" },
+            { q: "Have you received a ______ from him yet?", options: ["reply", "answer", "return", "speak"], a: "reply", explain: "'Receive a reply' = nhận được hồi âm.", unit: "Unit 21" },
+            { q: "I can't ______ to the internet right now.", options: ["connect", "join", "contact", "attach"], a: "connect", explain: "Cấu trúc 'connect to the internet'.", unit: "Unit 21" },
+            { q: "Don't forget to put a ______ on the envelope.", options: ["sticker", "stamp", "label", "ticket"], a: "stamp", explain: "'Stamp' = tem thư.", unit: "Unit 21" },
+            { q: "I need to ______ a phone call.", options: ["do", "make", "take", "get"], a: "make", explain: "Collocation: 'make a phone call'.", unit: "Unit 21" },
+            { q: "The phone is ______. Can you answer it?", options: ["calling", "ringing", "speaking", "crying"], a: "ringing", explain: "'The phone is ringing' = điện thoại đang reo.", unit: "Unit 21" },
+            { q: "I will ______ you an email later.", options: ["send", "post", "deliver", "transport"], a: "send", explain: "'Send an email' = gửi email.", unit: "Unit 21" },
+            { q: "The line is busy. I'll ______ up and try again later.", options: ["hang", "hold", "pick", "shut"], a: "hang", explain: "'Hang up' = gác máy/cúp máy.", unit: "Unit 21" },
+            { q: "Can you ______ back later?", options: ["call", "say", "tell", "speak"], a: "call", explain: "'Call back' = gọi lại.", unit: "Unit 21" },
+            { q: "I saw the news ______ the internet.", options: ["at", "in", "on", "by"], a: "on", explain: "Giới từ 'on the internet'.", unit: "Unit 21" },
+            { q: "He sent me a text ______.", options: ["note", "message", "letter", "word"], a: "message", explain: "'Text message' = tin nhắn văn bản.", unit: "Unit 21" },
+            { q: "You need to ______ on to the website with your password.", options: ["log", "turn", "set", "put"], a: "log", explain: "'Log on' = đăng nhập.", unit: "Unit 21" },
+            { q: "We were ______ off in the middle of our conversation.", options: ["cut", "put", "taken", "broken"], a: "cut", explain: "'Cut off' = bị ngắt kết nối (điện thoại/mạng).", unit: "Unit 21" },
+            { q: "What is your email ______?", options: ["location", "address", "number", "code"], a: "address", explain: "'Email address' = địa chỉ email.", unit: "Unit 21" },
+            { q: "I received a ______ from the bank today.", options: ["letter", "paper", "news", "post"], a: "letter", explain: "'Letter' = lá thư.", unit: "Unit 21" },
+            { q: "Can you turn ______ the volume? It's too quiet.", options: ["on", "up", "in", "out"], a: "up", explain: "'Turn up' = vặn to lên.", unit: "Unit 21" },
+            { q: "The new magazine comes ______ next week.", options: ["out", "up", "in", "away"], a: "out", explain: "'Come out' = được xuất bản/phát hành.", unit: "Unit 21" },
+            { q: "Please keep in ______ with me while you are away.", options: ["touch", "contact", "hold", "call"], a: "touch", explain: "Idiom: 'keep in touch' = giữ liên lạc.", unit: "Unit 21" },
+            { q: "The postman ______ the letters every morning.", options: ["brings", "delivers", "sends", "takes"], a: "delivers", explain: "'Deliver' = giao/phát (thư, hàng).", unit: "Unit 21" },
+            { q: "I found this information ______ Google.", options: ["at", "in", "on", "by"], a: "on", explain: "Dùng giới từ 'on' cho các nền tảng/trang web.", unit: "Unit 21" },
+
+            // --- UNIT 24: People and Daily Life ---
+            { q: "She has got ______ hair.", options: ["blonde", "yellow", "gold", "bright"], a: "blonde", explain: "'Blonde hair' = tóc vàng hoe.", unit: "Unit 24" },
+            { q: "He has no hair at all; he is ______.", options: ["bald", "bold", "bare", "empty"], a: "bald", explain: "'Bald' = hói.", unit: "Unit 24" },
+            { q: "I need to get a new pair of ______.", options: ["glass", "glasses", "glance", "goggles"], a: "glasses", explain: "'Glasses' = mắt kính (số nhiều).", unit: "Unit 24" },
+            { q: "You look very ______ in that dress.", options: ["attractive", "attract", "attraction", "attractively"], a: "attractive", explain: "Sau 'look' là tính từ. 'Attractive' = cuốn hút/hấp dẫn.", unit: "Unit 24" },
+            { q: "He grew a ______ on his chin.", options: ["moustache", "beard", "hair", "barber"], a: "beard", explain: "'Beard' = râu (ở cằm/quai nón). 'Moustache' = ria mép.", unit: "Unit 24" },
+            { q: "It's cold outside, put ______ your coat.", options: ["in", "on", "up", "over"], a: "on", explain: "'Put on' = mặc vào.", unit: "Unit 24" },
+            { q: "You should take ______ your shoes before entering.", options: ["off", "out", "away", "down"], a: "off", explain: "'Take off' = cởi ra.", unit: "Unit 24" },
+            { q: "She likes to dress ______ for parties.", options: ["up", "on", "in", "down"], a: "up", explain: "'Dress up' = diện đồ đẹp/hóa trang.", unit: "Unit 24" },
+            { q: "I have a bad ______ of biting my nails.", options: ["routine", "custom", "habit", "hobby"], a: "habit", explain: "'Habit' = thói quen xấu/tốt cá nhân.", unit: "Unit 24" },
+            { q: "My daily ______ includes jogging and reading.", options: ["routine", "habit", "plan", "timetable"], a: "routine", explain: "'Daily routine' = thói quen sinh hoạt hàng ngày.", unit: "Unit 24" },
+            { q: "Jeans are usually considered ______ clothes.", options: ["formal", "casual", "smart", "uniform"], a: "casual", explain: "'Casual clothes' = thường phục (không trang trọng).", unit: "Unit 24" },
+            { q: "That style is really out of ______ now.", options: ["fashion", "mode", "trend", "time"], a: "fashion", explain: "'Out of fashion' = lỗi mốt.", unit: "Unit 24" },
+            { q: "Can you help me ______ up the zip on my dress?", options: ["do", "make", "fix", "tie"], a: "do", explain: "'Do up' = cài/kéo khóa/cúc áo.", unit: "Unit 24" },
+            { q: "Children grow ______ so fast these days.", options: ["up", "on", "out", "in"], a: "up", explain: "'Grow up' = lớn lên/trưởng thành.", unit: "Unit 24" },
+            { q: "I'm going to ______ a bath.", options: ["have", "do", "make", "get"], a: "have", explain: "Collocation: 'have a bath/shower'.", unit: "Unit 24" },
+            { q: "He is very ______ about his appearance.", options: ["care", "careful", "caring", "careless"], a: "careful", explain: "'Careful about' = cẩn thận/chăm chút về cái gì.", unit: "Unit 24" },
+            { q: "She has a very busy ______.", options: ["lifestyle", "life", "living", "alive"], a: "lifestyle", explain: "'Lifestyle' = lối sống.", unit: "Unit 24" },
+            { q: "Those shoes don't ______ you; they are too small.", options: ["match", "fit", "suit", "go"], a: "fit", explain: "'Fit' = vừa vặn (về kích cỡ). 'Suit' = hợp (về phong cách).", unit: "Unit 24" },
+            { q: "That colour really ______ you.", options: ["fits", "suits", "matches", "likes"], a: "suits", explain: "'Suit' = hợp (làm cho bạn trông đẹp hơn).", unit: "Unit 24" },
+            { q: "Please ______ the washing up after dinner.", options: ["make", "do", "take", "have"], a: "do", explain: "Collocation: 'do the washing up' = rửa bát.", unit: "Unit 24" },
+
+            // --- UNIT 27: Working and Earning ---
+            { q: "He has a well-paid ______ in a bank.", options: ["work", "job", "labour", "task"], a: "job", explain: "'Job' (đếm được) = công việc/nghề nghiệp cụ thể. 'Work' không đếm được.", unit: "Unit 27" },
+            { q: "I ______ $2000 a month.", options: ["win", "gain", "earn", "take"], a: "earn", explain: "'Earn' = kiếm tiền từ sức lao động.", unit: "Unit 27" },
+            { q: "The factory workers are going on ______.", options: ["strike", "hit", "stop", "protest"], a: "strike", explain: "'Go on strike' = đình công.", unit: "Unit 27" },
+            { q: "She is a very experienced ______.", options: ["employ", "employer", "employee", "employment"], a: "employee", explain: "'Employee' = nhân viên. 'Employer' = ông chủ.", unit: "Unit 27" },
+            { q: "He decided to ______ at the age of 65.", options: ["resign", "retire", "leave", "stop"], a: "retire", explain: "'Retire' = nghỉ hưu.", unit: "Unit 27" },
+            { q: "I'm going to ______ for a new job.", options: ["apply", "ask", "request", "demand"], a: "apply", explain: "'Apply for a job' = nộp đơn xin việc.", unit: "Unit 27" },
+            { q: "The meeting was called ______ because the boss was ill.", options: ["off", "out", "away", "back"], a: "off", explain: "'Call off' = hủy bỏ (cancel).", unit: "Unit 27" },
+            { q: "My ______ and I are going for lunch.", options: ["colleagues", "colleges", "collections", "collisions"], a: "colleagues", explain: "'Colleagues' = đồng nghiệp.", unit: "Unit 27" },
+            { q: "She gets a good ______ every month.", options: ["wage", "salary", "money", "payment"], a: "salary", explain: "'Salary' = lương tháng/năm (cố định). 'Wage' thường là lương tuần/theo giờ.", unit: "Unit 27" },
+            { q: "He was ______ because he was always late.", options: ["fired", "shot", "hit", "stopped"], a: "fired", explain: "'Fired' = bị sa thải.", unit: "Unit 27" },
+            { q: "The company made a big ______ last year.", options: ["money", "profit", "benefit", "winning"], a: "profit", explain: "'Profit' = lợi nhuận.", unit: "Unit 27" },
+            { q: "Who is responsible ______ this department?", options: ["of", "for", "to", "with"], a: "for", explain: "'Responsible for' = chịu trách nhiệm về.", unit: "Unit 27" },
+            { q: "He has a lot of ______ in sales.", options: ["experience", "expert", "experiment", "exam"], a: "experience", explain: "'Experience' = kinh nghiệm.", unit: "Unit 27" },
+            { q: "We need to set ______ a new business.", options: ["up", "on", "in", "off"], a: "up", explain: "'Set up' = thành lập/khởi nghiệp.", unit: "Unit 27" },
+            { q: "Can you take ______ my shift tomorrow?", options: ["over", "up", "in", "out"], a: "over", explain: "'Take over' = tiếp quản/làm thay.", unit: "Unit 27" },
+            { q: "She turned ______ the job offer.", options: ["down", "up", "off", "out"], a: "down", explain: "'Turn down' = từ chối.", unit: "Unit 27" },
+            { q: "He is a very hard-working ______.", options: ["work", "worker", "working", "works"], a: "worker", explain: "'Worker' = người lao động.", unit: "Unit 27" },
+            { q: "The boss gave us a Christmas ______.", options: ["bonus", "prize", "gift", "present"], a: "bonus", explain: "'Bonus' = tiền thưởng thêm.", unit: "Unit 27" },
+            { q: "Doctors are in a caring ______.", options: ["profession", "professor", "professional", "confession"], a: "profession", explain: "'Profession' = nghề nghiệp (đòi hỏi chuyên môn cao).", unit: "Unit 27" },
+            { q: "Don't put ______ your work until tomorrow.", options: ["off", "on", "up", "in"], a: "off", explain: "'Put off' = trì hoãn.", unit: "Unit 27" },
+
+            // --- EXISTING MIXED QUESTIONS ---
+            { q: "I need to send this parcel by ______.", options: ["post", "mail", "letter", "stamp"], a: "post", explain: "'By post' = qua đường bưu điện.", unit: "Unit 21" },
+            { q: "She works ______ a nurse.", options: ["like", "as", "same", "for"], a: "as", explain: "Cấu trúc 'work as + nghề nghiệp'.", unit: "Unit 27" },
+            { q: "I ______ $50 on the lottery.", options: ["earned", "gained", "won", "beat"], a: "won", explain: "'Win' dùng cho trúng số/giải thưởng.", unit: "Unit 27" },
+            { q: "This jacket is too small, it doesn't ______.", options: ["fit", "suit", "match", "go"], a: "fit", explain: "'Fit' = vừa kích cỡ.", unit: "Unit 24" },
+            { q: "I'm writing to ______ for the position of manager.", options: ["apply", "ask", "demand", "request"], a: "apply", explain: "'Apply for' = ứng tuyển.", unit: "Unit 27" },
+            { q: "He ______ up late to finish the report.", options: ["stayed", "stood", "sat", "woke"], a: "stayed", explain: "'Stay up' = thức khuya.", unit: "Unit 27" },
+            { q: "The internet ______ down yesterday.", options: ["went", "came", "fell", "broke"], a: "went", explain: "'Go down' = bị sập (mạng/hệ thống).", unit: "Unit 21" },
+            { q: "She has a very ______ personality.", options: ["attract", "attractive", "attraction", "attracting"], a: "attractive", explain: "'Attractive personality' = tính cách lôi cuốn.", unit: "Unit 24" },
+            { q: "I need to ______ some money from the bank.", options: ["borrow", "lend", "rent", "hire"], a: "borrow", explain: "'Borrow' = vay.", unit: "Unit 27" },
+            { q: "Have you heard the ______ today?", options: ["news", "new", "notice", "novel"], a: "news", explain: "'News' = tin tức (không đếm được, luôn có s).", unit: "Unit 21" },
+            { q: "She is qualified ______ a teacher.", options: ["as", "for", "in", "to"], a: "as", explain: "'Qualified as' = có bằng cấp/tư cách là.", unit: "Unit 27" },
+            { q: "This website is under ______.", options: ["construction", "making", "building", "doing"], a: "construction", explain: "'Under construction' = đang xây dựng/bảo trì.", unit: "Unit 21" },
+            { q: "He is famous ______ his acting.", options: ["for", "of", "with", "about"], a: "for", explain: "'Famous for' = nổi tiếng về.", unit: "Unit 24" },
+
+            // --- NEWLY ADDED QUESTIONS (50 Questions) ---
+            // Unit 21: Sending & Receiving (Technology/Comm)
+            { q: "I read an interesting ______ about travel on the internet.", options: ["blog", "log", "record", "diary"], a: "blog", explain: "'Blog' = nhật ký web/bài viết trên mạng.", unit: "Unit 21" },
+            { q: "Click on the ______ to visit our website.", options: ["link", "chain", "connection", "rope"], a: "link", explain: "'Link' = đường dẫn liên kết.", unit: "Unit 21" },
+            { q: "The match was ______ live on TV.", options: ["broadcast", "performed", "shown", "played"], a: "broadcast", explain: "'Broadcast' = phát sóng.", unit: "Unit 21" },
+            { q: "You need to ______ on the icon to open the app.", options: ["hit", "click", "push", "touch"], a: "click", explain: "'Click on' = nhấp chuột vào.", unit: "Unit 21" },
+            { q: "My computer crashed and I lost all my ______.", options: ["papers", "files", "folders", "documents"], a: "files", explain: "'Files' = tập tin máy tính.", unit: "Unit 21" },
+            { q: "You can ______ music from this site.", options: ["load", "upload", "download", "down"], a: "download", explain: "'Download' = tải xuống.", unit: "Unit 21" },
+            { q: "I accidentally ______ the email.", options: ["deleted", "destroyed", "erased", "removed"], a: "deleted", explain: "'Delete' = xóa (dữ liệu số).", unit: "Unit 21" },
+            { q: "Read the newspaper ______ to see the main news.", options: ["headlines", "titles", "headers", "topics"], a: "headlines", explain: "'Headlines' = tiêu đề báo.", unit: "Unit 21" },
+            { q: "You must ______ this software to use the printer.", options: ["install", "put", "place", "set"], a: "install", explain: "'Install' = cài đặt phần mềm.", unit: "Unit 21" },
+            { q: "Use the ______ to type your password.", options: ["board", "keyboard", "keypad", "typewriter"], a: "keyboard", explain: "'Keyboard' = bàn phím.", unit: "Unit 21" },
+            { q: "The program will ______ the weather for tomorrow.", options: ["guess", "predict", "say", "tell"], a: "predict", explain: "'Predict' = dự đoán.", unit: "Unit 21" },
+            { q: "They are going to ______ her new book next month.", options: ["public", "publish", "print", "write"], a: "publish", explain: "'Publish' = xuất bản.", unit: "Unit 21" },
+            { q: "Google is a famous ______ engine.", options: ["search", "look", "find", "seek"], a: "search", explain: "'Search engine' = công cụ tìm kiếm.", unit: "Unit 21" },
+            { q: "You can ______ photos to Facebook.", options: ["upload", "download", "uprise", "upgrade"], a: "upload", explain: "'Upload' = tải lên.", unit: "Unit 21" },
+            { q: "Please ______ the button to start.", options: ["push", "press", "pull", "hit"], a: "press", explain: "'Press a button' = nhấn nút.", unit: "Unit 21" },
+            { q: "The TV program was ______ by a news flash.", options: ["interrupted", "stopped", "broken", "cut"], a: "interrupted", explain: "'Interrupted' = bị gián đoạn.", unit: "Unit 21" },
+            { q: "I ______ I won't tell anyone your secret.", options: ["promise", "swear", "say", "tell"], a: "swear", explain: "'Swear' = thề.", unit: "Unit 21" },
+
+            // Unit 24: People & Daily Life (Appearance/Clothes)
+            { q: "She wore a leather ______ around her waist.", options: ["belt", "tie", "strap", "band"], a: "belt", explain: "'Belt' = thắt lưng.", unit: "Unit 24" },
+            { q: "This shirt is made of pure ______.", options: ["cotton", "wood", "metal", "plant"], a: "cotton", explain: "'Cotton' = vải bông.", unit: "Unit 24" },
+            { q: "Everyone wore a ______ to the Halloween party.", options: ["costume", "uniform", "suit", "dress"], a: "costume", explain: "'Costume' = trang phục hóa trang.", unit: "Unit 24" },
+            { q: "He decided to ______ his hair red.", options: ["color", "paint", "dye", "stain"], a: "dye", explain: "'Dye' = nhuộm (tóc/vải).", unit: "Unit 24" },
+            { q: "She is wearing beautiful gold ______.", options: ["ears", "earrings", "rings", "necklaces"], a: "earrings", explain: "'Earrings' = bông tai.", unit: "Unit 24" },
+            { q: "These high ______ are difficult to walk in.", options: ["heels", "shoes", "boots", "feet"], a: "heels", explain: "'High heels' = giày cao gót.", unit: "Unit 24" },
+            { q: "It's cold, put on a ______.", options: ["jumper", "shirt", "blouse", "t-shirt"], a: "jumper", explain: "'Jumper' (hoặc sweater) = áo len chui đầu.", unit: "Unit 24" },
+            { q: "These trousers are too ______; I need a belt.", options: ["loose", "tight", "big", "long"], a: "loose", explain: "'Loose' = rộng thùng thình.", unit: "Unit 24" },
+            { q: "This shirt is too ______; I can't breathe.", options: ["tight", "loose", "small", "short"], a: "tight", explain: "'Tight' = chật.", unit: "Unit 24" },
+            { q: "What ______ is this bag made of?", options: ["matter", "material", "cloth", "fabric"], a: "material", explain: "'Material' = chất liệu.", unit: "Unit 24" },
+            { q: "I like the floral ______ on your dress.", options: ["model", "pattern", "design", "style"], a: "pattern", explain: "'Pattern' = hoa văn/họa tiết.", unit: "Unit 24" },
+            { q: "I stay in my ______ all Sunday morning.", options: ["pyjamas", "suit", "uniform", "clothes"], a: "pyjamas", explain: "'Pyjamas' = đồ ngủ.", unit: "Unit 24" },
+            { q: "He rolled up his ______ to work.", options: ["sleeves", "arms", "hands", "shirts"], a: "sleeves", explain: "'Sleeves' = tay áo.", unit: "Unit 24" },
+            { q: "He wore a ______ shirt.", options: ["striped", "stripe", "line", "lined"], a: "striped", explain: "'Striped' = có kẻ sọc.", unit: "Unit 24" },
+            { q: "The doctor asked him to ______.", options: ["undress", "dress", "unwear", "take off"], a: "undress", explain: "'Undress' = cởi quần áo.", unit: "Unit 24" },
+            { q: "That hat is very ______-fashioned.", options: ["old", "past", "ancient", "aged"], a: "old", explain: "'Old-fashioned' = lỗi thời.", unit: "Unit 24" },
+            { q: "She put her keys in her ______.", options: ["bag", "pocket", "wallet", "case"], a: "pocket", explain: "'Pocket' = túi quần/áo.", unit: "Unit 24" },
+
+            // Unit 27: Working & Earning (Business/Jobs)
+            { q: "His ______ is to become a pilot.", options: ["ambition", "dream", "hope", "wish"], a: "ambition", explain: "'Ambition' = tham vọng/hoài bão.", unit: "Unit 27" },
+            { q: "You have to sign the ______ before you start.", options: ["paper", "contract", "agreement", "deal"], a: "contract", explain: "'Contract' = hợp đồng lao động.", unit: "Unit 27" },
+            { q: "The hotel ______ were very friendly.", options: ["staff", "members", "workers", "crew"], a: "staff", explain: "'Staff' = đội ngũ nhân viên (danh từ tập hợp).", unit: "Unit 27" },
+            { q: "I'll check my ______ to see if I'm free.", options: ["diary", "journal", "book", "calendar"], a: "diary", explain: "'Diary' = sổ nhật ký/lịch trình.", unit: "Unit 27" },
+            { q: "He keeps all the documents in a red ______.", options: ["file", "box", "case", "bag"], a: "file", explain: "'File' = tập hồ sơ tài liệu.", unit: "Unit 27" },
+            { q: "It's difficult to ______ a large team.", options: ["control", "manage", "rule", "lead"], a: "manage", explain: "'Manage' = quản lý.", unit: "Unit 27" },
+            { q: "He lives on a state ______ now that he is old.", options: ["pension", "salary", "wage", "money"], a: "pension", explain: "'Pension' = lương hưu.", unit: "Unit 27" },
+            { q: "You have to pay ______ on your earnings.", options: ["tax", "fee", "bill", "cost"], a: "tax", explain: "'Tax' = thuế.", unit: "Unit 27" },
+            { q: "Many people in the world live in ______.", options: ["poor", "poverty", "hunger", "need"], a: "poverty", explain: "'Poverty' = sự nghèo đói.", unit: "Unit 27" },
+            { q: "Health is better than ______.", options: ["rich", "money", "wealth", "gold"], a: "wealth", explain: "'Wealth' = sự giàu có/của cải.", unit: "Unit 27" },
+            { q: "Teaching is a noble ______.", options: ["job", "work", "career", "profession"], a: "profession", explain: "'Profession' = nghề nghiệp chuyên môn cao.", unit: "Unit 27" },
+            { q: "He is a born ______.", options: ["leader", "boss", "manager", "head"], a: "leader", explain: "'Leader' = nhà lãnh đạo.", unit: "Unit 27" },
+            { q: "The ______ sentenced him to prison.", options: ["lawyer", "judge", "police", "guard"], a: "judge", explain: "'Judge' = thẩm phán.", unit: "Unit 27" },
+            { q: "The security ______ checked our bags.", options: ["police", "officer", "guard", "man"], a: "guard", explain: "'Security guard' = nhân viên bảo vệ.", unit: "Unit 27" },
+            { q: "She works as a nurse in a private ______.", options: ["hospital", "clinic", "office", "shop"], a: "clinic", explain: "'Clinic' = phòng khám tư.", unit: "Unit 27" },
+            { q: "He is the ______ of the sales department.", options: ["head", "top", "front", "first"], a: "head", explain: "'Head of department' = trưởng phòng.", unit: "Unit 27" }
+        ];
+
+        // --- App State ---
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false; 
+        let selectedAnswer = null; 
+        let userAnswers = [];
+
+        // --- DOM Elements ---
+        const appContent = document.getElementById('app-content');
+        const scoreDisplay = document.getElementById('score-display');
+
+        // --- Utility Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Logic Functions ---
+
+        function startQuiz() {
+            // Shuffle full bank and take first 50 (or less if bank is smaller)
+            const shuffled = shuffleArray([...questionBank]);
+            // Take up to 50 questions for one session
+            const limit = Math.min(50, shuffled.length);
+            currentQuestions = shuffled.slice(0, limit);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            answered = false;
+            selectedAnswer = null;
+
+            scoreDisplay.classList.remove('hidden');
+            updateScoreDisplay();
+            renderQuestion(true); 
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = `Score: ${score}/${currentQuestions.length}`;
+        }
+
+        function handleAnswer(opt) {
+            if (answered) return; 
+
+            answered = true;
+            selectedAnswer = opt;
+            const question = currentQuestions[currentQuestionIndex];
+            const isCorrect = (opt === question.a);
+
+            if (isCorrect) score++;
+
+            userAnswers.push({
+                question: question,
+                selected: opt,
+                isCorrect: isCorrect
+            });
+
+            updateScoreDisplay();
+            renderQuestion(false); 
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                answered = false;
+                selectedAnswer = null;
+                renderQuestion(true); 
+            } else {
+                renderResults();
+            }
+        }
+
+        // --- Render Functions ---
+
+        function renderStartScreen() {
+            scoreDisplay.classList.add('hidden');
+            appContent.innerHTML = `
+                <div class="text-center fade-in space-y-6 flex flex-col items-center justify-center h-full">
+                    <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mb-2">
+                        <i class="fas fa-briefcase text-4xl text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Review: Units 21, 24, 27</h2>
+                        <p class="text-gray-500 text-sm mt-2 max-w-md mx-auto">
+                            Mỗi lượt chơi sẽ lấy ngẫu nhiên 50 câu.
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-500 w-full max-w-sm">
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-paper-plane text-indigo-500 mr-2"></i>Unit 21: Sending</div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-user-clock text-indigo-500 mr-2"></i>Unit 24: Lifestyle</div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-building text-indigo-500 mr-2"></i>Unit 27: Work</div>
+                    </div>
+
+                    <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition transform hover:-translate-y-1 mt-4">
+                        Bắt đầu
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderQuestion(animate = true) {
+            const question = currentQuestions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            
+            const animClass = animate ? "fade-in" : "";
+
+            const optionsHtml = question.options.map((opt, index) => {
+                let btnClass = "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-400";
+                let icon = "";
+                
+                if (answered) {
+                    if (opt === question.a) {
+                        btnClass = "bg-green-100 border-2 border-green-500 text-green-800 font-bold";
+                        icon = '<i class="fas fa-check-circle text-green-600 float-right mt-1"></i>';
+                    } else if (opt === selectedAnswer && opt !== question.a) {
+                        btnClass = "bg-red-50 border-2 border-red-400 text-red-800";
+                        icon = '<i class="fas fa-times-circle text-red-500 float-right mt-1"></i>';
+                    } else {
+                        btnClass = "bg-gray-50 border-gray-100 text-gray-400 opacity-60";
+                    }
+                }
+
+                return `
+                    <button onclick="handleAnswer('${opt}')" 
+                        ${answered ? 'disabled' : ''}
+                        class="option-btn w-full p-4 rounded-xl text-left relative group ${btnClass}">
+                        <span class="inline-block w-6 font-bold opacity-50 mr-2">${String.fromCharCode(65 + index)}.</span>
+                        ${opt}
+                        ${icon}
+                    </button>
+                `;
+            }).join('');
+
+            let feedbackHtml = '';
+            if (answered) {
+                const isCorrect = selectedAnswer === question.a;
+                const feedbackColor = isCorrect ? "text-green-600 bg-green-50 border-green-200" : "text-red-600 bg-red-50 border-red-200";
+                const feedbackIcon = isCorrect ? "fa-check" : "fa-times";
+                const feedbackText = isCorrect ? "Chính xác!" : "Chưa chính xác!";
+
+                feedbackHtml = `
+                    <div class="mt-6 explain-fade">
+                        <div class="${feedbackColor} border rounded-lg p-4 mb-4">
+                            <div class="font-bold flex items-center gap-2 mb-1">
+                                <i class="fas ${feedbackIcon}"></i> ${feedbackText}
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed">
+                                <span class="font-semibold text-indigo-600">Giải thích:</span> ${question.explain}
+                            </p>
+                        </div>
+                        <button onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow transition">
+                            Câu tiếp theo <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="${animClass} w-full max-w-xl mx-auto">
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span>Câu hỏi ${currentQuestionIndex + 1}/${currentQuestions.length}</span>
+                            <span>${Math.round(progress)}%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5">
+                            <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="mb-6">
+                        <span class="inline-block bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mb-2">${question.unit}</span>
+                        <h3 class="text-xl text-gray-800 font-medium leading-relaxed">
+                            ${question.q.replace('______', '<span class="border-b-2 border-indigo-300 text-indigo-600 px-1 mx-1 font-bold">.......</span>')}
+                        </h3>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="grid grid-cols-1 gap-3">
+                        ${optionsHtml}
+                    </div>
+
+                    <!-- Feedback Area -->
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+
+        function renderResults() {
+            scoreDisplay.classList.add('hidden');
+            const total = currentQuestions.length;
+            const percentage = Math.round((score / total) * 100);
+            let message = "";
+            let colorClass = "";
+
+            if (percentage >= 90) { message = "Xuất sắc! Bạn nắm rất vững từ vựng."; colorClass = "text-green-600"; }
+            else if (percentage >= 70) { message = "Làm tốt lắm! Kiến thức khá vững."; colorClass = "text-blue-600"; }
+            else if (percentage >= 50) { message = "Tạm ổn, nhưng cần ôn thêm."; colorClass = "text-yellow-600"; }
+            else { message = "Cần cố gắng nhiều hơn!"; colorClass = "text-red-600"; }
+
+            const wrongList = userAnswers.filter(a => !a.isCorrect);
+            let wrongHtml = '';
+            
+            if (wrongList.length > 0) {
+                wrongHtml = `
+                    <div class="w-full mt-6 text-left border-t pt-4">
+                        <h4 class="font-bold text-gray-700 mb-3">Xem lại các câu sai (${wrongList.length})</h4>
+                        <div class="space-y-3 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                            ${wrongList.map(item => `
+                                <div class="bg-red-50 p-3 rounded border border-red-100 text-sm">
+                                    <p class="text-gray-800 mb-1 font-medium">${item.question.q}</p>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span class="text-red-500">Bạn chọn: ${item.selected}</span>
+                                        <span class="text-green-600 font-bold">Đúng: ${item.question.a}</span>
+                                    </div>
+                                    <p class="text-xs text-indigo-600 mt-1 italic">${item.question.explain}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="text-center fade-in flex flex-col items-center justify-center w-full h-full">
+                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 relative">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="${percentage >= 70 ? 'text-green-500' : 'text-indigo-500'}" stroke-dasharray="${percentage}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                        </svg>
+                        <span class="absolute text-lg font-bold text-gray-700">${score}/${total}</span>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 mb-1">Kết quả</h2>
+                    <p class="${colorClass} font-medium mb-6 text-sm">${message}</p>
+                    
+                    <button onclick="renderStartScreen()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-8 rounded-full shadow transition text-sm">
+                        <i class="fas fa-redo mr-2"></i> Làm lại
+                    </button>
+
+                    ${wrongHtml}
+                </div>
+            `;
+        }
+
+        renderStartScreen();
+
+    </script>
+</body>
+</html>

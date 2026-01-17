@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination B1: Final Review (Units 39, 42 & Mixed)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .explain-fade {
+            animation: fadeInExplain 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInExplain {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Container -->
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden min-h-[600px] flex flex-col relative">
+        
+        <!-- Header -->
+        <div class="bg-gray-800 p-6 text-white text-center flex justify-between items-center relative z-10">
+            <div>
+                <h1 class="text-xl font-bold text-left"><i class="fas fa-flag-checkered mr-2"></i>Destination B1</h1>
+                <p class="text-gray-300 text-xs mt-1 text-left">Final Review: Units 39, 42 & Mixed</p>
+            </div>
+            <div id="score-display" class="hidden bg-gray-700 px-4 py-2 rounded-lg text-sm font-bold border border-gray-600">
+                Score: 0/0
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 p-6 flex flex-col" id="app-content">
+            <!-- Content will be injected here via JS -->
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-3 text-center text-gray-400 text-xs border-t">
+            Interactive Vocabulary & Grammar Quiz
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Database of Questions for Units 39, 42 and General Mixed Review
+        const questionBank = [
+            // --- UNIT 39: Laughing and Crying (Emotions/Personality) ---
+            { q: "That comedian told a really funny ______.", options: ["joke", "lie", "story", "play"], a: "joke", explain: "'Tell a joke' = kể chuyện cười.", unit: "Unit 39" },
+            { q: "She has a great sense of ______.", options: ["humour", "feeling", "laugh", "happy"], a: "humour", explain: "'Sense of humour' = khiếu hài hước.", unit: "Unit 39" },
+            { q: "Don't shout ______ me! It wasn't my fault.", options: ["at", "to", "with", "on"], a: "at", explain: "'Shout at sb' = quát tháo ai (giận dữ). 'Shout to' = gọi to để ai nghe thấy.", unit: "Unit 39" },
+            { q: "I felt so ______ when I dropped my plate in the restaurant.", options: ["ashamed", "embarrassed", "guilty", "nervous"], a: "embarrassed", explain: "'Embarrassed' = xấu hổ/ngượng ngùng (vì tình huống xã hội).", unit: "Unit 39" },
+            { q: "He is ______ of spiders.", options: ["scared", "fear", "angry", "upset"], a: "scared", explain: "'Scared of' = sợ cái gì.", unit: "Unit 39" },
+            { q: "Why are you so ______ with me? What did I do?", options: ["cross", "happy", "excited", "bored"], a: "cross", explain: "'Cross (with sb)' = giận dữ/bực mình (angry).", unit: "Unit 39" },
+            { q: "I'm really ______ about the exam tomorrow.", options: ["anxious", "boring", "enjoy", "lazy"], a: "anxious", explain: "'Anxious' = lo lắng/bồn chồn.", unit: "Unit 39" },
+            { q: "It's a ______ that you can't come to the party.", options: ["pity", "shameful", "sad", "bad"], a: "pity", explain: "'It's a pity' (hoặc shame) = thật đáng tiếc.", unit: "Unit 39" },
+            { q: "She burst into ______ when she heard the news.", options: ["tears", "crying", "sadness", "water"], a: "tears", explain: "'Burst into tears' = òa khóc.", unit: "Unit 39" },
+            { q: "He is in a bad ______ today, so leave him alone.", options: ["mood", "feeling", "temper", "spirit"], a: "mood", explain: "'In a bad mood' = tâm trạng tồi tệ.", unit: "Unit 39" },
+            { q: "I was ______ to see him again.", options: ["delighted", "delicious", "delight", "delighting"], a: "delighted", explain: "'Delighted' = rất vui mừng/hài lòng.", unit: "Unit 39" },
+            { q: "The film was very ______; I fell asleep.", options: ["boring", "bored", "bore", "bores"], a: "boring", explain: "'Boring' (tính từ chủ động) = gây nhàm chán.", unit: "Unit 39" },
+            { q: "I was ______ with the service at the hotel.", options: ["disappointed", "disappointing", "missed", "sad"], a: "disappointed", explain: "'Disappointed' (tính từ bị động) = bị thất vọng.", unit: "Unit 39" },
+            { q: "Don't ______ at people! It's rude.", options: ["laugh", "smile", "look", "watch"], a: "laugh", explain: "'Laugh at sb' = cười nhạo ai đó.", unit: "Unit 39" },
+            { q: "She gave a happy ______.", options: ["smile", "laugh", "cry", "joke"], a: "smile", explain: "'Smile' = nụ cười (mỉm).", unit: "Unit 39" },
+            { q: "Are you ______ about the trip?", options: ["excited", "exciting", "excite", "excitement"], a: "excited", explain: "'Excited about' = hào hứng về.", unit: "Unit 39" },
+            { q: "The children behaved ______ at the party.", options: ["badly", "bad", "worse", "worst"], a: "badly", explain: "'Behave badly' = cư xử tệ.", unit: "Unit 39" },
+
+            // --- UNIT 42: Problems and Solutions ---
+            { q: "You will get into ______ if you steal that.", options: ["trouble", "problem", "difficult", "mess"], a: "trouble", explain: "'Get into trouble' = gặp rắc rối.", unit: "Unit 42" },
+            { q: "I did it by ______, I didn't mean to.", options: ["mistake", "fault", "wrong", "purpose"], a: "mistake", explain: "'By mistake' (hoặc by accident) = vô tình/do nhầm lẫn.", unit: "Unit 42" },
+            { q: "It wasn't my ______! He pushed me.", options: ["fault", "mistake", "error", "blame"], a: "fault", explain: "'It is my fault' = đó là lỗi của tôi.", unit: "Unit 42" },
+            { q: "The car ______ into a tree.", options: ["crashed", "hit", "broke", "knocked"], a: "crashed", explain: "'Crash into' = đâm sầm vào.", unit: "Unit 42" },
+            { q: "There was a long ______ at the bus stop.", options: ["queue", "line", "row", "tail"], a: "queue", explain: "'Queue' = hàng người xếp hàng.", unit: "Unit 42" },
+            { q: "The police ______ the thief.", options: ["arrested", "caught", "took", "held"], a: "arrested", explain: "'Arrest' = bắt giữ (cảnh sát).", unit: "Unit 42" },
+            { q: "You are ______ the law by parking here.", options: ["breaking", "destroying", "damaging", "hitting"], a: "breaking", explain: "'Break the law' = phá luật/phạm luật.", unit: "Unit 42" },
+            { q: "She ______ that she had seen a ghost.", options: ["claimed", "said", "told", "spoke"], a: "claimed", explain: "'Claim' = khẳng định/quả quyết (thường là điều khó tin/chưa chứng thực).", unit: "Unit 42" },
+            { q: "I ______ if he is telling the truth.", options: ["doubt", "believe", "think", "guess"], a: "doubt", explain: "'Doubt' = nghi ngờ.", unit: "Unit 42" },
+            { q: "Make sure you ______ the instructions carefully.", options: ["follow", "do", "make", "listen"], a: "follow", explain: "'Follow instructions' = làm theo hướng dẫn.", unit: "Unit 42" },
+            { q: "He managed to ______ from the burning building.", options: ["escape", "leave", "exit", "go"], a: "escape", explain: "'Escape from' = trốn thoát/thoát khỏi.", unit: "Unit 42" },
+            { q: "Did you do it on ______?", options: ["purpose", "aim", "goal", "intention"], a: "purpose", explain: "'On purpose' = cố tình.", unit: "Unit 42" },
+            { q: "Taking the shortcut was a big ______.", options: ["risk", "danger", "threat", "chance"], a: "risk", explain: "'Take a risk' = mạo hiểm.", unit: "Unit 42" },
+            { q: "The ______ said he was guilty.", options: ["judge", "police", "guard", "lawyer"], a: "judge", explain: "'Judge' = thẩm phán.", unit: "Unit 42" },
+            { q: "Please ______ me if I am wrong.", options: ["correct", "right", "repair", "fix"], a: "correct", explain: "'Correct' (động từ) = sửa cho đúng.", unit: "Unit 42" },
+            { q: "He was ______ with murder.", options: ["charged", "accused", "blamed", "arrested"], a: "charged", explain: "'Charged with' = bị buộc tội (chính thức).", unit: "Unit 42" },
+            { q: "I want to complain ______ the noise.", options: ["about", "for", "of", "with"], a: "about", explain: "'Complain about' = phàn nàn về.", unit: "Unit 42" },
+            { q: "You shouldn't ______ lies.", options: ["tell", "say", "speak", "talk"], a: "tell", explain: "'Tell a lie' (hoặc tell lies) = nói dối.", unit: "Unit 42" },
+            { q: "Try to stay out of ______.", options: ["trouble", "problem", "difficult", "mess"], a: "trouble", explain: "'Stay out of trouble' = tránh xa rắc rối.", unit: "Unit 42" },
+
+            // --- MIXED SCATTERED VOCABULARY (Phrasal Verbs & Collocations not fully covered) ---
+            { q: "I'm looking ______ to my birthday.", options: ["forward", "for", "after", "up"], a: "forward", explain: "'Look forward to' = mong chờ.", unit: "Mixed" },
+            { q: "We have run ______ of milk.", options: ["out", "down", "off", "away"], a: "out", explain: "'Run out of' = hết/cạn kiệt.", unit: "Mixed" },
+            { q: "Can you ______ me a favour?", options: ["do", "make", "give", "take"], a: "do", explain: "'Do a favour' = giúp đỡ ai đó.", unit: "Mixed" },
+            { q: "I don't get ______ with my brother very well.", options: ["on", "up", "in", "by"], a: "on", explain: "'Get on (well) with' = hòa thuận với.", unit: "Mixed" },
+            { q: "He ______ up a story about being a spy.", options: ["made", "did", "put", "set"], a: "made", explain: "'Make up' = bịa đặt (câu chuyện).", unit: "Mixed" },
+            { q: "The caterpillar turned ______ a butterfly.", options: ["into", "to", "in", "on"], a: "into", explain: "'Turn into' = biến thành.", unit: "Mixed" },
+            { q: "I can't put ______ with this noise anymore.", options: ["up", "on", "in", "out"], a: "up", explain: "'Put up with' = chịu đựng.", unit: "Mixed" },
+            { q: "Please ______ off your shoes.", options: ["take", "put", "get", "make"], a: "take", explain: "'Take off' = cởi ra.", unit: "Mixed" },
+            { q: "I need to ______ up this word in the dictionary.", options: ["look", "find", "search", "get"], a: "look", explain: "'Look up' = tra cứu.", unit: "Mixed" },
+            { q: "Don't ______ fun of him.", options: ["make", "do", "have", "take"], a: "make", explain: "'Make fun of' = chế giễu.", unit: "Mixed" },
+            { q: "She is ______ of hearing.", options: ["hard", "bad", "difficult", "tough"], a: "hard", explain: "'Hard of hearing' = lãng tai/nghe kém.", unit: "Mixed" },
+            { q: "It depends ______ the weather.", options: ["on", "of", "from", "with"], a: "on", explain: "'Depend on' = phụ thuộc vào.", unit: "Mixed" },
+            { q: "He is famous ______ his singing.", options: ["for", "of", "about", "with"], a: "for", explain: "'Famous for' = nổi tiếng về.", unit: "Mixed" },
+            { q: "I am fed ______ with this rain.", options: ["up", "on", "in", "out"], a: "up", explain: "'Fed up with' = chán ngấy.", unit: "Mixed" },
+            { q: "This bag belongs ______ me.", options: ["to", "for", "with", "at"], a: "to", explain: "'Belong to' = thuộc về.", unit: "Mixed" },
+            { q: "I applied ______ a job at the bank.", options: ["for", "to", "with", "at"], a: "for", explain: "'Apply for' = nộp đơn xin.", unit: "Mixed" },
+            { q: "He succeeded ______ opening the door.", options: ["in", "on", "at", "to"], a: "in", explain: "'Succeed in + Ving' = thành công trong việc gì.", unit: "Mixed" },
+            { q: "I am tired ______ waiting.", options: ["of", "from", "with", "about"], a: "of", explain: "'Tired of' = chán/mệt mỏi vì.", unit: "Mixed" },
+            { q: "Prevent him ______ falling.", options: ["from", "of", "for", "to"], a: "from", explain: "'Prevent sb from Ving' = ngăn ai làm gì.", unit: "Mixed" },
+            { q: "I prefer tea ______ coffee.", options: ["to", "than", "from", "over"], a: "to", explain: "'Prefer A to B' = thích A hơn B.", unit: "Mixed" },
+            { q: "What's wrong ______ your car?", options: ["with", "about", "of", "for"], a: "with", explain: "'Wrong with' = có vấn đề gì với.", unit: "Mixed" },
+            { q: "She is married ______ a doctor.", options: ["to", "with", "for", "by"], a: "to", explain: "'Married to' = kết hôn với.", unit: "Mixed" },
+            { q: "I am satisfied ______ my results.", options: ["with", "about", "for", "of"], a: "with", explain: "'Satisfied with' = hài lòng với.", unit: "Mixed" },
+            { q: "Translate this ______ English.", options: ["into", "to", "in", "for"], a: "into", explain: "'Translate into' = dịch sang.", unit: "Mixed" },
+            { q: "It reminds me ______ home.", options: ["of", "about", "for", "to"], a: "of", explain: "'Remind sb of' = gợi nhớ về.", unit: "Mixed" },
+
+            // --- MORE SCATTERED / CONFUSING WORDS ---
+            { q: "Can I ______ some money from you?", options: ["borrow", "lend", "rent", "hire"], a: "borrow", explain: "'Borrow' = mượn (từ ai).", unit: "Mixed" },
+            { q: "Can you ______ me your pen?", options: ["lend", "borrow", "give", "take"], a: "lend", explain: "'Lend' = cho mượn.", unit: "Mixed" },
+            { q: "He ______ the bank yesterday.", options: ["robbed", "stole", "thieved", "took"], a: "robbed", explain: "'Rob' = cướp (ngân hàng/người - dùng bạo lực/đe dọa). 'Steal' = trộm (đồ vật).", unit: "Mixed" },
+            { q: "Someone ______ my wallet.", options: ["stole", "robbed", "took", "mugged"], a: "stole", explain: "'Steal' + vật bị mất.", unit: "Mixed" },
+            { q: "Please ______ me to call her.", options: ["remind", "remember", "forget", "recall"], a: "remind", explain: "'Remind' = nhắc nhở.", unit: "Mixed" },
+            { q: "I don't ______ his name.", options: ["remember", "remind", "memory", "forget"], a: "remember", explain: "'Remember' = nhớ.", unit: "Mixed" },
+            { q: "I ______ music to films.", options: ["prefer", "rather", "like", "love"], a: "prefer", explain: "'Prefer' = thích hơn.", unit: "Mixed" },
+            { q: "I would ______ stay at home.", options: ["rather", "prefer", "like", "want"], a: "rather", explain: "'Would rather + V nguyên thể'.", unit: "Mixed" },
+            { q: "She ______ me a story.", options: ["told", "said", "spoke", "talked"], a: "told", explain: "'Tell' + sb + sth.", unit: "Mixed" },
+            { q: "He ______ that he was tired.", options: ["said", "told", "spoke", "talked"], a: "said", explain: "'Say' + (that) + clause.", unit: "Mixed" },
+            { q: "Can you ______ English?", options: ["speak", "say", "talk", "tell"], a: "speak", explain: "'Speak' + ngôn ngữ.", unit: "Mixed" },
+            { q: "We ______ about politics all night.", options: ["talked", "said", "told", "spoke"], a: "talked", explain: "'Talk about' = trò chuyện về.", unit: "Mixed" },
+            { q: "The ______ was very high.", options: ["price", "cost", "value", "expense"], a: "price", explain: "'Price' = giá tiền (của sản phẩm).", unit: "Mixed" },
+            { q: "The cost of ______ is rising.", options: ["living", "life", "live", "alive"], a: "living", explain: "'Cost of living' = chi phí sinh hoạt.", unit: "Mixed" },
+            { q: "I missed the last ______ home.", options: ["bus", "car", "taxi", "driver"], a: "bus", explain: "'Miss the bus/train' = lỡ xe.", unit: "Mixed" },
+            { q: "I ______ my way in the city.", options: ["lost", "missed", "failed", "dropped"], a: "lost", explain: "'Lose one's way' = lạc đường.", unit: "Mixed" },
+            { q: "Have you ______ your homework?", options: ["done", "made", "worked", "created"], a: "done", explain: "'Do homework' (not make).", unit: "Mixed" },
+            { q: "I made a ______ to help him.", options: ["promise", "word", "truth", "lie"], a: "promise", explain: "'Make a promise' = hứa.", unit: "Mixed" },
+            { q: "Take a ______ if you are tired.", options: ["break", "rest", "stop", "pause"], a: "break", explain: "'Take a break' = nghỉ giải lao.", unit: "Mixed" },
+            { q: "Catch a ______.", options: ["cold", "ill", "sick", "pain"], a: "cold", explain: "'Catch a cold' = bị cảm lạnh.", unit: "Mixed" },
+            { q: "Pay ______ to the teacher.", options: ["attention", "intention", "notice", "care"], a: "attention", explain: "'Pay attention' = chú ý.", unit: "Mixed" },
+            { q: "Save ______ for a rainy day.", options: ["money", "cash", "coin", "note"], a: "money", explain: "'Save money' = tiết kiệm tiền.", unit: "Mixed" },
+            { q: "Keep a ______.", options: ["secret", "quiet", "silence", "hush"], a: "secret", explain: "'Keep a secret' = giữ bí mật.", unit: "Mixed" },
+            { q: "Come ______ time.", options: ["on", "in", "at", "by"], a: "on", explain: "'On time' = đúng giờ.", unit: "Mixed" },
+            { q: "In ______ of the rain, we went out.", options: ["spite", "despite", "although", "even"], a: "spite", explain: "'In spite of' = mặc dù.", unit: "Mixed" },
+            { q: "______ of the fact that it was raining.", options: ["Regardless", "Despite", "Although", "However"], a: "Regardless", explain: "'Regardless of' = bất chấp/bất kể.", unit: "Mixed" },
+            { q: "According ______ the news.", options: ["to", "with", "by", "for"], a: "to", explain: "'According to' = theo như.", unit: "Mixed" },
+            { q: "Instead ______ going out, we stayed in.", options: ["of", "to", "for", "with"], a: "of", explain: "'Instead of' = thay vì.", unit: "Mixed" },
+            { q: "Apart ______ that, I'm fine.", options: ["from", "of", "for", "with"], a: "from", explain: "'Apart from' = ngoại trừ việc đó ra.", unit: "Mixed" },
+            { q: "I am ______ charge of this team.", options: ["in", "on", "at", "with"], a: "in", explain: "'In charge of' = phụ trách/chịu trách nhiệm.", unit: "Mixed" },
+            { q: "We are ______ of stock.", options: ["out", "off", "away", "down"], a: "out", explain: "'Out of stock' = hết hàng.", unit: "Mixed" },
+            { q: "The lift is out of ______.", options: ["order", "work", "job", "function"], a: "order", explain: "'Out of order' = bị hỏng.", unit: "Mixed" },
+            { q: "I did it on my ______.", options: ["own", "self", "personal", "private"], a: "own", explain: "'On my own' = tự mình làm.", unit: "Mixed" },
+            { q: "Are you ______ a hurry?", options: ["in", "on", "at", "with"], a: "in", explain: "'In a hurry' = đang vội.", unit: "Mixed" },
+            { q: "For ______.", options: ["instance", "example", "sample", "case"], a: "instance", explain: "'For instance' = ví dụ (như for example).", unit: "Mixed" },
+            { q: "In ______.", options: ["general", "common", "usual", "normal"], a: "general", explain: "'In general' = nhìn chung.", unit: "Mixed" },
+            { q: "At ______.", options: ["least", "last", "less", "list"], a: "least", explain: "'At least' = ít nhất.", unit: "Mixed" },
+            { q: "At ______.", options: ["last", "end", "final", "finish"], a: "last", explain: "'At last' = cuối cùng thì (sau khi chờ đợi).", unit: "Mixed" },
+            { q: "By the ______.", options: ["way", "road", "street", "path"], a: "way", explain: "'By the way' = nhân tiện.", unit: "Mixed" }
+        ];
+
+        // --- App State ---
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false; 
+        let selectedAnswer = null; 
+        let userAnswers = [];
+
+        // --- DOM Elements ---
+        const appContent = document.getElementById('app-content');
+        const scoreDisplay = document.getElementById('score-display');
+
+        // --- Utility Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Logic Functions ---
+
+        function startQuiz() {
+            // Shuffle full bank and take first 50
+            const shuffled = shuffleArray([...questionBank]);
+            // Take up to 50 questions for one session
+            const limit = Math.min(50, shuffled.length);
+            currentQuestions = shuffled.slice(0, limit);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            answered = false;
+            selectedAnswer = null;
+
+            scoreDisplay.classList.remove('hidden');
+            updateScoreDisplay();
+            renderQuestion(true); 
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = `Score: ${score}/${currentQuestions.length}`;
+        }
+
+        function handleAnswer(opt) {
+            if (answered) return; 
+
+            answered = true;
+            selectedAnswer = opt;
+            const question = currentQuestions[currentQuestionIndex];
+            const isCorrect = (opt === question.a);
+
+            if (isCorrect) score++;
+
+            userAnswers.push({
+                question: question,
+                selected: opt,
+                isCorrect: isCorrect
+            });
+
+            updateScoreDisplay();
+            renderQuestion(false); 
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                answered = false;
+                selectedAnswer = null;
+                renderQuestion(true); 
+            } else {
+                renderResults();
+            }
+        }
+
+        // --- Render Functions ---
+
+        function renderStartScreen() {
+            scoreDisplay.classList.add('hidden');
+            appContent.innerHTML = `
+                <div class="text-center fade-in space-y-6 flex flex-col items-center justify-center h-full">
+                    <div class="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mb-2 border-4 border-gray-200">
+                        <i class="fas fa-layer-group text-4xl text-gray-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Final Review</h2>
+                        <p class="text-gray-500 text-sm mt-2 max-w-md mx-auto">
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-500 w-full max-w-sm">
+                        <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 text-indigo-800"><i class="fas fa-laugh-beam mr-2"></i>Unit 39: Emotions</div>
+                        <div class="bg-red-50 p-3 rounded-lg border border-red-100 text-red-800"><i class="fas fa-exclamation-triangle mr-2"></i>Unit 42: Problems</div>
+                        <div class="bg-green-50 p-3 rounded-lg border border-green-100 text-green-800 col-span-1 sm:col-span-2"><i class="fas fa-random mr-2"></i>Mixed Phrasal Verbs & Collocations</div>
+                    </div>
+
+                    <button onclick="startQuiz()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-10 rounded-full shadow-lg transition transform hover:-translate-y-1 mt-4">
+                        Bắt đầu làm bài
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderQuestion(animate = true) {
+            const question = currentQuestions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            
+            const animClass = animate ? "fade-in" : "";
+
+            const optionsHtml = question.options.map((opt, index) => {
+                let btnClass = "bg-white border-2 border-gray-200 text-gray-700 hover:border-gray-400";
+                let icon = "";
+                
+                if (answered) {
+                    if (opt === question.a) {
+                        btnClass = "bg-green-100 border-2 border-green-500 text-green-800 font-bold";
+                        icon = '<i class="fas fa-check-circle text-green-600 float-right mt-1"></i>';
+                    } else if (opt === selectedAnswer && opt !== question.a) {
+                        btnClass = "bg-red-50 border-2 border-red-400 text-red-800";
+                        icon = '<i class="fas fa-times-circle text-red-500 float-right mt-1"></i>';
+                    } else {
+                        btnClass = "bg-gray-50 border-gray-100 text-gray-400 opacity-60";
+                    }
+                }
+
+                return `
+                    <button onclick="handleAnswer('${opt}')" 
+                        ${answered ? 'disabled' : ''}
+                        class="option-btn w-full p-4 rounded-xl text-left relative group ${btnClass}">
+                        <span class="inline-block w-6 font-bold opacity-50 mr-2">${String.fromCharCode(65 + index)}.</span>
+                        ${opt}
+                        ${icon}
+                    </button>
+                `;
+            }).join('');
+
+            let feedbackHtml = '';
+            if (answered) {
+                const isCorrect = selectedAnswer === question.a;
+                const feedbackColor = isCorrect ? "text-green-600 bg-green-50 border-green-200" : "text-red-600 bg-red-50 border-red-200";
+                const feedbackIcon = isCorrect ? "fa-check" : "fa-times";
+                const feedbackText = isCorrect ? "Chính xác!" : "Chưa chính xác!";
+
+                feedbackHtml = `
+                    <div class="mt-6 explain-fade">
+                        <div class="${feedbackColor} border rounded-lg p-4 mb-4">
+                            <div class="font-bold flex items-center gap-2 mb-1">
+                                <i class="fas ${feedbackIcon}"></i> ${feedbackText}
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed">
+                                <span class="font-semibold text-gray-800">Giải thích:</span> ${question.explain}
+                            </p>
+                        </div>
+                        <button onclick="nextQuestion()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-lg shadow transition">
+                            Câu tiếp theo <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="${animClass} w-full max-w-xl mx-auto">
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span>Câu hỏi ${currentQuestionIndex + 1}/${currentQuestions.length}</span>
+                            <span>${Math.round(progress)}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                            <div class="bg-gray-600 h-1.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="mb-6">
+                        <span class="inline-block bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mb-2">${question.unit}</span>
+                        <h3 class="text-xl text-gray-800 font-medium leading-relaxed">
+                            ${question.q.replace('______', '<span class="border-b-2 border-gray-400 text-gray-600 px-1 mx-1 font-bold">.......</span>')}
+                        </h3>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="grid grid-cols-1 gap-3">
+                        ${optionsHtml}
+                    </div>
+
+                    <!-- Feedback Area -->
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+
+        function renderResults() {
+            scoreDisplay.classList.add('hidden');
+            const total = currentQuestions.length;
+            const percentage = Math.round((score / total) * 100);
+            let message = "";
+            let colorClass = "";
+
+            if (percentage >= 90) { message = "Xuất sắc! Bạn đã chinh phục Destination B1."; colorClass = "text-green-600"; }
+            else if (percentage >= 70) { message = "Làm tốt lắm! Kiến thức khá vững."; colorClass = "text-blue-600"; }
+            else if (percentage >= 50) { message = "Tạm ổn, hãy ôn lại những từ hay sai."; colorClass = "text-yellow-600"; }
+            else { message = "Cần cố gắng nhiều hơn!"; colorClass = "text-red-600"; }
+
+            const wrongList = userAnswers.filter(a => !a.isCorrect);
+            let wrongHtml = '';
+            
+            if (wrongList.length > 0) {
+                wrongHtml = `
+                    <div class="w-full mt-6 text-left border-t pt-4">
+                        <h4 class="font-bold text-gray-700 mb-3">Xem lại các câu sai (${wrongList.length})</h4>
+                        <div class="space-y-3 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                            ${wrongList.map(item => `
+                                <div class="bg-red-50 p-3 rounded border border-red-100 text-sm">
+                                    <p class="text-gray-800 mb-1 font-medium">${item.question.q}</p>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span class="text-red-500">Bạn chọn: ${item.selected}</span>
+                                        <span class="text-green-600 font-bold">Đúng: ${item.question.a}</span>
+                                    </div>
+                                    <p class="text-xs text-indigo-600 mt-1 italic">${item.question.explain}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="text-center fade-in flex flex-col items-center justify-center w-full h-full">
+                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 relative">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="${percentage >= 70 ? 'text-green-500' : 'text-gray-500'}" stroke-dasharray="${percentage}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                        </svg>
+                        <span class="absolute text-lg font-bold text-gray-700">${score}/${total}</span>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 mb-1">Kết quả</h2>
+                    <p class="${colorClass} font-medium mb-6 text-sm">${message}</p>
+                    
+                    <button onclick="renderStartScreen()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-8 rounded-full shadow transition text-sm">
+                        <i class="fas fa-redo mr-2"></i> Làm lại
+                    </button>
+
+                    ${wrongHtml}
+                </div>
+            `;
+        }
+
+        renderStartScreen();
+
+    </script>
+</body>
+</html>

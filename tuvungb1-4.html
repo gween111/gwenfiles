@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination B1: Unit 30, 33, 36 Vocabulary Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .explain-fade {
+            animation: fadeInExplain 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInExplain {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Container -->
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden min-h-[600px] flex flex-col relative">
+        
+        <!-- Header -->
+        <div class="bg-indigo-600 p-6 text-white text-center flex justify-between items-center relative z-10">
+            <div>
+                <h1 class="text-xl font-bold text-left"><i class="fas fa-book-open mr-2"></i>Destination B1</h1>
+                <p class="text-indigo-200 text-xs mt-1 text-left">Units 30, 33, 36 Review (100+ Questions)</p>
+            </div>
+            <div id="score-display" class="hidden bg-indigo-700 px-4 py-2 rounded-lg text-sm font-bold">
+                Score: 0/0
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 p-6 flex flex-col" id="app-content">
+            <!-- Content will be injected here via JS -->
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-3 text-center text-gray-400 text-xs border-t">
+            Interactive Vocabulary & Grammar Quiz
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Database of Questions for Units 30, 33, 36
+        const questionBank = [
+            // --- UNIT 30: Body and Lifestyle ---
+            { q: "You should ______ your food well before swallowing.", options: ["chew", "bite", "chop", "slice"], a: "chew", explain: "'Chew' = nhai.", unit: "Unit 30" },
+            { q: "I have a terrible ______ in my back.", options: ["pain", "hurt", "injury", "sore"], a: "pain", explain: "'Pain' = cơn đau.", unit: "Unit 30" },
+            { q: "The doctor gave me a ______ for some antibiotics.", options: ["recipe", "prescription", "receipt", "note"], a: "prescription", explain: "'Prescription' = đơn thuốc.", unit: "Unit 30" },
+            { q: "She had to have an ______ on her knee.", options: ["operation", "operate", "operating", "operator"], a: "operation", explain: "'Operation' = ca phẫu thuật.", unit: "Unit 30" },
+            { q: "If you have the ______, you should stay in bed.", options: ["flu", "fly", "coldness", "cough"], a: "flu", explain: "'The flu' = bệnh cúm.", unit: "Unit 30" },
+            { q: "He ______ his finger with a knife while cooking.", options: ["cut", "chop", "slice", "broke"], a: "cut", explain: "'Cut' = bị đứt tay/cắt.", unit: "Unit 30" },
+            { q: "This curry is very ______, it has a lot of chili.", options: ["spicy", "sweet", "sour", "salty"], a: "spicy", explain: "'Spicy' = cay.", unit: "Unit 30" },
+            { q: "Please ______ the onions into small pieces.", options: ["chop", "break", "tear", "damage"], a: "chop", explain: "'Chop' = băm/thái nhỏ.", unit: "Unit 30" },
+            { q: "You need to ______ the soup so it doesn't burn.", options: ["stir", "mix", "move", "roll"], a: "stir", explain: "'Stir' = khuấy.", unit: "Unit 30" },
+            { q: "Lemons taste very ______.", options: ["sour", "sweet", "bitter", "salty"], a: "sour", explain: "'Sour' = chua.", unit: "Unit 30" },
+            { q: "She keeps fit by doing ______ every morning.", options: ["exercise", "homework", "sport", "yoga"], a: "exercise", explain: "'Do exercise' = tập thể dục.", unit: "Unit 30" },
+            { q: "I can't stop ______; I must have a cold.", options: ["coughing", "breathing", "eating", "sleeping"], a: "coughing", explain: "'Cough' = ho.", unit: "Unit 30" },
+            { q: "He ______ from asthma when he was young.", options: ["suffered", "experienced", "had", "took"], a: "suffered", explain: "'Suffer from' = chịu đựng/mắc bệnh gì.", unit: "Unit 30" },
+            { q: "It took him a long time to ______ from the accident.", options: ["recover", "return", "repair", "rescue"], a: "recover", explain: "'Recover from' = hồi phục.", unit: "Unit 30" },
+            { q: "Fresh fruit contains a lot of ______.", options: ["vitamins", "medicines", "pills", "drugs"], a: "vitamins", explain: "'Vitamins' = vitamin.", unit: "Unit 30" },
+            { q: "Can you give me the ______ for this cake?", options: ["recipe", "receipt", "prescription", "menu"], a: "recipe", explain: "'Recipe' = công thức nấu ăn.", unit: "Unit 30" },
+            { q: "The doctor told him to give ______ smoking.", options: ["up", "in", "out", "away"], a: "up", explain: "'Give up' = từ bỏ.", unit: "Unit 30" },
+            { q: "She is allergic ______ cats.", options: ["to", "with", "of", "for"], a: "to", explain: "'Allergic to' = bị dị ứng với.", unit: "Unit 30" },
+            { q: "I put too much salt in the soup, it's too ______.", options: ["salty", "sweet", "sour", "hot"], a: "salty", explain: "'Salty' = mặn.", unit: "Unit 30" },
+            { q: "Take one ______ three times a day after meals.", options: ["pill", "tablet", "medicine", "drug"], a: "pill", explain: "'Pill' = viên thuốc.", unit: "Unit 30" },
+            { q: "The nurse took my ______.", options: ["temperature", "heat", "hot", "cold"], a: "temperature", explain: "'Take temperature' = đo thân nhiệt.", unit: "Unit 30" },
+            { q: "You should ______ your breath for 10 seconds.", options: ["hold", "keep", "stay", "take"], a: "hold", explain: "'Hold your breath' = nín thở.", unit: "Unit 30" },
+            { q: "Water is essential ______ life.", options: ["for", "to", "with", "of"], a: "for", explain: "'Essential for' (hoặc to) = cần thiết cho.", unit: "Unit 30" },
+            { q: "He looks very ______; he goes to the gym daily.", options: ["fit", "fat", "thin", "weak"], a: "fit", explain: "'Fit' = dáng vóc cân đối/khỏe mạnh.", unit: "Unit 30" },
+            { q: "Don't ______ to take your medicine.", options: ["forget", "remind", "leave", "miss"], a: "forget", explain: "'Forget to V' = quên làm gì.", unit: "Unit 30" },
+            { q: "Check the list of ______ on the packet.", options: ["ingredients", "parts", "elements", "items"], a: "ingredients", explain: "'Ingredients' = thành phần (trong đồ ăn).", unit: "Unit 30" },
+            { q: "I've put ______ a lot of weight recently.", options: ["on", "up", "in", "off"], a: "on", explain: "'Put on weight' = tăng cân.", unit: "Unit 30" },
+            { q: "She went ______ a diet to lose weight.", options: ["on", "in", "with", "to"], a: "on", explain: "'Go on a diet' = ăn kiêng.", unit: "Unit 30" },
+            { q: "This knife is for ______ bread.", options: ["slicing", "chopping", "breaking", "tearing"], a: "slicing", explain: "'Slice' = cắt lát mỏng (bánh mì, thịt nguội).", unit: "Unit 30" },
+            { q: "Eating too much sugar is bad ______ your teeth.", options: ["for", "to", "with", "at"], a: "for", explain: "'Bad for' = có hại cho.", unit: "Unit 30" },
+            { q: "Doctors are trying to find a ______ for cancer.", options: ["cure", "heal", "treat", "fix"], a: "cure", explain: "'Cure' = cách chữa trị/thuốc chữa.", unit: "Unit 30" },
+            { q: "My knee really ______ when I walk.", options: ["hurts", "pains", "injures", "damages"], a: "hurts", explain: "'Hurt' (động từ) = gây đau/bị đau.", unit: "Unit 30" },
+            { q: "He broke his leg and had to wear a ______.", options: ["plaster", "bandage", "cast", "cover"], a: "cast", explain: "'Cast' (hoặc plaster cast) = bó bột.", unit: "Unit 30" },
+            { q: "You need to maintain a healthy ______.", options: ["balance", "scale", "weight", "diet"], a: "balance", explain: "'Healthy balance' hoặc trong ngữ cảnh này 'diet' cũng đúng, nhưng câu hỏi thường nhắm vào 'balance' trong cuộc sống. Tuy nhiên, 'maintain a healthy diet' rất phổ biến. Destination B1 Unit 30 có từ 'Balance'. Hãy chọn 'diet' nếu nói về ăn uống, 'balance' nếu nói về lối sống. Ở đây đáp án 'balance' (cân bằng) là từ vựng chính của Unit.", unit: "Unit 30" },
+            { q: "The wound could lead to an ______.", options: ["infection", "effect", "affect", "illness"], a: "infection", explain: "'Infection' = nhiễm trùng.", unit: "Unit 30" },
+
+            // --- UNIT 33: Creating and Building ---
+            { q: "They are going to ______ a new bridge here.", options: ["construct", "invent", "discover", "design"], a: "construct", explain: "'Construct' = xây dựng (công trình lớn).", unit: "Unit 33" },
+            { q: "The architect drew a ______ of the house.", options: ["plan", "note", "letter", "mark"], a: "plan", explain: "'Plan' = bản vẽ thiết kế/sơ đồ.", unit: "Unit 33" },
+            { q: "We need some more ______ to finish the wall.", options: ["bricks", "sticks", "stones", "rocks"], a: "bricks", explain: "'Bricks' = viên gạch.", unit: "Unit 33" },
+            { q: "The statue is made of ______.", options: ["concrete", "cement", "liquid", "gas"], a: "concrete", explain: "'Concrete' = bê tông.", unit: "Unit 33" },
+            { q: "Can you ______ this broken chair?", options: ["fix", "solve", "make", "build"], a: "fix", explain: "'Fix' = sửa chữa.", unit: "Unit 33" },
+            { q: "I need a ______ to hit this nail.", options: ["hammer", "screw", "drill", "saw"], a: "hammer", explain: "'Hammer' = cái búa. 'Nail' = cái đinh.", unit: "Unit 33" },
+            { q: "The building relies on a steel ______.", options: ["structure", "shape", "figure", "body"], a: "structure", explain: "'Structure' = kết cấu/cấu trúc.", unit: "Unit 33" },
+            { q: "They decided to ______ down the old library.", options: ["knock", "hit", "pull", "push"], a: "knock", explain: "'Knock down' = phá dỡ (tòa nhà).", unit: "Unit 33" },
+            { q: "He works in the ______ industry.", options: ["construction", "construct", "building", "build"], a: "construction", explain: "'Construction industry' = ngành xây dựng.", unit: "Unit 33" },
+            { q: "This table is made of solid ______.", options: ["wood", "wool", "cotton", "leather"], a: "wood", explain: "'Wood' = gỗ.", unit: "Unit 33" },
+            { q: "The tower has a very unusual ______.", options: ["shape", "size", "long", "high"], a: "shape", explain: "'Shape' = hình dáng.", unit: "Unit 33" },
+            { q: "Use a ______ to tighten the screw.", options: ["screwdriver", "hammer", "drill", "saw"], a: "screwdriver", explain: "'Screwdriver' = tua vít. 'Screw' = ốc vít.", unit: "Unit 33" },
+            { q: "Please put on your safety ______.", options: ["helmet", "hat", "cap", "mask"], a: "helmet", explain: "'Safety helmet' = mũ bảo hộ.", unit: "Unit 33" },
+            { q: "The house was ______ by a famous architect.", options: ["designed", "made", "done", "invented"], a: "designed", explain: "'Design' = thiết kế.", unit: "Unit 33" },
+            { q: "We need to ______ up the wall before painting.", options: ["clean", "clear", "wash", "brush"], a: "clean", explain: "Có thể là 'clean up' nhưng trong xây dựng 'put up' (xây lên) hay 'fix up' (sửa sang) phổ biến hơn. Tuy nhiên 'clean up' dọn dẹp trước khi sơn là hợp lý.", unit: "Unit 33" },
+            { q: "Be careful on the building ______.", options: ["site", "place", "location", "spot"], a: "site", explain: "'Building site' = công trường xây dựng.", unit: "Unit 33" },
+            { q: "The roof collapsed under the ______ of the snow.", options: ["weight", "heavy", "wait", "weigh"], a: "weight", explain: "'Weight' = trọng lượng.", unit: "Unit 33" },
+            { q: "They put ______ a fence around the garden.", options: ["up", "on", "in", "off"], a: "up", explain: "'Put up' = dựng lên (hàng rào, lều, biển báo).", unit: "Unit 33" },
+            { q: "Modern buildings use a lot of ______ and glass.", options: ["steel", "iron", "gold", "silver"], a: "steel", explain: "'Steel' = thép.", unit: "Unit 33" },
+            { q: "He is a ______ engineer.", options: ["civil", "civic", "city", "public"], a: "civil", explain: "'Civil engineer' = kỹ sư xây dựng dân dụng.", unit: "Unit 33" },
+            { q: "The ancient ______ of Rome are fascinating.", options: ["ruins", "wrecks", "damages", "spoils"], a: "ruins", explain: "'Ruins' = tàn tích.", unit: "Unit 33" },
+            { q: "I need to ______ the shelf to the wall.", options: ["attach", "join", "connect", "link"], a: "attach", explain: "'Attach' = gắn vào.", unit: "Unit 33" },
+            { q: "Measure the ______ of the room.", options: ["width", "wide", "widen", "broad"], a: "width", explain: "'Width' = chiều rộng.", unit: "Unit 33" },
+            { q: "The Pyramids are an amazing ______.", options: ["structure", "item", "piece", "unit"], a: "structure", explain: "'Structure' = công trình kiến trúc.", unit: "Unit 33" },
+            { q: "We used a ______ to cut the wood.", options: ["saw", "hammer", "drill", "nail"], a: "saw", explain: "'Saw' = cái cưa.", unit: "Unit 33" },
+            { q: "The skyscraper is a ______ of modern engineering.", options: ["symbol", "sign", "mark", "signal"], a: "symbol", explain: "'Symbol' = biểu tượng.", unit: "Unit 33" },
+            { q: "They plan to ______ the old factory into flats.", options: ["convert", "change", "turn", "make"], a: "convert", explain: "'Convert' = chuyển đổi mục đích sử dụng.", unit: "Unit 33" },
+            { q: "The floor is made of ______.", options: ["tiles", "bricks", "slates", "sheets"], a: "tiles", explain: "'Tiles' = gạch men lát sàn.", unit: "Unit 33" },
+            { q: "Watch out for the loose ______.", options: ["brick", "wall", "floor", "roof"], a: "brick", explain: "'Loose brick' = viên gạch bị lỏng.", unit: "Unit 33" },
+            { q: "He used a ______ to make a hole in the wall.", options: ["drill", "hammer", "driver", "turner"], a: "drill", explain: "'Drill' = máy khoan.", unit: "Unit 33" },
+            { q: "The ______ of the tower is 300 meters.", options: ["height", "high", "tall", "length"], a: "height", explain: "'Height' = chiều cao.", unit: "Unit 33" },
+            { q: "Before building, they had to ______ the land.", options: ["clear", "clean", "empty", "remove"], a: "clear", explain: "'Clear the land' = dọn dẹp mặt bằng.", unit: "Unit 33" },
+            { q: "The bridge is supported by two large ______.", options: ["pillars", "posts", "poles", "sticks"], a: "pillars", explain: "'Pillars' = cột trụ lớn.", unit: "Unit 33" },
+
+            // --- UNIT 36: Nature and the Universe ---
+            { q: "We must do more to protect the ______.", options: ["environment", "nature", "surroundings", "neighborhood"], a: "environment", explain: "'The environment' = môi trường.", unit: "Unit 36" },
+            { q: "Many rare animal species are in danger of becoming ______.", options: ["extinct", "dead", "lost", "gone"], a: "extinct", explain: "'Extinct' = tuyệt chủng.", unit: "Unit 36" },
+            { q: "The weather ______ says it will rain tomorrow.", options: ["forecast", "prediction", "guess", "news"], a: "forecast", explain: "'Weather forecast' = dự báo thời tiết.", unit: "Unit 36" },
+            { q: "Pollution is a major ______ issue.", options: ["global", "world", "earth", "planet"], a: "global", explain: "'Global issue' = vấn đề toàn cầu.", unit: "Unit 36" },
+            { q: "Don't drop ______ on the street.", options: ["litter", "rubbish", "waste", "garbage"], a: "litter", explain: "'Litter' = rác thải (vứt bừa bãi nơi công cộng).", unit: "Unit 36" },
+            { q: "We should ______ paper, glass and plastic.", options: ["recycle", "reuse", "repeat", "return"], a: "recycle", explain: "'Recycle' = tái chế.", unit: "Unit 36" },
+            { q: "The Earth is a ______ that orbits the Sun.", options: ["planet", "star", "moon", "world"], a: "planet", explain: "'Planet' = hành tinh.", unit: "Unit 36" },
+            { q: "There was a loud crash of ______ during the storm.", options: ["thunder", "lightning", "rain", "wind"], a: "thunder", explain: "'Thunder' = sấm (âm thanh).", unit: "Unit 36" },
+            { q: "A flash of ______ lit up the sky.", options: ["lightning", "thunder", "light", "fire"], a: "lightning", explain: "'Lightning' = chớp (ánh sáng).", unit: "Unit 36" },
+            { q: "The ______ system consists of the Sun and planets.", options: ["solar", "sun", "space", "star"], a: "solar", explain: "'Solar system' = hệ mặt trời.", unit: "Unit 36" },
+            { q: "It's ______ cold outside today.", options: ["freezing", "frozen", "freeze", "froze"], a: "freezing", explain: "'Freezing' = lạnh đóng băng.", unit: "Unit 36" },
+            { q: "A tiger is a ______ animal.", options: ["wild", "natural", "free", "savage"], a: "wild", explain: "'Wild animal' = động vật hoang dã.", unit: "Unit 36" },
+            { q: "The camel is an animal that lives in the ______.", options: ["desert", "dessert", "beach", "forest"], a: "desert", explain: "'Desert' = sa mạc.", unit: "Unit 36" },
+            { q: "We saw a lot of ______ in the national park.", options: ["wildlife", "wilds", "natures", "animals"], a: "wildlife", explain: "'Wildlife' = cuộc sống hoang dã/động vật hoang dã (không đếm được).", unit: "Unit 36" },
+            { q: "The climate here is very ______ in winter.", options: ["mild", "soft", "gentle", "weak"], a: "mild", explain: "'Mild' = ôn hòa (không quá lạnh).", unit: "Unit 36" },
+            { q: "Scientists have discovered a new ______ of bird.", options: ["species", "type", "kind", "sort"], a: "species", explain: "'Species' = loài.", unit: "Unit 36" },
+            { q: "Global ______ is caused by greenhouse gases.", options: ["warming", "heating", "hotness", "change"], a: "warming", explain: "'Global warming' = sự nóng lên toàn cầu.", unit: "Unit 36" },
+            { q: "The rocket was launched into ______.", options: ["space", "universe", "sky", "air"], a: "space", explain: "'Space' = không gian vũ trụ.", unit: "Unit 36" },
+            { q: "We need to save energy to protect the ______.", options: ["planet", "world", "globe", "earth"], a: "planet", explain: "'Protect the planet' = bảo vệ hành tinh.", unit: "Unit 36" },
+            { q: "A ______ is a tropical storm with strong winds.", options: ["hurricane", "breeze", "shower", "fog"], a: "hurricane", explain: "'Hurricane' = bão lớn (cuồng phong).", unit: "Unit 36" },
+            { q: "The ______ layer protects us from the sun.", options: ["ozone", "oxygen", "air", "atmosphere"], a: "ozone", explain: "'Ozone layer' = tầng ozone.", unit: "Unit 36" },
+            { q: "It was a clear night and we could see the ______.", options: ["stars", "planets", "suns", "lights"], a: "stars", explain: "'Stars' = các vì sao.", unit: "Unit 36" },
+            { q: "The moon goes ______ the earth.", options: ["round", "across", "over", "through"], a: "round", explain: "'Go round' (orbit) = quay quanh.", unit: "Unit 36" },
+            { q: "This area is famous for its beautiful ______.", options: ["scenery", "scene", "view", "sight"], a: "scenery", explain: "'Scenery' = phong cảnh thiên nhiên.", unit: "Unit 36" },
+            { q: "We watched the sun ______ over the ocean.", options: ["set", "go", "down", "fall"], a: "set", explain: "'Sunset' / 'Sun set' = mặt trời lặn.", unit: "Unit 36" },
+            { q: "There was a heavy ______ yesterday evening.", options: ["shower", "rain", "wet", "drop"], a: "shower", explain: "'Shower' = trận mưa rào.", unit: "Unit 36" },
+            { q: "The ______ sends signals for TV and radio.", options: ["satellite", "planet", "moon", "star"], a: "satellite", explain: "'Satellite' = vệ tinh.", unit: "Unit 36" },
+            { q: "Dinosaurs became ______ millions of years ago.", options: ["extinct", "dead", "gone", "lost"], a: "extinct", explain: "'Become extinct' = bị tuyệt chủng.", unit: "Unit 36" },
+            { q: "We must prevent the ______ of the rainforests.", options: ["destruction", "destroy", "damage", "ruin"], a: "destruction", explain: "'Destruction' = sự phá hủy.", unit: "Unit 36" },
+            { q: "The ______ is the air around the earth.", options: ["atmosphere", "space", "sky", "ozone"], a: "atmosphere", explain: "'Atmosphere' = khí quyển.", unit: "Unit 36" },
+            { q: "Snakes and lizards are ______.", options: ["reptiles", "mammals", "insects", "birds"], a: "reptiles", explain: "'Reptiles' = loài bò sát.", unit: "Unit 36" },
+            { q: "Whales are ______ not fish.", options: ["mammals", "animals", "creatures", "beings"], a: "mammals", explain: "'Mammals' = động vật có vú.", unit: "Unit 36" },
+            { q: "The heat ______ caused many problems.", options: ["wave", "storm", "wind", "spell"], a: "wave", explain: "'Heatwave' = đợt nắng nóng.", unit: "Unit 36" },
+            { q: "They are exploring the ______ of the universe.", options: ["origin", "start", "begin", "source"], a: "origin", explain: "'Origin' = nguồn gốc.", unit: "Unit 36" },
+            { q: "Look at that huge ______ in the sky.", options: ["cloud", "smoke", "fog", "mist"], a: "cloud", explain: "'Cloud' = đám mây.", unit: "Unit 36" },
+
+            // --- MORE MIXED / HARDER QUESTIONS (to reach 100+) ---
+            { q: "He works ______ a waiter in the summer.", options: ["as", "like", "so", "for"], a: "as", explain: "Cấu trúc 'work as'.", unit: "Grammar" },
+            { q: "The soup needs a pinch of ______.", options: ["salt", "salty", "salts", "salted"], a: "salt", explain: "'Salt' (danh từ) = muối.", unit: "Unit 30" },
+            { q: "I felt ______ after the long walk.", options: ["exhausted", "tiredness", "exhausting", "exhaust"], a: "exhausted", explain: "'Exhausted' = kiệt sức.", unit: "Unit 30" },
+            { q: "The ______ was designed to withstand earthquakes.", options: ["skyscraper", "skyline", "skater", "scraper"], a: "skyscraper", explain: "'Skyscraper' = tòa nhà chọc trời.", unit: "Unit 33" },
+            { q: "Concrete is a mixture of cement, sand and ______.", options: ["gravel", "stone", "rock", "brick"], a: "gravel", explain: "'Gravel' = sỏi.", unit: "Unit 33" },
+            { q: "Solar ______ are used to generate electricity.", options: ["panels", "boards", "sheets", "plates"], a: "panels", explain: "'Solar panels' = tấm pin năng lượng mặt trời.", unit: "Unit 36" },
+            { q: "The ______ of the river is in the mountains.", options: ["source", "start", "top", "mouth"], a: "source", explain: "'Source of a river' = thượng nguồn.", unit: "Unit 36" },
+            { q: "We are running ______ of petrol.", options: ["out", "off", "down", "away"], a: "out", explain: "'Run out of' = cạn kiệt.", unit: "Unit 36" },
+            { q: "The bomb blew ______.", options: ["up", "out", "off", "away"], a: "up", explain: "'Blow up' = nổ tung.", unit: "Unit 36" },
+            { q: "Traffic is building ______ on the motorway.", options: ["up", "on", "in", "out"], a: "up", explain: "'Build up' = tích tụ/ùn tắc.", unit: "Unit 36" },
+            { q: "They managed to put ______ the fire.", options: ["out", "off", "away", "down"], a: "out", explain: "'Put out' = dập tắt (lửa).", unit: "Unit 36" },
+            { q: "The fog hasn't cleared ______ yet.", options: ["up", "out", "away", "off"], a: "up", explain: "'Clear up' = quang đãng/tan (sương mù, bệnh).", unit: "Unit 36" },
+            { q: "The fire went ______ during the night.", options: ["out", "off", "away", "down"], a: "out", explain: "'Go out' = (lửa) tắt.", unit: "Unit 36" }
+        ];
+
+        // --- App State ---
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false; 
+        let selectedAnswer = null; 
+        let userAnswers = [];
+
+        // --- DOM Elements ---
+        const appContent = document.getElementById('app-content');
+        const scoreDisplay = document.getElementById('score-display');
+
+        // --- Utility Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Logic Functions ---
+
+        function startQuiz() {
+            // Shuffle full bank and take first 50
+            const shuffled = shuffleArray([...questionBank]);
+            // Take up to 50 questions for one session
+            const limit = Math.min(50, shuffled.length);
+            currentQuestions = shuffled.slice(0, limit);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            answered = false;
+            selectedAnswer = null;
+
+            scoreDisplay.classList.remove('hidden');
+            updateScoreDisplay();
+            renderQuestion(true); 
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = `Score: ${score}/${currentQuestions.length}`;
+        }
+
+        function handleAnswer(opt) {
+            if (answered) return; 
+
+            answered = true;
+            selectedAnswer = opt;
+            const question = currentQuestions[currentQuestionIndex];
+            const isCorrect = (opt === question.a);
+
+            if (isCorrect) score++;
+
+            userAnswers.push({
+                question: question,
+                selected: opt,
+                isCorrect: isCorrect
+            });
+
+            updateScoreDisplay();
+            renderQuestion(false); 
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                answered = false;
+                selectedAnswer = null;
+                renderQuestion(true); 
+            } else {
+                renderResults();
+            }
+        }
+
+        // --- Render Functions ---
+
+        function renderStartScreen() {
+            scoreDisplay.classList.add('hidden');
+            appContent.innerHTML = `
+                <div class="text-center fade-in space-y-6 flex flex-col items-center justify-center h-full">
+                    <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mb-2">
+                        <i class="fas fa-globe-americas text-4xl text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Review: Units 30, 33, 36</h2>
+                        <p class="text-gray-500 text-sm mt-2 max-w-md mx-auto">
+                            Mỗi lượt chơi sẽ lấy ngẫu nhiên 50 câu từ các chủ đề bên dưới.
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-500 w-full max-w-sm">
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-heartbeat text-indigo-500 mr-2"></i>Unit 30: Health</div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-hammer text-indigo-500 mr-2"></i>Unit 33: Building</div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-leaf text-indigo-500 mr-2"></i>Unit 36: Nature</div>
+                    </div>
+
+                    <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition transform hover:-translate-y-1 mt-4">
+                        Bắt đầu
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderQuestion(animate = true) {
+            const question = currentQuestions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            
+            const animClass = animate ? "fade-in" : "";
+
+            const optionsHtml = question.options.map((opt, index) => {
+                let btnClass = "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-400";
+                let icon = "";
+                
+                if (answered) {
+                    if (opt === question.a) {
+                        btnClass = "bg-green-100 border-2 border-green-500 text-green-800 font-bold";
+                        icon = '<i class="fas fa-check-circle text-green-600 float-right mt-1"></i>';
+                    } else if (opt === selectedAnswer && opt !== question.a) {
+                        btnClass = "bg-red-50 border-2 border-red-400 text-red-800";
+                        icon = '<i class="fas fa-times-circle text-red-500 float-right mt-1"></i>';
+                    } else {
+                        btnClass = "bg-gray-50 border-gray-100 text-gray-400 opacity-60";
+                    }
+                }
+
+                return `
+                    <button onclick="handleAnswer('${opt}')" 
+                        ${answered ? 'disabled' : ''}
+                        class="option-btn w-full p-4 rounded-xl text-left relative group ${btnClass}">
+                        <span class="inline-block w-6 font-bold opacity-50 mr-2">${String.fromCharCode(65 + index)}.</span>
+                        ${opt}
+                        ${icon}
+                    </button>
+                `;
+            }).join('');
+
+            let feedbackHtml = '';
+            if (answered) {
+                const isCorrect = selectedAnswer === question.a;
+                const feedbackColor = isCorrect ? "text-green-600 bg-green-50 border-green-200" : "text-red-600 bg-red-50 border-red-200";
+                const feedbackIcon = isCorrect ? "fa-check" : "fa-times";
+                const feedbackText = isCorrect ? "Chính xác!" : "Chưa chính xác!";
+
+                feedbackHtml = `
+                    <div class="mt-6 explain-fade">
+                        <div class="${feedbackColor} border rounded-lg p-4 mb-4">
+                            <div class="font-bold flex items-center gap-2 mb-1">
+                                <i class="fas ${feedbackIcon}"></i> ${feedbackText}
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed">
+                                <span class="font-semibold text-indigo-600">Giải thích:</span> ${question.explain}
+                            </p>
+                        </div>
+                        <button onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow transition">
+                            Câu tiếp theo <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="${animClass} w-full max-w-xl mx-auto">
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span>Câu hỏi ${currentQuestionIndex + 1}/${currentQuestions.length}</span>
+                            <span>${Math.round(progress)}%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5">
+                            <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="mb-6">
+                        <span class="inline-block bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mb-2">${question.unit}</span>
+                        <h3 class="text-xl text-gray-800 font-medium leading-relaxed">
+                            ${question.q.replace('______', '<span class="border-b-2 border-indigo-300 text-indigo-600 px-1 mx-1 font-bold">.......</span>')}
+                        </h3>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="grid grid-cols-1 gap-3">
+                        ${optionsHtml}
+                    </div>
+
+                    <!-- Feedback Area -->
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+
+        function renderResults() {
+            scoreDisplay.classList.add('hidden');
+            const total = currentQuestions.length;
+            const percentage = Math.round((score / total) * 100);
+            let message = "";
+            let colorClass = "";
+
+            if (percentage >= 90) { message = "Xuất sắc! Bạn nắm rất vững từ vựng."; colorClass = "text-green-600"; }
+            else if (percentage >= 70) { message = "Làm tốt lắm! Kiến thức khá vững."; colorClass = "text-blue-600"; }
+            else if (percentage >= 50) { message = "Tạm ổn, nhưng cần ôn thêm."; colorClass = "text-yellow-600"; }
+            else { message = "Cần cố gắng nhiều hơn!"; colorClass = "text-red-600"; }
+
+            const wrongList = userAnswers.filter(a => !a.isCorrect);
+            let wrongHtml = '';
+            
+            if (wrongList.length > 0) {
+                wrongHtml = `
+                    <div class="w-full mt-6 text-left border-t pt-4">
+                        <h4 class="font-bold text-gray-700 mb-3">Xem lại các câu sai (${wrongList.length})</h4>
+                        <div class="space-y-3 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                            ${wrongList.map(item => `
+                                <div class="bg-red-50 p-3 rounded border border-red-100 text-sm">
+                                    <p class="text-gray-800 mb-1 font-medium">${item.question.q}</p>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span class="text-red-500">Bạn chọn: ${item.selected}</span>
+                                        <span class="text-green-600 font-bold">Đúng: ${item.question.a}</span>
+                                    </div>
+                                    <p class="text-xs text-indigo-600 mt-1 italic">${item.question.explain}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="text-center fade-in flex flex-col items-center justify-center w-full h-full">
+                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 relative">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="${percentage >= 70 ? 'text-green-500' : 'text-indigo-500'}" stroke-dasharray="${percentage}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                        </svg>
+                        <span class="absolute text-lg font-bold text-gray-700">${score}/${total}</span>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 mb-1">Kết quả</h2>
+                    <p class="${colorClass} font-medium mb-6 text-sm">${message}</p>
+                    
+                    <button onclick="renderStartScreen()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-8 rounded-full shadow transition text-sm">
+                        <i class="fas fa-redo mr-2"></i> Làm lại
+                    </button>
+
+                    ${wrongHtml}
+                </div>
+            `;
+        }
+
+        renderStartScreen();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination B1: Unit 1 - 9 Vocabulary Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out; /* Nhanh hơn và mượt hơn */
+        }
+        /* Hiệu ứng riêng cho phần giải thích để nó hiện ra nhẹ nhàng */
+        .explain-fade {
+            animation: fadeInExplain 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); } /* Giảm độ nảy từ 10px xuống 5px */
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInExplain {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Container -->
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden min-h-[600px] flex flex-col relative">
+        
+        <!-- Header -->
+        <div class="bg-indigo-600 p-6 text-white text-center flex justify-between items-center relative z-10">
+            <div>
+                <h1 class="text-xl font-bold text-left"><i class="fas fa-book-open mr-2"></i>Destination B1</h1>
+                <p class="text-indigo-200 text-xs mt-1 text-left">Unit 1 - 9 Review</p>
+            </div>
+            <div id="score-display" class="hidden bg-indigo-700 px-4 py-2 rounded-lg text-sm font-bold">
+                Score: 0/0
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 p-6 flex flex-col" id="app-content">
+            <!-- Content will be injected here via JS -->
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-3 text-center text-gray-400 text-xs border-t">
+            Interactive Vocabulary & Grammar Quiz
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Database of Questions with Explanations
+        const questionBank = [
+            // --- UNIT 3: Fun and Games ---
+            { q: "Our team ______ the match by two goals to one.", options: ["won", "beat", "scored", "played"], a: "won", explain: "'Win' dùng cho cuộc thi hoặc giải thưởng (win a match/cup). 'Beat' dùng khi đánh bại đối thủ (beat a person/team).", unit: "Unit 3" },
+            { q: "You have to ______ the other player to move to the next round.", options: ["win", "defeat", "score", "board"], a: "defeat", explain: "'Defeat' có nghĩa là đánh bại một đối thủ (tương tự như 'beat').", unit: "Unit 3" },
+            { q: "The ______ blew the whistle and the game started.", options: ["captain", "coach", "referee", "musician"], a: "referee", explain: "'Referee' (trọng tài) là người điều khiển trận đấu và thổi còi.", unit: "Unit 3" },
+            { q: "I don't like playing ______ games like Monopoly or Chess.", options: ["video", "board", "active", "gym"], a: "board", explain: "'Board games' là các trò chơi bàn cờ như Cờ vua, Cờ tỷ phú.", unit: "Unit 3" },
+            { q: "It's important to ______ exercise regularly to stay healthy.", options: ["make", "do", "play", "go"], a: "do", explain: "Collocation: 'do exercise' (tập thể dục). Không dùng make/play/go.", unit: "Unit 3" },
+            { q: "My favorite ______ group is releasing a new album next week.", options: ["music", "concert", "band", "stage"], a: "band", explain: "Cụm từ đúng là 'music group' hoặc 'band'. Tuy nhiên 'music band' ít dùng, 'pop group' hoặc 'rock band' phổ biến hơn. Ở đây 'band' đứng một mình hoặc 'music group'. Câu gốc thường dùng 'group' hoặc 'band'. Đáp án 'band' là hợp lý nhất trong ngữ cảnh nhóm nhạc.", unit: "Unit 3" },
+            { q: "He was sent off because he tried to ______ in the exam.", options: ["cheat", "trick", "fake", "lie"], a: "cheat", explain: "'Cheat' nghĩa là gian lận trong thi cử hoặc trò chơi.", unit: "Unit 3" },
+            { q: "The ______ of the football team wore a yellow armband.", options: ["coach", "captain", "fan", "supporter"], a: "captain", explain: "'Captain' (đội trưởng) thường đeo băng đội trưởng.", unit: "Unit 3" },
+            { q: "Do you want to ______ cards with us tonight?", options: ["do", "make", "go", "play"], a: "play", explain: "Collocation: 'play cards' (chơi bài).", unit: "Unit 3" },
+            { q: "I hope you ______ yourself at the party yesterday.", options: ["entertained", "pleased", "enjoyed", "funny"], a: "enjoyed", explain: "Cấu trúc: 'enjoy yourself' = có khoảng thời gian vui vẻ.", unit: "Unit 3" },
+            { q: "We have a new ______ who is training us very hard.", options: ["referee", "coach", "opponent", "member"], a: "coach", explain: "'Coach' là huấn luyện viên, người huấn luyện đội bóng.", unit: "Unit 3" },
+            { q: "It's a big ______ to climb that mountain without equipment.", options: ["risk", "danger", "pleasure", "beat"], a: "risk", explain: "'Risk' (rủi ro/mạo hiểm). Cấu trúc 'take a risk'.", unit: "Unit 3" },
+            { q: "Who is your ______ in the next tennis match?", options: ["member", "supporter", "opponent", "group"], a: "opponent", explain: "'Opponent' là đối thủ trong thi đấu thể thao.", unit: "Unit 3" },
+            { q: "I used to collect stamps, but I gave ______ that hobby years ago.", options: ["up", "in", "out", "off"], a: "up", explain: "Phrasal verb: 'give up' = từ bỏ, dừng làm gì đó.", unit: "Unit 3" },
+            { q: "The concert is sold out, so we can't get ______.", options: ["papers", "tickets", "seats", "cards"], a: "tickets", explain: "Cần mua 'tickets' (vé) để vào xem hòa nhạc.", unit: "Unit 3" },
+
+            // --- UNIT 6: Learning and Doing ---
+            { q: "She has a ______ in Economics from Harvard University.", options: ["certificate", "degree", "mark", "grade"], a: "degree", explain: "'Degree' (bằng cấp đại học). 'Certificate' thường là chứng chỉ ngắn hạn.", unit: "Unit 6" },
+            { q: "You need to ______ for the test tomorrow or you might fail.", options: ["remind", "revise", "search", "learn"], a: "revise", explain: "'Revise' nghĩa là ôn tập lại kiến thức để thi.", unit: "Unit 6" },
+            { q: "If you work hard, you will surely ______ progress.", options: ["do", "take", "make", "get"], a: "make", explain: "Collocation: 'make progress' (tiến bộ).", unit: "Unit 6" },
+            { q: "The teacher asked us to learn the poem by ______.", options: ["mind", "heart", "brain", "head"], a: "heart", explain: "Idiom: 'learn by heart' = học thuộc lòng.", unit: "Unit 6" },
+            { q: "Is this subject ______ or optional?", options: ["compulsory", "clever", "talented", "mental"], a: "compulsory", explain: "'Compulsory' (bắt buộc) trái nghĩa với 'optional' (tự chọn).", unit: "Unit 6" },
+            { q: "I didn't ______ the exam, so I have to take it again.", options: ["pass", "take", "write", "succeed"], a: "pass", explain: "'Pass an exam' = thi đỗ. Nếu không đỗ thì phải thi lại.", unit: "Unit 6" },
+            { q: "He is an ______ on ancient history.", options: ["expert", "experienced", "instruction", "ability"], a: "expert", explain: "'Expert on/in sth' = chuyên gia về lĩnh vực gì.", unit: "Unit 6" },
+            { q: "Please pay attention ______ what I am saying.", options: ["at", "to", "with", "for"], a: "to", explain: "Cấu trúc: 'pay attention to' (chú ý đến).", unit: "Unit 6" },
+            { q: "She is very ______ at fixing computers.", options: ["talented", "clever", "skilled", "good"], a: "good", explain: "Cấu trúc: 'good at' (giỏi về cái gì). 'Talented' cũng đi với at/in nhưng 'good at' phổ biến nhất cho kỹ năng chung.", unit: "Unit 6" },
+            { q: "Can you ______ the word 'cat' for me?", options: ["read", "spell", "write", "guess"], a: "spell", explain: "'Spell' = đánh vần.", unit: "Unit 6" },
+            { q: "I crossed ______ the wrong answer and wrote the correct one.", options: ["out", "in", "off", "over"], a: "out", explain: "Phrasal verb: 'cross out' = gạch bỏ (chữ sai).", unit: "Unit 6" },
+            { q: "The teacher marked our exams and gave us our ______.", options: ["points", "degrees", "grades", "qualifications"], a: "grades", explain: "'Grades' (hoặc marks) là điểm số cho bài thi.", unit: "Unit 6" },
+            { q: "Don't ______ to lock the door when you leave.", options: ["remind", "remember", "forget", "hesitate"], a: "forget", explain: "'Don't forget to do sth' = Đừng quên làm gì.", unit: "Unit 6" },
+            { q: "He has a lot of ______ in teaching English.", options: ["experience", "experiment", "expert", "exam"], a: "experience", explain: "'Experience' (kinh nghiệm). 'Experiment' là thí nghiệm.", unit: "Unit 6" },
+            { q: "I'm not sure about the answer, I'll have to ______.", options: ["guess", "think", "hesitate", "wonder"], a: "guess", explain: "'Guess' = đoán.", unit: "Unit 6" },
+
+            // --- UNIT 9: Coming and Going ---
+            { q: "We went on a school ______ to the museum.", options: ["travel", "journey", "trip", "voyage"], a: "trip", explain: "'Trip' thường dùng cho chuyến đi ngắn hoặc có mục đích cụ thể (school trip, business trip). 'Journey' nhấn mạnh quá trình đi lại dài.", unit: "Unit 9" },
+            { q: "The train was ______ by two hours because of the snow.", options: ["cancelled", "delayed", "crashed", "booked"], a: "delayed", explain: "'Delayed' = bị hoãn/chậm trễ.", unit: "Unit 9" },
+            { q: "You must show your ______ when you enter the country.", options: ["ticket", "passport", "souvenir", "luggage"], a: "passport", explain: "Cần 'passport' (hộ chiếu) để nhập cảnh.", unit: "Unit 9" },
+            { q: "The train to London leaves from ______ 4.", options: ["platform", "station", "port", "stop"], a: "platform", explain: "Xe lửa rời đi từ 'platform' (sân ga).", unit: "Unit 9" },
+            { q: "Is this seat ______ or is someone sitting here?", options: ["free", "empty", "taken", "open"], a: "taken", explain: "'Is this seat taken?' = Ghế này có người ngồi chưa?", unit: "Unit 9" },
+            { q: "We stayed in a lovely ______ near the beach.", options: ["hotel", "camping", "journey", "vehicle"], a: "hotel", explain: "'Hotel' là nơi ở. 'Camping' là hành động cắm trại.", unit: "Unit 9" },
+            { q: "Please ______ your seatbelt before the plane takes off.", options: ["tie", "fasten", "close", "lock"], a: "fasten", explain: "Collocation: 'fasten your seatbelt' (thắt dây an toàn).", unit: "Unit 9" },
+            { q: "It takes about two hours to ______ the coast.", options: ["arrive", "get", "reach", "come"], a: "reach", explain: "'Reach' + địa điểm (không cần giới từ). 'Arrive' cần at/in. 'Get' cần to.", unit: "Unit 9" },
+            { q: "I always buy a ______ to remember the places I visit.", options: ["souvenir", "ticket", "brochure", "view"], a: "souvenir", explain: "'Souvenir' = đồ lưu niệm.", unit: "Unit 9" },
+            { q: "There was so much ______, the cars weren't moving at all.", options: ["transport", "vehicle", "traffic", "travel"], a: "traffic", explain: "'Traffic' = giao thông/xe cộ trên đường.", unit: "Unit 9" },
+            { q: "We are going to ______ a flight to Paris tomorrow.", options: ["catch", "pick", "hold", "go"], a: "catch", explain: "Collocation: 'catch a flight/bus/train'.", unit: "Unit 9" },
+            { q: "How much ______ are you taking with you?", options: ["suitcase", "luggage", "bag", "box"], a: "luggage", explain: "'Luggage' (hành lý - không đếm được) chỉ tổng thể các túi xách mang theo.", unit: "Unit 9" },
+            { q: "The car broke ______ on the way to the airport.", options: ["up", "off", "down", "out"], a: "down", explain: "Phrasal verb: 'break down' = bị hỏng (xe cộ, máy móc).", unit: "Unit 9" },
+            { q: "My dad went away on business ______ last week.", options: ["foreign", "abroad", "outside", "ticket"], a: "abroad", explain: "'Go abroad' = đi nước ngoài.", unit: "Unit 9" },
+            { q: "We arrived ______ the station just in time.", options: ["to", "in", "at", "for"], a: "at", explain: "'Arrive at' dùng cho địa điểm nhỏ (station, airport). 'Arrive in' dùng cho thành phố/quốc gia.", unit: "Unit 9" },
+
+            // --- GRAMMAR & OTHERS ---
+            { q: "I ______ think that's a good idea.", options: ["am not", "don't", "not", "isn't"], a: "don't", explain: "Hiện tại đơn phủ định với động từ thường: don't/doesn't + V.", unit: "Unit 1" },
+            { q: "Be quiet! I ______ to listen to the radio.", options: ["try", "tried", "am trying", "have tried"], a: "am trying", explain: "Dấu hiệu 'Be quiet!' cho thấy hành động đang diễn ra -> Hiện tại tiếp diễn.", unit: "Unit 1" },
+            { q: "This soup ______ delicious!", options: ["tastes", "is tasting", "tasted", "taste"], a: "tastes", explain: "'Taste' là động từ chỉ trạng thái (stative verb) khi nói về vị của món ăn -> Dùng thì đơn.", unit: "Unit 1" },
+            { q: "I ______ to the cinema three times last week.", options: ["go", "went", "have gone", "was going"], a: "went", explain: "'Last week' là thời gian xác định trong quá khứ -> Quá khứ đơn.", unit: "Unit 2" },
+            { q: "While I ______ down the street, I saw my friend.", options: ["walked", "walk", "was walking", "have walked"], a: "was walking", explain: "Hành động đang xảy ra (đi bộ) thì hành động khác chen vào (gặp bạn) -> Quá khứ tiếp diễn.", unit: "Unit 2" },
+            { q: "I ______ to play the piano when I was young, but I stopped.", options: ["used", "use", "usually", "using"], a: "used", explain: "Cấu trúc 'used to + V' chỉ thói quen trong quá khứ nay không còn nữa.", unit: "Unit 2" },
+            { q: "They ______ finished their homework yet.", options: ["didn't", "haven't", "hasn't", "aren't"], a: "haven't", explain: "'Yet' thường dùng trong thì Hiện tại hoàn thành phủ định. They + haven't.", unit: "Unit 4" },
+            { q: "I have lived here ______ ten years.", options: ["since", "for", "from", "during"], a: "for", explain: "'For' + khoảng thời gian (ten years). 'Since' + mốc thời gian.", unit: "Unit 4" },
+            { q: "She ______ London in 2010.", options: ["has visited", "visited", "visits", "visiting"], a: "visited", explain: "'In 2010' là mốc thời gian quá khứ xác định -> Quá khứ đơn.", unit: "Unit 4" },
+            { q: "By the time we arrived, the film ______.", options: ["started", "had started", "starts", "has started"], a: "had started", explain: "Hành động xảy ra trước một hành động khác trong quá khứ -> Quá khứ hoàn thành (Had + P2).", unit: "Unit 5" },
+            { q: "Look at those clouds! It ______ rain.", options: ["will", "is going to", "shall", "might"], a: "is going to", explain: "Dự đoán có căn cứ rõ ràng (mây đen) -> 'be going to'.", unit: "Unit 7" },
+            { q: "I promise I ______ help you with your homework.", options: ["will", "am going to", "am", "do"], a: "will", explain: "Lời hứa (promise) dùng thì tương lai đơn 'will'.", unit: "Unit 7" },
+            { q: "The train ______ at 9:00 AM tomorrow.", options: ["leave", "leaves", "leaving", "will leave"], a: "leaves", explain: "Lịch trình tàu xe cố định dùng thì Hiện tại đơn mang nghĩa tương lai.", unit: "Unit 7" },
+            { q: "We are meeting ______ Tuesday morning.", options: ["in", "on", "at", "by"], a: "on", explain: "Giới từ chỉ ngày/thứ: 'On' Tuesday.", unit: "Unit 8" },
+            { q: "My birthday is ______ July.", options: ["on", "at", "in", "to"], a: "in", explain: "Giới từ chỉ tháng: 'In' July.", unit: "Unit 8" },
+            { q: "The picture is hanging ______ the wall.", options: ["in", "at", "on", "above"], a: "on", explain: "Ở trên bề mặt tường: 'On' the wall.", unit: "Unit 8" },
+            { q: "She is interested ______ learning French.", options: ["in", "on", "at", "with"], a: "in", explain: "Cấu trúc: 'interested in' + Ving.", unit: "Unit 8" },
+            { q: "I am waiting ______ the bus.", options: ["to", "at", "for", "on"], a: "for", explain: "Cấu trúc: 'wait for' (chờ đợi ai/cái gì).", unit: "Unit 8" },
+            { q: "He is afraid ______ spiders.", options: ["with", "of", "about", "for"], a: "of", explain: "Cấu trúc: 'afraid of' (sợ cái gì).", unit: "Unit 8" },
+            { q: "This bag belongs ______ me.", options: ["for", "at", "to", "with"], a: "to", explain: "Cấu trúc: 'belong to' (thuộc về ai).", unit: "Unit 8" },
+            { q: "What time do you wake ______ in the morning?", options: ["out", "in", "up", "on"], a: "up", explain: "Phrasal verb: 'wake up' (thức dậy).", unit: "Unit 9" },
+            { q: "We need to set ______ early to avoid traffic.", options: ["off", "up", "on", "in"], a: "off", explain: "Phrasal verb: 'set off' (khởi hành).", unit: "Unit 9" },
+            { q: "Can you turn ______ the TV? It's too loud.", options: ["up", "down", "in", "on"], a: "down", explain: "Phrasal verb: 'turn down' (vặn nhỏ âm lượng).", unit: "Unit 9" },
+            { q: "He looks ______ his father.", options: ["after", "like", "for", "at"], a: "like", explain: "'Look like' = trông giống ai.", unit: "Vocab" },
+            { q: "I'm looking ______ to the holiday.", options: ["forward", "for", "about", "after"], a: "forward", explain: "Phrase: 'look forward to' (mong chờ).", unit: "Vocab" },
+            { q: "The plane took ______ on time.", options: ["up", "off", "out", "away"], a: "off", explain: "Phrasal verb: 'take off' (cất cánh).", unit: "Unit 9" },
+            { q: "A ______ is a long journey by sea.", options: ["trip", "voyage", "flight", "excursion"], a: "voyage", explain: "'Voyage' là chuyến hải trình dài trên biển.", unit: "Unit 9" },
+            { q: "I've decided to take ______ tennis.", options: ["up", "in", "on", "off"], a: "up", explain: "Phrasal verb: 'take up' (bắt đầu một sở thích/môn thể thao mới).", unit: "Unit 3" },
+            { q: "The car park is full, there is no ______.", options: ["place", "room", "space", "area"], a: "space", explain: "Dùng 'space' (chỗ trống) cho xe hơi. 'Room' thường là không gian chung chung hoặc phòng.", unit: "Unit 9" },
+            { q: "Accommodation in London is very ______.", options: ["expensive", "rich", "money", "value"], a: "expensive", explain: "Giá cả đắt đỏ dùng tính từ 'expensive'.", unit: "Unit 9" },
+            { q: "We stayed at a youth ______.", options: ["hotel", "hostel", "hospital", "house"], a: "hostel", explain: "'Youth hostel' là nhà trọ giá rẻ cho thanh niên du lịch.", unit: "Unit 9" },
+            { q: "Did you ______ friends with anyone at the camp?", options: ["get", "do", "make", "take"], a: "make", explain: "Collocation: 'make friends' (kết bạn).", unit: "Collocation" },
+            { q: "I did my best, but I couldn't ______ the record.", options: ["break", "win", "beat", "hit"], a: "break", explain: "Collocation: 'break a record' (phá kỷ lục).", unit: "Unit 3" },
+            { q: "She is responsible ______ booking the tickets.", options: ["for", "to", "with", "at"], a: "for", explain: "Cấu trúc: 'responsible for' (chịu trách nhiệm về).", unit: "Unit 6" },
+            { q: "I'm fond ______ swimming.", options: ["in", "at", "of", "with"], a: "of", explain: "Cấu trúc: 'fond of' (thích).", unit: "Unit 3" },
+            { q: "This song reminds me ______ my childhood.", options: ["about", "of", "for", "with"], a: "of", explain: "Cấu trúc: 'remind sb of sth' (gợi nhớ ai về cái gì).", unit: "Vocab" },
+            { q: "He succeeded ______ passing the exam.", options: ["on", "in", "at", "to"], a: "in", explain: "Cấu trúc: 'succeed in + Ving' (thành công trong việc gì).", unit: "Unit 6" },
+            { q: "The bus fare is reasonable, it's quite ______.", options: ["cheap", "fast", "convenient", "comfort"], a: "cheap", explain: "'Reasonable' (giá cả hợp lý) đồng nghĩa với 'cheap' trong ngữ cảnh này.", unit: "Unit 9" },
+            { q: "We have to ______ a decision soon.", options: ["do", "make", "get", "create"], a: "make", explain: "Collocation: 'make a decision' (ra quyết định).", unit: "Collocation" },
+            { q: "Please ______ your hand if you know the answer.", options: ["rise", "raise", "lift", "put"], a: "raise", explain: "'Raise' là ngoại động từ (raise your hand). 'Rise' là nội động từ (sun rises).", unit: "Vocab" },
+            { q: "The sun ______ in the east.", options: ["rise", "rises", "raise", "raises"], a: "rises", explain: "Mặt trời mọc (nội động từ, hiện tại đơn - sự thật hiển nhiên).", unit: "Unit 1" },
+            { q: "I can't afford ______ buy a new car.", options: ["buying", "to buy", "buy", "bought"], a: "to buy", explain: "Cấu trúc: 'afford to V' (đủ khả năng chi trả).", unit: "Grammar" },
+            { q: "Do you fancy ______ to the cinema tonight?", options: ["go", "to go", "going", "went"], a: "going", explain: "Cấu trúc: 'fancy + Ving' (thích làm gì).", unit: "Unit 3" },
+            { q: "You had better ______ a doctor.", options: ["see", "to see", "seeing", "saw"], a: "see", explain: "Cấu trúc: 'had better + V nguyên thể' (nên làm gì).", unit: "Grammar" },
+            { q: "I would rather ______ home tonight.", options: ["stay", "to stay", "staying", "stayed"], a: "stay", explain: "Cấu trúc: 'would rather + V nguyên thể' (thà/muốn làm gì hơn).", unit: "Grammar" },
+            { q: "It's not worth ______ about.", options: ["worry", "to worry", "worrying", "worried"], a: "worrying", explain: "Cấu trúc: 'It is not worth + Ving' (không đáng để làm gì).", unit: "Grammar" },
+            { q: "She apologized ______ being late.", options: ["at", "for", "to", "with"], a: "for", explain: "Cấu trúc: 'apologize for + Ving' (xin lỗi vì việc gì).", unit: "Preposition" },
+            { q: "I am keen ______ photography.", options: ["in", "at", "on", "of"], a: "on", explain: "Cấu trúc: 'keen on' (yêu thích/đam mê).", unit: "Unit 3" },
+            { q: "What's the difference ______ these two pictures?", options: ["from", "with", "between", "of"], a: "between", explain: "Difference 'between' A and B.", unit: "Preposition" },
+            { q: "The hotel provides guests ______ free Wi-Fi.", options: ["for", "with", "to", "of"], a: "with", explain: "Cấu trúc: 'provide sb with sth' (cung cấp cho ai cái gì).", unit: "Preposition" },
+            { q: "My parents are very proud ______ me.", options: ["of", "for", "with", "at"], a: "of", explain: "Cấu trúc: 'proud of' (tự hào về).", unit: "Preposition" },
+            { q: "This book is similar ______ the one I read last week.", options: ["with", "as", "to", "from"], a: "to", explain: "Cấu trúc: 'similar to' (tương tự với).", unit: "Preposition" },
+            { q: "Don't blame me ______ the accident.", options: ["for", "on", "about", "with"], a: "for", explain: "Cấu trúc: 'blame sb for sth' (đổ lỗi cho ai về việc gì).", unit: "Preposition" }
+        ];
+
+        // --- App State ---
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false; // Trạng thái: đã trả lời câu hỏi hiện tại chưa?
+        let selectedAnswer = null; // Đáp án người dùng chọn
+        let userAnswers = []; // Lưu lịch sử để review cuối giờ
+
+        // --- DOM Elements ---
+        const appContent = document.getElementById('app-content');
+        const scoreDisplay = document.getElementById('score-display');
+
+        // --- Utility Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Logic Functions ---
+
+        function startQuiz() {
+            // Shuffle full bank and take first 50
+            const shuffled = shuffleArray([...questionBank]);
+            currentQuestions = shuffled.slice(0, 50);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            answered = false;
+            selectedAnswer = null;
+
+            scoreDisplay.classList.remove('hidden');
+            updateScoreDisplay();
+            renderQuestion(true); // Animation bật cho lần đầu
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = `Score: ${score}/${currentQuestions.length}`;
+        }
+
+        function handleAnswer(opt) {
+            if (answered) return; // Prevent clicking again
+
+            answered = true;
+            selectedAnswer = opt;
+            const question = currentQuestions[currentQuestionIndex];
+            const isCorrect = (opt === question.a);
+
+            if (isCorrect) score++;
+
+            // Record history
+            userAnswers.push({
+                question: question,
+                selected: opt,
+                isCorrect: isCorrect
+            });
+
+            updateScoreDisplay();
+            renderQuestion(false); // Animation TẮT khi hiện đáp án để không bị nhấp nháy
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < 49) {
+                currentQuestionIndex++;
+                answered = false;
+                selectedAnswer = null;
+                renderQuestion(true); // Animation bật khi sang câu mới
+            } else {
+                renderResults();
+            }
+        }
+
+        // --- Render Functions ---
+
+        function renderStartScreen() {
+            scoreDisplay.classList.add('hidden');
+            appContent.innerHTML = `
+                <div class="text-center fade-in space-y-6 flex flex-col items-center justify-center h-full">
+                    <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mb-2">
+                        <i class="fas fa-graduation-cap text-4xl text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Unit 1 - Unit 9 Check</h2>
+                        <p class="text-gray-500 text-sm mt-2 max-w-md mx-auto">
+                            Bài kiểm tra gồm 50 câu hỏi mỗi lượt</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-500 w-full max-w-sm">
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-running text-indigo-500 mr-2"></i>Unit 3: Games</div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-university text-indigo-500 mr-2"></i>Unit 6: Study</div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-plane text-indigo-500 mr-2"></i>Unit 9: Travel</div>
+                    </div>
+
+                    <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition transform hover:-translate-y-1 mt-4">
+                        Bắt đầu
+                    </button>
+                </div>
+            `;
+        }
+
+        // Thêm tham số animate vào hàm renderQuestion
+        function renderQuestion(animate = true) {
+            const question = currentQuestions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex) / 50) * 100;
+            
+            // Chỉ thêm class fade-in nếu animate = true (khi chuyển câu hỏi)
+            // Khi chọn đáp án (animate = false), giao diện sẽ đứng yên
+            const animClass = animate ? "fade-in" : "";
+
+            // Generate Options HTML
+            const optionsHtml = question.options.map((opt, index) => {
+                let btnClass = "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-400";
+                let icon = "";
+                
+                if (answered) {
+                    if (opt === question.a) {
+                        // Correct Answer -> Green
+                        btnClass = "bg-green-100 border-2 border-green-500 text-green-800 font-bold";
+                        icon = '<i class="fas fa-check-circle text-green-600 float-right mt-1"></i>';
+                    } else if (opt === selectedAnswer && opt !== question.a) {
+                        // Wrong Selection -> Red
+                        btnClass = "bg-red-50 border-2 border-red-400 text-red-800";
+                        icon = '<i class="fas fa-times-circle text-red-500 float-right mt-1"></i>';
+                    } else {
+                        // Other options -> Fade out
+                        btnClass = "bg-gray-50 border-gray-100 text-gray-400 opacity-60";
+                    }
+                }
+
+                return `
+                    <button onclick="handleAnswer('${opt}')" 
+                        ${answered ? 'disabled' : ''}
+                        class="option-btn w-full p-4 rounded-xl text-left relative group ${btnClass}">
+                        <span class="inline-block w-6 font-bold opacity-50 mr-2">${String.fromCharCode(65 + index)}.</span>
+                        ${opt}
+                        ${icon}
+                    </button>
+                `;
+            }).join('');
+
+            // Explanation Section
+            let feedbackHtml = '';
+            if (answered) {
+                const isCorrect = selectedAnswer === question.a;
+                const feedbackColor = isCorrect ? "text-green-600 bg-green-50 border-green-200" : "text-red-600 bg-red-50 border-red-200";
+                const feedbackIcon = isCorrect ? "fa-check" : "fa-times";
+                const feedbackText = isCorrect ? "Chính xác!" : "Chưa chính xác!";
+
+                // Dùng class explain-fade riêng cho phần giải thích
+                feedbackHtml = `
+                    <div class="mt-6 explain-fade">
+                        <div class="${feedbackColor} border rounded-lg p-4 mb-4">
+                            <div class="font-bold flex items-center gap-2 mb-1">
+                                <i class="fas ${feedbackIcon}"></i> ${feedbackText}
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed">
+                                <span class="font-semibold text-indigo-600">Giải thích:</span> ${question.explain}
+                            </p>
+                        </div>
+                        <button onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow transition">
+                            Câu tiếp theo <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="${animClass} w-full max-w-xl mx-auto">
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span>Câu hỏi ${currentQuestionIndex + 1}/50</span>
+                            <span>${Math.round(progress)}%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5">
+                            <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="mb-6">
+                        <span class="inline-block bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mb-2">${question.unit}</span>
+                        <h3 class="text-xl text-gray-800 font-medium leading-relaxed">
+                            ${question.q.replace('______', '<span class="border-b-2 border-indigo-300 text-indigo-600 px-1 mx-1 font-bold">.......</span>')}
+                        </h3>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="grid grid-cols-1 gap-3">
+                        ${optionsHtml}
+                    </div>
+
+                    <!-- Feedback Area -->
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+
+        function renderResults() {
+            scoreDisplay.classList.add('hidden');
+            const percentage = Math.round((score / 50) * 100);
+            let message = "";
+            let colorClass = "";
+
+            if (percentage >= 90) { message = "Xuất sắc! Bạn nắm rất vững kiến thức."; colorClass = "text-green-600"; }
+            else if (percentage >= 70) { message = "Làm tốt lắm! Kiến thức khá vững."; colorClass = "text-blue-600"; }
+            else if (percentage >= 50) { message = "Tạm ổn, nhưng cần ôn thêm."; colorClass = "text-yellow-600"; }
+            else { message = "Cần cố gắng nhiều hơn!"; colorClass = "text-red-600"; }
+
+            // Wrong answers list logic
+            const wrongList = userAnswers.filter(a => !a.isCorrect);
+            let wrongHtml = '';
+            
+            if (wrongList.length > 0) {
+                wrongHtml = `
+                    <div class="w-full mt-6 text-left border-t pt-4">
+                        <h4 class="font-bold text-gray-700 mb-3">Xem lại các câu sai (${wrongList.length})</h4>
+                        <div class="space-y-3 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                            ${wrongList.map(item => `
+                                <div class="bg-red-50 p-3 rounded border border-red-100 text-sm">
+                                    <p class="text-gray-800 mb-1 font-medium">${item.question.q}</p>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span class="text-red-500">Bạn chọn: ${item.selected}</span>
+                                        <span class="text-green-600 font-bold">Đúng: ${item.question.a}</span>
+                                    </div>
+                                    <p class="text-xs text-indigo-600 mt-1 italic">${item.question.explain}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="text-center fade-in flex flex-col items-center justify-center w-full h-full">
+                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 relative">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="${percentage >= 70 ? 'text-green-500' : 'text-indigo-500'}" stroke-dasharray="${percentage}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                        </svg>
+                        <span class="absolute text-lg font-bold text-gray-700">${score}/50</span>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 mb-1">Kết quả</h2>
+                    <p class="${colorClass} font-medium mb-6 text-sm">${message}</p>
+                    
+                    <button onclick="renderStartScreen()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-8 rounded-full shadow transition text-sm">
+                        <i class="fas fa-redo mr-2"></i> Làm lại
+                    </button>
+
+                    ${wrongHtml}
+                </div>
+            `;
+        }
+
+        // Initialize
+        renderStartScreen();
+
+    </script>
+</body>
+</html>

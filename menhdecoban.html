@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bài Tập Mệnh Đề Quan Hệ - 50 Câu Chuyên Sâu (Random)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Tối ưu font chữ cho di động */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f3f4f6; 
+            -webkit-tap-highlight-color: transparent; /* Bỏ màu highlight mặc định khi chạm trên mobile */
+        }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Animation cho đúng/sai */
+        .correct-anim { animation: pulse 0.5s; background-color: #dcfce7 !important; border-color: #22c55e !important; }
+        .wrong-anim { animation: shake 0.4s; background-color: #fee2e2 !important; border-color: #ef4444 !important; }
+        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        
+        /* Cỡ chữ linh hoạt */
+        .question-text { font-size: 1.125rem; line-height: 1.6; }
+        @media (min-width: 640px) {
+            .question-text { font-size: 1.25rem; }
+        }
+        
+        /* Tăng vùng chạm cho mobile */
+        .option-item:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-3 sm:p-4">
+
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[95vh]" id="app">
+        
+        <!-- Header -->
+        <div class="bg-indigo-600 p-4 sm:p-6 text-white text-center shadow-md z-10 shrink-0">
+            <h1 class="text-xl sm:text-3xl font-bold mb-1">Trắc Nghiệm Ngữ Pháp</h1>
+            <div class="flex items-center justify-center space-x-2">
+                <p class="text-indigo-100 text-xs sm:text-sm">50 Câu hỏi chuyên sâu: Mệnh đề quan hệ</p>
+                <span class="bg-indigo-500 text-xs px-2 py-0.5 rounded text-white border border-indigo-400"><i class="fas fa-random mr-1"></i>Random</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 h-1.5 shrink-0">
+            <div class="bg-green-500 h-1.5 transition-all duration-300" id="progress-bar" style="width: 0%"></div>
+        </div>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-grow overflow-y-auto custom-scrollbar">
+            
+            <!-- Start Screen -->
+            <div id="start-screen" class="p-6 sm:p-10 text-center fade-in flex flex-col items-center justify-center min-h-[400px]">
+                <div class="mb-6 text-indigo-500 text-6xl sm:text-7xl animate-bounce">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold mb-3 text-gray-800">Sẵn sàng chưa?</h2>
+                <div class="text-left bg-gray-50 p-4 rounded-lg border border-gray-100 mb-8 w-full shadow-inner text-sm sm:text-base">
+                    <p class="text-gray-600 mb-2">Bài thi bao gồm:</p>
+                    <ul class="text-gray-600 space-y-1 list-disc pl-5">
+                        <li>Who, Whom, Which, That</li>
+                        <li>Where, When, Why</li>
+                        <li>Giới từ (In which, To whom...)</li>
+                        <li>Dạng rút gọn & Nâng cao</li>
+                    </ul>
+                    <p class="mt-3 text-indigo-600 font-semibold text-xs italic">*Câu hỏi sẽ được đảo ngẫu nhiên mỗi lần thi.</p>
+                </div>
+                <button onclick="startQuiz()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-xl transition transform active:scale-95 shadow-lg flex items-center justify-center text-lg">
+                    <i class="fas fa-play mr-2"></i> Bắt đầu làm bài
+                </button>
+            </div>
+
+            <!-- Quiz Container -->
+            <div id="quiz-container" class="hidden p-4 sm:p-8 fade-in flex flex-col pb-20"> <!-- pb-20 để tránh bị che bởi nút floating nếu có -->
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <span class="text-xs sm:text-sm font-bold text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full" id="question-counter">Câu 1/50</span>
+                    <span class="text-xs sm:text-sm font-bold text-gray-500" id="score-display">Điểm: 0</span>
+                </div>
+
+                <div class="mb-4 sm:mb-6">
+                    <h3 class="question-text font-semibold text-gray-800 mb-4 sm:mb-6" id="question-text">
+                        <!-- Question goes here -->
+                    </h3>
+                
+                    <div class="grid grid-cols-1 gap-3 sm:gap-4" id="options-container">
+                        <!-- Options go here -->
+                    </div>
+                </div>
+
+                <!-- Explanation Box -->
+                <div id="explanation-box" class="hidden mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg fade-in shadow-sm text-sm sm:text-base">
+                    <p class="font-bold text-blue-700 mb-1 flex items-center"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Giải thích:</p>
+                    <p class="text-gray-700 leading-relaxed" id="explanation-text"></p>
+                </div>
+
+                <!-- Next Button (Mobile Friendly) -->
+                <div class="mt-4 hidden" id="next-btn-container">
+                    <button onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center text-lg active:bg-indigo-800">
+                        Câu tiếp theo <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="result-screen" class="hidden p-6 sm:p-10 text-center fade-in min-h-[400px] flex flex-col items-center justify-center">
+                <div class="mb-4 sm:mb-6 text-6xl sm:text-7xl" id="result-icon"></div>
+                <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-gray-800" id="result-title"></h2>
+                <p class="text-gray-600 mb-8 text-base sm:text-lg px-2" id="result-message"></p>
+                
+                <div class="flex justify-center items-center mb-8 space-x-4 w-full">
+                    <div class="flex-1 text-center p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <span class="block text-2xl sm:text-4xl font-bold text-indigo-600 mb-1" id="final-score"></span>
+                        <span class="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-bold">Điểm số</span>
+                    </div>
+                    <div class="flex-1 text-center p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <span class="block text-2xl sm:text-4xl font-bold text-green-600 mb-1" id="final-percent"></span>
+                        <span class="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-bold">Tỷ lệ</span>
+                    </div>
+                </div>
+
+                <button onclick="restartQuiz()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-900 text-white font-bold py-3.5 px-10 rounded-xl transition transform active:scale-95 shadow-lg flex items-center justify-center">
+                    <i class="fas fa-redo-alt mr-2"></i> Làm lại (Đảo đề)
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data gốc (đã bỏ số thứ tự ở đầu để random không bị lỗi hiển thị)
+        const questionBank = [
+            // --- NHÓM 1: CƠ BẢN (WHO, WHOM, WHICH, THAT) ---
+            {
+                question: "The girl ______ is wearing the blue dress is my sister.",
+                options: ["who", "whom", "which", "whose"],
+                answer: 0,
+                explanation: "Dùng 'who' vì thay thế cho danh từ chỉ người (The girl) và đóng vai trò làm Chủ ngữ cho động từ 'is wearing'."
+            },
+            {
+                question: "The book ______ I bought yesterday is very interesting.",
+                options: ["who", "what", "which", "whom"],
+                answer: 2,
+                explanation: "Dùng 'which' thay thế cho danh từ chỉ vật (The book)."
+            },
+            {
+                question: "This is the boy ______ I told you about.",
+                options: ["which", "whose", "whom", "where"],
+                answer: 2,
+                explanation: "Dùng 'whom' thay thế cho người (the boy) đóng vai trò Tân ngữ (sau giới từ 'about'). Dùng 'who' cũng chấp nhận được trong văn nói nhưng 'whom' chuẩn ngữ pháp hơn ở đây."
+            },
+            {
+                question: "The letter ______ arrived this morning had no stamp.",
+                options: ["who", "whom", "which", "whose"],
+                answer: 2,
+                explanation: "Dùng 'which' cho vật (The letter) làm chủ ngữ."
+            },
+            {
+                question: "I talked to the woman ______ car had broken down.",
+                options: ["who", "which", "whose", "whom"],
+                answer: 2,
+                explanation: "Dùng 'whose' chỉ sở hữu: Cái xe CỦA người phụ nữ (whose car)."
+            },
+            {
+                question: "Do you know the man ______ lives next door?",
+                options: ["which", "whom", "who", "whose"],
+                answer: 2,
+                explanation: "Cần chủ ngữ chỉ người cho động từ 'lives' => Dùng 'who'."
+            },
+            {
+                question: "The machine ______ broke down has been repaired.",
+                options: ["that", "whom", "who", "whose"],
+                answer: 0,
+                explanation: "Dùng 'that' (hoặc 'which') thay thế cho vật trong mệnh đề xác định."
+            },
+             {
+                question: "This is the only book ______ I have.",
+                options: ["who", "that", "what", "where"],
+                answer: 1,
+                explanation: "Sau 'the only', 'the first', 'the best'... bắt buộc dùng 'THAT'."
+            },
+
+            // --- NHÓM 2: TRẠNG TỪ (WHERE, WHEN, WHY) ---
+            {
+                question: "The hotel ______ we stayed wasn't very clean.",
+                options: ["which", "that", "where", "whom"],
+                answer: 2,
+                explanation: "Dùng 'where' (= at which) vì câu sau đủ nghĩa S+V (we stayed) và ám chỉ nơi chốn."
+            },
+            {
+                question: "Do you remember the day ______ we first met?",
+                options: ["where", "which", "when", "that"],
+                answer: 2,
+                explanation: "Dùng 'when' thay thế cho danh từ chỉ thời gian (the day)."
+            },
+            {
+                question: "Tell me the reason ______ you are late.",
+                options: ["where", "why", "which", "when"],
+                answer: 1,
+                explanation: "Dùng 'why' (hoặc 'for which') sau danh từ 'the reason'."
+            },
+            {
+                question: "Put it in the drawer ______ you keep the keys.",
+                options: ["which", "that", "where", "when"],
+                answer: 2,
+                explanation: "Nơi chốn để chìa khóa => Dùng 'where' (trong ngăn kéo đó)."
+            },
+            {
+                question: "I'll never forget the time ______ we spent together.",
+                options: ["when", "which", "where", "why"],
+                answer: 1,
+                explanation: "CẨN THẬN! 'Spend time' là ngoại động từ (spend cái gì?). 'We spent [time]' => Thiếu tân ngữ => Dùng 'which' hoặc 'that' (lược bỏ cũng được). Không dùng 'when' ở đây vì không có nghĩa 'vào lúc'."
+            },
+
+            // --- NHÓM 3: GIỚI TỪ (IN WHICH, TO WHOM, FOR WHICH...) ---
+            {
+                question: "The man ______ I was talking is my uncle.",
+                options: ["to whom", "to who", "whom to", "who to"],
+                answer: 0,
+                explanation: "Cấu trúc: talk TO somebody. Khi đảo giới từ lên trước, bắt buộc dùng WHOM (to whom). Không dùng 'to who'."
+            },
+            {
+                question: "The chair ______ he is sitting is broken.",
+                options: ["on which", "in which", "at which", "which"],
+                answer: 0,
+                explanation: "Sit ON a chair => Dùng 'on which'."
+            },
+            {
+                question: "This is the house ______ I was born.",
+                options: ["which", "in which", "that", "whom"],
+                answer: 1,
+                explanation: "Born IN a house => Dùng 'in which' (= where)."
+            },
+            {
+                question: "The job ______ I applied is taken.",
+                options: ["for which", "to which", "at which", "in which"],
+                answer: 0,
+                explanation: "Apply FOR a job => Dùng 'for which'."
+            },
+            {
+                question: "The person ______ I live is my cousin.",
+                options: ["with who", "with whom", "with that", "whom with"],
+                answer: 1,
+                explanation: "Live WITH somebody => Dùng 'with whom'."
+            },
+            {
+                question: "That is the subject ______ I am interested.",
+                options: ["in which", "on which", "at which", "about which"],
+                answer: 0,
+                explanation: "Interested IN something => Dùng 'in which'."
+            },
+            {
+                question: "The song ______ we listened was beautiful.",
+                options: ["to which", "to that", "which", "at which"],
+                answer: 0,
+                explanation: "Listen TO something => Dùng 'to which'. Không dùng 'to that'."
+            },
+            {
+                question: "The pen ______ I write is blue.",
+                options: ["with which", "by which", "of which", "in which"],
+                answer: 0,
+                explanation: "Write WITH a pen (viết bằng bút) => Dùng 'with which'."
+            },
+            {
+                question: "The woman ______ I spoke to was helpful.",
+                options: ["whom", "which", "whose", "where"],
+                answer: 0,
+                explanation: "Speak TO someone. Giới từ 'to' ở cuối câu => Dùng 'whom' (hoặc 'who/that' đều được). Ở đây đáp án đúng nhất là whom."
+            },
+            {
+                question: "The date ______ the meeting will be held has been changed.",
+                options: ["at which", "in which", "on which", "to which"],
+                answer: 2,
+                explanation: "Date (ngày) đi với giới từ ON => 'on which' (= when)."
+            },
+            {
+                question: "The problem ______ we are dealing is complex.",
+                options: ["with which", "about which", "for which", "to which"],
+                answer: 0,
+                explanation: "Deal WITH something (giải quyết việc gì) => Dùng 'with which'."
+            },
+            {
+                question: "This is the document ______ you asked.",
+                options: ["for which", "about which", "to which", "at which"],
+                answer: 0,
+                explanation: "Ask FOR something (yêu cầu cái gì) => Dùng 'for which'."
+            },
+
+            // --- NHÓM 4: BẪY & NÂNG CAO (WHAT, QUANTIFIERS, SENTENCE RELATIVE) ---
+            {
+                question: "Ha Long Bay, ______ is a UNESCO World Heritage Site, is beautiful.",
+                options: ["where", "which", "that", "whom"],
+                answer: 1,
+                explanation: "Dùng 'which' làm chủ ngữ cho 'is'. Không dùng 'that' vì có dấu phẩy (mệnh đề không xác định)."
+            },
+            {
+                question: "The city ______ we visited last summer is famous for its food.",
+                options: ["where", "at which", "which", "in which"],
+                answer: 2,
+                explanation: "Động từ 'visit' cần tân ngữ (visit something), không phải visit 'at' something. Do đó dùng 'which'."
+            },
+            {
+                question: "He passed the exam, ______ made his parents happy.",
+                options: ["that", "what", "which", "who"],
+                answer: 2,
+                explanation: "Dùng 'which' thay thế cho CẢ MỆNH ĐỀ phía trước (việc anh ấy đỗ kỳ thi). Có dấu phẩy nên không dùng 'that'."
+            },
+            {
+                question: "I have two brothers, ______ are doctors.",
+                options: ["both of whom", "both of who", "both of them", "whom both"],
+                answer: 0,
+                explanation: "Sau lượng từ (both of, all of, none of...) + Đại từ quan hệ. Với người dùng 'whom'."
+            },
+            {
+                question: "He has many books, ______ he hasn't read.",
+                options: ["many of which", "many of that", "many of them", "which many"],
+                answer: 0,
+                explanation: "Với vật dùng 'which' sau lượng từ => 'many of which'."
+            },
+            {
+                question: "I don't agree with ______ you said.",
+                options: ["which", "that", "what", "who"],
+                answer: 2,
+                explanation: "Đây là mệnh đề danh từ, không phải mệnh đề quan hệ bổ nghĩa cho danh từ đứng trước. 'Cái điều mà bạn nói' => Dùng 'WHAT' (= the thing that)."
+            },
+            {
+                question: "______ happens, keep calm.",
+                options: ["Which", "What", "Whatever", "Who"],
+                answer: 2,
+                explanation: "'Bất cứ điều gì xảy ra' => 'Whatever'."
+            },
+            {
+                question: "The girl ______ name I forgot is over there.",
+                options: ["whose", "whom", "who", "which"],
+                answer: 0,
+                explanation: "Tên CỦA cô ấy => 'whose name'."
+            },
+            {
+                question: "My father, ______ I respect greatly, is a teacher.",
+                options: ["who", "whom", "that", "which"],
+                answer: 1,
+                explanation: "Có dấu phẩy + vị trí Tân ngữ (tôi tôn trọng ông ấy) => Dùng 'whom' là chuẩn nhất (hoặc 'who'). Tuyệt đối không dùng 'that'."
+            },
+            {
+                question: "That is the shop ______ I bought my shoes.",
+                options: ["which", "that", "where", "what"],
+                answer: 2,
+                explanation: "Mua giày TẠI shop đó => Dùng 'where'."
+            },
+            {
+                question: "That is the shop ______ sells good shoes.",
+                options: ["where", "who", "which", "what"],
+                answer: 2,
+                explanation: "Shop đó BÁN giày (làm chủ ngữ cho động từ 'sells') => Dùng 'which'."
+            },
+             {
+                question: "He failed the test, for ______ he was punished.",
+                options: ["that", "which", "what", "whom"],
+                answer: 1,
+                explanation: "For which = Vì lý do đó (thay cho cả mệnh đề trước). Sau dấu phẩy và giới từ thì chỉ dùng 'which'."
+            },
+             {
+                question: "The reason ______ I cannot come is confidential.",
+                options: ["why", "for which", "which", "A and B"],
+                answer: 3,
+                explanation: "Reason đi với 'why' hoặc 'for which' đều đúng."
+            },
+            {
+                question: "There are some words ______ meaning is difficult to translate.",
+                options: ["which", "whose", "of which", "that"],
+                answer: 1,
+                explanation: "Nghĩa CỦA những từ đó => Dùng 'whose' (dùng được cho cả vật)."
+            },
+             {
+                question: "______ wins the race will get a prize.",
+                options: ["Who", "Whoever", "Whom", "Which"],
+                answer: 1,
+                explanation: "Bất cứ ai thắng => 'Whoever'."
+            },
+            
+            // --- NHÓM 5: TỔNG HỢP & RÚT GỌN ---
+            {
+                question: "The man ______ at the door is my father. (Rút gọn)",
+                options: ["stands", "standing", "stood", "is standing"],
+                answer: 1,
+                explanation: "Rút gọn mệnh đề quan hệ dạng chủ động (The man WHO IS STANDING) => The man STANDING."
+            },
+            {
+                question: "The toys ______ in China are cheap. (Rút gọn)",
+                options: ["making", "make", "made", "to make"],
+                answer: 2,
+                explanation: "Rút gọn dạng bị động (The toys WHICH ARE MADE) => The toys MADE."
+            },
+             {
+                question: "He was the last person ______ the room.",
+                options: ["leave", "leaving", "left", "to leave"],
+                answer: 3,
+                explanation: "Sau 'the last' => Rút gọn dùng To V (to leave)."
+            },
+            {
+                question: "We have a lot of things ______.",
+                options: ["to do", "doing", "did", "that doing"],
+                answer: 0,
+                explanation: "Rút gọn mệnh đề quan hệ chỉ mục đích hoặc sau 'have' => to do (things that we must do)."
+            },
+            {
+                question: "Anybody ______ in this subject can sign up.",
+                options: ["interested", "interesting", "interest", "to interest"],
+                answer: 0,
+                explanation: "Rút gọn bị động/tính từ: Anybody WHO IS INTERESTED => Anybody INTERESTED."
+            },
+            {
+                question: "The platform ______ the train is standing is Platform 5.",
+                options: ["at which", "on which", "in which", "to which"],
+                answer: 0,
+                explanation: "Train stands AT a platform => Dùng 'at which'."
+            },
+            {
+                question: "The speed ______ we were driving was very high.",
+                options: ["at which", "on which", "in which", "with which"],
+                answer: 0,
+                explanation: "At a speed (ở tốc độ) => Dùng 'at which'."
+            },
+            {
+                question: "The extent ______ he has improved is remarkable.",
+                options: ["to which", "at which", "on which", "for which"],
+                answer: 0,
+                explanation: "To an extent (tới một mức độ) => Dùng 'to which'."
+            },
+            {
+                question: "Physics is the subject ______ I am bad.",
+                options: ["at which", "in which", "on which", "about which"],
+                answer: 0,
+                explanation: "Bad AT something (dốt môn gì) => Dùng 'at which'."
+            },
+            {
+                question: "This is the solution ______ we have been looking.",
+                options: ["for which", "at which", "after which", "to which"],
+                answer: 0,
+                explanation: "Look FOR (tìm kiếm) => Dùng 'for which'."
+            }
+        ];
+
+        let questions = []; // Mảng chứa câu hỏi hiện tại (đã shuffle)
+        let currentQuestion = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        const startScreen = document.getElementById('start-screen');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultScreen = document.getElementById('result-screen');
+        const progressBar = document.getElementById('progress-bar');
+        const explanationBox = document.getElementById('explanation-box');
+        const nextBtnContainer = document.getElementById('next-btn-container');
+
+        // Hàm xáo trộn mảng (Fisher-Yates Shuffle)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden'); // Ẩn màn hình kết quả nếu restart
+            quizContainer.classList.remove('hidden');
+            
+            // Reset điểm và bộ câu hỏi
+            score = 0;
+            currentQuestion = 0;
+            questions = [...questionBank]; // Copy từ ngân hàng câu hỏi
+            shuffleArray(questions); // Xáo trộn thứ tự
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            const q = questions[currentQuestion];
+            
+            // Update UI elements
+            document.getElementById('question-counter').innerText = `Câu ${currentQuestion + 1}/${questions.length}`;
+            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('score-display').innerText = `Điểm: ${score}`;
+            
+            explanationBox.classList.add('hidden');
+            nextBtnContainer.classList.add('hidden');
+
+            // Update Progress Bar
+            const progress = ((currentQuestion) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Generate Options - Tối ưu cho mobile: luôn hiển thị 1 cột, border rõ ràng
+            const optionsHtml = q.options.map((opt, index) => `
+                <div onclick="checkAnswer(${index}, this)" 
+                     class="option-item border-2 border-gray-200 rounded-xl p-4 cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition flex items-center group bg-white shadow-sm active:bg-indigo-100 touch-manipulation">
+                    <div class="w-8 h-8 rounded-full border-2 border-gray-300 mr-4 flex-shrink-0 flex items-center justify-center group-hover:border-indigo-500 font-bold text-gray-400 text-sm">
+                        ${String.fromCharCode(65 + index)}
+                    </div>
+                    <span class="text-gray-700 font-medium text-base sm:text-lg">${opt}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('options-container').innerHTML = optionsHtml;
+        }
+
+        function checkAnswer(selectedIndex, element) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option-item');
+
+            // Show explanation
+            document.getElementById('explanation-text').innerHTML = q.explanation;
+            explanationBox.classList.remove('hidden');
+            nextBtnContainer.classList.remove('hidden');
+
+            // Scroll to explanation on mobile
+            if (window.innerWidth < 640) {
+                setTimeout(() => {
+                    explanationBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+
+            if (selectedIndex === q.answer) {
+                // Correct
+                score++;
+                element.classList.add('correct-anim');
+                element.classList.remove('border-gray-200', 'hover:bg-indigo-50');
+                element.querySelector('div').classList.add('bg-green-500', 'text-white', 'border-transparent');
+                element.innerHTML += '<i class="fas fa-check text-green-600 ml-auto text-xl"></i>';
+            } else {
+                // Wrong
+                element.classList.add('wrong-anim');
+                element.classList.remove('border-gray-200', 'hover:bg-indigo-50');
+                element.querySelector('div').classList.add('bg-red-500', 'text-white', 'border-transparent');
+                element.innerHTML += '<i class="fas fa-times text-red-600 ml-auto text-xl"></i>';
+                
+                // Highlight correct answer
+                const correctOption = options[q.answer];
+                correctOption.classList.add('bg-green-100', 'border-green-500');
+                correctOption.querySelector('div').classList.add('bg-green-500', 'text-white', 'border-transparent');
+                correctOption.innerHTML += '<i class="fas fa-check text-green-600 ml-auto text-xl"></i>';
+            }
+            
+            document.getElementById('score-display').innerText = `Điểm: ${score}`;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            progressBar.style.width = '100%';
+
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('final-score').innerText = `${score}/${questions.length}`;
+            document.getElementById('final-percent').innerText = `${percentage}%`;
+
+            const iconEl = document.getElementById('result-icon');
+            const titleEl = document.getElementById('result-title');
+            const msgEl = document.getElementById('result-message');
+
+            if (percentage === 100) {
+                iconEl.innerHTML = '<i class="fas fa-trophy text-yellow-400 animate-bounce"></i>';
+                titleEl.innerText = "Tuyệt đối!";
+                msgEl.innerText = "Đỉnh của chóp! Không sai câu nào.";
+            } else if (percentage >= 80) {
+                iconEl.innerHTML = '<i class="fas fa-medal text-blue-500"></i>';
+                titleEl.innerText = "Rất xuất sắc!";
+                msgEl.innerText = "Kiến thức cực kỳ vững chắc.";
+            } else if (percentage >= 50) {
+                iconEl.innerHTML = '<i class="fas fa-thumbs-up text-indigo-500"></i>';
+                titleEl.innerText = "Đã hoàn thành!";
+                msgEl.innerText = "Làm tốt lắm. Hãy xem lại các câu sai nhé.";
+            } else {
+                iconEl.innerHTML = '<i class="fas fa-book-open text-gray-400"></i>';
+                titleEl.innerText = "Cần cố gắng!";
+                msgEl.innerText = "Đừng nản lòng, làm lại để nhớ lâu hơn.";
+            }
+        }
+
+        function restartQuiz() {
+            startQuiz(); // startQuiz sẽ tự động reset và shuffle
+        }
+    </script>
+</body>
+</html>

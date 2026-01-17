@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination B1: Unit 12, 15, 18 Vocabulary Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .explain-fade {
+            animation: fadeInExplain 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInExplain {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Container -->
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden min-h-[600px] flex flex-col relative">
+        
+        <!-- Header -->
+        <div class="bg-indigo-600 p-6 text-white text-center flex justify-between items-center relative z-10">
+            <div>
+                <h1 class="text-xl font-bold text-left"><i class="fas fa-book-open mr-2"></i>Destination B1</h1>
+                <p class="text-indigo-200 text-xs mt-1 text-left">Units 12, 15, 18 Review (Updated)</p>
+            </div>
+            <div id="score-display" class="hidden bg-indigo-700 px-4 py-2 rounded-lg text-sm font-bold">
+                Score: 0/0
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 p-6 flex flex-col" id="app-content">
+            <!-- Content will be injected here via JS -->
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-3 text-center text-gray-400 text-xs border-t">
+            Interactive Vocabulary & Grammar Quiz
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Database of Questions for Units 12, 15, 18
+        const questionBank = [
+            // --- EXISTING QUESTIONS ---
+            { q: "I have a lot in ______ with my best friend.", options: ["common", "contact", "connection", "touch"], a: "common", explain: "Cấu trúc 'have sth in common': có điểm chung.", unit: "Unit 12" },
+            { q: "I tried to ______ to her, but she wouldn't listen.", options: ["excuse", "apologize", "forgive", "regret"], a: "apologize", explain: "'Apologize to sb' = xin lỗi ai.", unit: "Unit 12" },
+            { q: "He is single now. He ______ up with his girlfriend last week.", options: ["split", "broke", "ended", "cut"], a: "split", explain: "Phrasal verb 'split up' (hoặc break up) = chia tay.", unit: "Unit 12" },
+            { q: "Do you ______ on well with your neighbors?", options: ["go", "get", "make", "do"], a: "get", explain: "Phrasal verb 'get on (well) with sb' = hòa thuận với ai.", unit: "Unit 12" },
+            { q: "Parents usually ______ up their children to be polite.", options: ["grow", "bring", "raise", "take"], a: "bring", explain: "'Bring up' = nuôi nấng/dạy dỗ. 'Grow up' là lớn lên (nội động từ).", unit: "Unit 12" },
+            { q: "I haven't seen my ______ since the family reunion.", options: ["parents", "relatives", "colleagues", "strangers"], a: "relatives", explain: "'Relatives' = họ hàng/người thân.", unit: "Unit 12" },
+            { q: "Don't talk to ______! It's dangerous.", options: ["guests", "strangers", "customers", "friends"], a: "strangers", explain: "'Stranger' = người lạ.", unit: "Unit 12" },
+            { q: "She is a close ______ of mine from work.", options: ["colleague", "employee", "staff", "client"], a: "colleague", explain: "'Colleague' = đồng nghiệp.", unit: "Unit 12" },
+            { q: "He finally got ______ to his childhood sweetheart.", options: ["marriage", "marry", "married", "marrying"], a: "married", explain: "Cấu trúc 'get married to sb' = kết hôn với ai.", unit: "Unit 12" },
+            { q: "You should ______ your elders.", options: ["inspect", "respect", "expect", "suspect"], a: "respect", explain: "'Respect' = tôn trọng.", unit: "Unit 12" },
+            { q: "I can't ______ him. He always tells lies.", options: ["trust", "believe", "rely", "depend"], a: "trust", explain: "'Trust' = tin tưởng (về tính cách/độ trung thực).", unit: "Unit 12" },
+            { q: "They had a big ______ about money and stopped speaking.", options: ["discuss", "chat", "argument", "talk"], a: "argument", explain: "'Argument' = cuộc cãi vã/tranh luận gay gắt.", unit: "Unit 12" },
+            { q: "Are you doing anything at the moment, or are you ______?", options: ["single", "alone", "lonely", "free"], a: "single", explain: "Trong ngữ cảnh Unit 12 (Relationships), câu này hỏi về tình trạng quan hệ: 'Are you single?'.", unit: "Unit 12" },
+            { q: "Who looks ______ the baby when you go to work?", options: ["for", "at", "after", "up"], a: "after", explain: "'Look after' = chăm sóc.", unit: "Unit 12" },
+            { q: "She felt very ______ when she moved to a new city.", options: ["alone", "lonely", "single", "only"], a: "lonely", explain: "'Lonely' = cô đơn (cảm xúc). 'Alone' = một mình (trạng thái).", unit: "Unit 12" },
+            { q: "It's difficult to make ______ at a new school.", options: ["friends", "acquaintances", "colleagues", "partners"], a: "friends", explain: "Collocation 'make friends' = kết bạn.", unit: "Unit 12" },
+            { q: "My sister fell ______ with her best friend over a boy.", options: ["over", "out", "down", "off"], a: "out", explain: "'Fall out (with sb)' = cãi nhau/nghỉ chơi với ai.", unit: "Unit 12" },
+            { q: "Please forgive me ______ forgetting your birthday.", options: ["about", "for", "of", "with"], a: "for", explain: "'Forgive sb for Ving' = tha thứ cho ai vì việc gì.", unit: "Unit 12" },
+            { q: "He is a very ______ person. You can tell him your secrets.", options: ["confident", "kind", "reliable", "funny"], a: "reliable", explain: "'Reliable' = đáng tin cậy.", unit: "Unit 12" },
+            { q: "I prefer living on my ______.", options: ["self", "own", "owner", "private"], a: "own", explain: "'On my own' = by myself (một mình).", unit: "Unit 12" },
+
+            { q: "I can't ______ to buy a new car right now.", options: ["afford", "spend", "pay", "cost"], a: "afford", explain: "'Can't afford (to V)' = không đủ tiền để làm gì.", unit: "Unit 15" },
+            { q: "I bought this shirt in the ______ for half price.", options: ["sell", "sale", "sales", "sold"], a: "sale", explain: "'In the sale' hoặc 'on sale' = đang giảm giá.", unit: "Unit 15" },
+            { q: "Keep the ______ in case you want to return the item.", options: ["bill", "recipe", "receipt", "ticket"], a: "receipt", explain: "'Receipt' = hóa đơn mua hàng (để đổi trả).", unit: "Unit 15" },
+            { q: "This shop has a huge ______ of shoes.", options: ["variety", "vary", "various", "change"], a: "variety", explain: "'A variety of' = sự đa dạng/nhiều loại.", unit: "Unit 15" },
+            { q: "How much did that watch ______ you?", options: ["pay", "spend", "cost", "charge"], a: "cost", explain: "Cấu trúc 'Cost sb + amount' = tốn của ai bao nhiêu tiền.", unit: "Unit 15" },
+            { q: "Can I pay by credit card or in ______?", options: ["money", "currency", "cash", "notes"], a: "cash", explain: "'In cash' = bằng tiền mặt.", unit: "Unit 15" },
+            { q: "The shirt didn't fit, so I took it ______ to the shop.", options: ["away", "back", "off", "up"], a: "back", explain: "'Take sth back' = mang trả lại.", unit: "Unit 15" },
+            { q: "I'm saving ______ for a new laptop.", options: ["in", "on", "up", "down"], a: "up", explain: "'Save up' = tiết kiệm tiền.", unit: "Unit 15" },
+            { q: "That old painting is worth a ______.", options: ["money", "treasure", "fortune", "rich"], a: "fortune", explain: "'Worth a fortune' = đáng cả gia tài.", unit: "Unit 15" },
+            { q: "Don't forget to ask for a ______ if the product is broken.", options: ["refund", "repay", "return", "reward"], a: "refund", explain: "'Refund' = tiền hoàn lại.", unit: "Unit 15" },
+            { q: "I lent him $50 and he hasn't paid me ______ yet.", options: ["to", "for", "back", "off"], a: "back", explain: "'Pay back' = trả nợ.", unit: "Unit 15" },
+            { q: "It was a real ______! Only $5 for this jacket.", options: ["bargain", "cheap", "sale", "profit"], a: "bargain", explain: "'Bargain' = món hời.", unit: "Unit 15" },
+            { q: "This car is very expensive to ______.", options: ["run", "work", "job", "do"], a: "run", explain: "'Run a car' = vận hành/nuôi xe.", unit: "Unit 15" },
+            { q: "The shop assistant gave me the wrong ______.", options: ["money", "change", "cash", "coin"], a: "change", explain: "'Change' = tiền thừa trả lại.", unit: "Unit 15" },
+            { q: "I ______ him $100.", options: ["own", "owe", "borrow", "lend"], a: "owe", explain: "'Owe' = nợ ai tiền.", unit: "Unit 15" },
+            { q: "The dictionary is available at a reasonable ______.", options: ["cost", "price", "charge", "fee"], a: "price", explain: "'At a reasonable price' = giá hợp lý.", unit: "Unit 15" },
+            { q: "This supermarket stocks many ______ brands.", options: ["famous", "name", "title", "label"], a: "famous", explain: "'Famous brand' = thương hiệu nổi tiếng.", unit: "Unit 15" },
+            { q: "We need to ______ the cost of the holiday.", options: ["value", "estimate", "guess", "predict"], a: "estimate", explain: "'Estimate' = ước tính.", unit: "Unit 15" },
+            { q: "If you buy two, you get a 10% ______.", options: ["discount", "decrease", "refund", "deposit"], a: "discount", explain: "'Discount' = giảm giá.", unit: "Unit 15" },
+            { q: "They usually ______ 10% for service.", options: ["cost", "price", "charge", "ask"], a: "charge", explain: "'Charge' = tính phí.", unit: "Unit 15" },
+            { q: "I picked up the wrong bag by ______.", options: ["mistake", "error", "fault", "accident"], a: "mistake", explain: "'By mistake' = do nhầm lẫn.", unit: "Unit 15" },
+            { q: "This shop is ______ for sale.", options: ["out", "up", "in", "on"], a: "up", explain: "'Up for sale' = đang được rao bán.", unit: "Unit 15" },
+
+            { q: "Who ______ the telephone?", options: ["discovered", "invented", "found", "created"], a: "invented", explain: "'Invent' = phát minh (cái mới).", unit: "Unit 18" },
+            { q: "Scientists are doing ______ to test the new drug.", options: ["experiences", "experiments", "examinations", "effects"], a: "experiments", explain: "'Do experiments' = làm thí nghiệm.", unit: "Unit 18" },
+            { q: "My car broke ______ on the motorway.", options: ["off", "out", "down", "up"], a: "down", explain: "'Break down' = bị hỏng.", unit: "Unit 18" },
+            { q: "Can you turn ______ the TV? I want to watch the news.", options: ["on", "in", "up", "out"], a: "on", explain: "'Turn on' = bật.", unit: "Unit 18" },
+            { q: "I came ______ this old photo in the attic.", options: ["across", "over", "into", "round"], a: "across", explain: "'Come across' = tình cờ thấy.", unit: "Unit 18" },
+            { q: "We need to ______ out what happened.", options: ["look", "find", "search", "know"], a: "find", explain: "'Find out' = tìm ra thông tin.", unit: "Unit 18" },
+            { q: "The internet is a wonderful ______.", options: ["discovery", "invention", "machine", "research"], a: "invention", explain: "Internet là một phát minh.", unit: "Unit 18" },
+            { q: "This computer has a lot of modern ______.", options: ["tools", "equipment", "hardware", "software"], a: "software", explain: "'Software' = phần mềm.", unit: "Unit 18" },
+            { q: "The car has an ______ engine.", options: ["electric", "electrical", "electricity", "electronic"], a: "electric", explain: "'Electric engine' = động cơ điện.", unit: "Unit 18" },
+            { q: "Don't throw ______ those papers, I need them.", options: ["out", "away", "off", "down"], a: "away", explain: "'Throw away' = vứt đi.", unit: "Unit 18" },
+            { q: "The washing machine is out of ______.", options: ["work", "order", "function", "job"], a: "order", explain: "'Out of order' = bị hỏng.", unit: "Unit 18" },
+            { q: "This gadget is very ______ for cutting vegetables.", options: ["using", "use", "useful", "useless"], a: "useful", explain: "'Useful' = hữu ích.", unit: "Unit 18" },
+            { q: "I couldn't ______ the problem with my computer.", options: ["solve", "answer", "beat", "break"], a: "solve", explain: "'Solve a problem' = giải quyết vấn đề.", unit: "Unit 18" },
+            { q: "Scientists have ______ a new planet.", options: ["invented", "discovered", "created", "made"], a: "discovered", explain: "'Discovered' = khám phá ra (cái đã có).", unit: "Unit 18" },
+            { q: "Modern ______ has changed our lives.", options: ["technique", "technology", "technical", "technician"], a: "technology", explain: "'Technology' = công nghệ.", unit: "Unit 18" },
+            { q: "Just click on the icon on the ______.", options: ["mouse", "screen", "keyboard", "printer"], a: "screen", explain: "Icon trên 'screen' (màn hình).", unit: "Unit 18" },
+            { q: "This chemical causes a strange ______ on the skin.", options: ["affect", "effect", "result", "change"], a: "effect", explain: "'Effect' (danh từ) = tác động.", unit: "Unit 18" },
+            { q: "The laboratory is full of scientific ______.", options: ["tools", "equipment", "device", "gadget"], a: "equipment", explain: "'Equipment' = trang thiết bị.", unit: "Unit 18" },
+            { q: "Is this watch ______ or mechanical?", options: ["digit", "digital", "electric", "computer"], a: "digital", explain: "'Digital' = kỹ thuật số.", unit: "Unit 18" },
+            { q: "We carried out some ______ in the lab.", options: ["experiences", "research", "test", "job"], a: "research", explain: "'Carry out research' = tiến hành nghiên cứu.", unit: "Unit 18" },
+            { q: "The new factory will ______ plastic toys.", options: ["invent", "create", "produce", "build"], a: "produce", explain: "'Produce' = sản xuất.", unit: "Unit 18" },
+            { q: "It's a ______ story, he made it up.", options: ["false", "fake", "wrong", "artificial"], a: "false", explain: "'False story' = câu chuyện bịa đặt/không thật.", unit: "Unit 18" },
+            { q: "Artificial ______ is becoming more advanced.", options: ["intelligent", "intelligence", "mind", "brain"], a: "intelligence", explain: "AI = Artificial Intelligence.", unit: "Unit 18" },
+
+            // --- NEWLY ADDED QUESTIONS (50 MORE) ---
+            // Unit 12: Friends & Relations
+            { q: "I really ______ my grandfather; he fought in the war.", options: ["admire", "approve", "accept", "attract"], a: "admire", explain: "'Admire' = ngưỡng mộ.", unit: "Unit 12" },
+            { q: "She is extremely ______ of her younger sister's success.", options: ["jealous", "greedy", "angry", "disappointed"], a: "jealous", explain: "Cấu trúc 'jealous of' = ghen tị với.", unit: "Unit 12" },
+            { q: "A dog is a very ______ animal.", options: ["loyal", "confident", "honest", "polite"], a: "loyal", explain: "'Loyal' = trung thành.", unit: "Unit 12" },
+            { q: "Don't be ______! Say thank you.", options: ["kind", "rude", "polite", "nice"], a: "rude", explain: "'Rude' = thô lỗ, bất lịch sự.", unit: "Unit 12" },
+            { q: "They are a lovely ______; they've been married for years.", options: ["pair", "couple", "partner", "double"], a: "couple", explain: "'Couple' = cặp đôi (vợ chồng/người yêu).", unit: "Unit 12" },
+            { q: "I'm very ______ of my classmates.", options: ["keen", "interested", "fond", "like"], a: "fond", explain: "Cấu trúc 'fond of' = thích/quý mến.", unit: "Unit 12" },
+            { q: "He asked her to ______ him, and she said yes!", options: ["marry", "divorce", "engage", "relate"], a: "marry", explain: "'Marry sb' = kết hôn với ai (không có giới từ).", unit: "Unit 12" },
+            { q: "Never ______ a lie to your best friend.", options: ["say", "tell", "speak", "talk"], a: "tell", explain: "Collocation 'tell a lie' = nói dối.", unit: "Unit 12" },
+            { q: "I ______ going out with Tom next week.", options: ["fancy", "want", "hope", "wish"], a: "fancy", explain: "'Fancy + Ving' = thích/muốn làm gì.", unit: "Unit 12" },
+            { q: "Are you ______ with this girl?", options: ["going out", "going on", "going in", "going off"], a: "going out", explain: "'Go out with sb' = hẹn hò với ai.", unit: "Unit 12" },
+            { q: "I always ______ up early in the morning.", options: ["get", "wake", "stand", "look"], a: "wake", explain: "'Wake up' = thức giấc.", unit: "Unit 12" },
+            { q: "My parents ______ me to respect others.", options: ["learned", "taught", "studied", "instructed"], a: "taught", explain: "'Teach sb to V' = dạy ai làm gì.", unit: "Unit 12" },
+            { q: "She cares ______ the environment deeply.", options: ["of", "in", "about", "for"], a: "about", explain: "'Care about' = quan tâm đến.", unit: "Unit 12" },
+            { q: "We had a big ______ about politics.", options: ["discussion", "chat", "speak", "sentence"], a: "discussion", explain: "'Have a discussion about' = thảo luận về.", unit: "Unit 12" },
+            { q: "He is very ______ in his ability to win.", options: ["confident", "shy", "nervous", "afraid"], a: "confident", explain: "'Confident' = tự tin.", unit: "Unit 12" },
+            { q: "I can't stand people who are ______ to animals.", options: ["kind", "cruel", "nice", "friendly"], a: "cruel", explain: "'Cruel' = độc ác/tàn nhẫn.", unit: "Unit 12" },
+            { q: "Don't blame me ______ your mistakes.", options: ["with", "on", "for", "about"], a: "for", explain: "Cấu trúc 'blame sb for sth' = đổ lỗi cho ai.", unit: "Unit 12" },
+
+            // Unit 15: Buying and Selling
+            { q: "I saw an ______ for a new job in the newspaper.", options: ["advertisement", "advice", "announce", "article"], a: "advertisement", explain: "'Advertisement' (ad/advert) = quảng cáo.", unit: "Unit 15" },
+            { q: "Can I ______ $10 from you?", options: ["lend", "borrow", "owe", "rent"], a: "borrow", explain: "'Borrow from' = mượn từ ai. 'Lend to' = cho ai mượn.", unit: "Unit 15" },
+            { q: "He is in ______ because he spent too much money.", options: ["credit", "debt", "profit", "loan"], a: "debt", explain: "'In debt' = mắc nợ.", unit: "Unit 15" },
+            { q: "The workers ______ higher wages.", options: ["command", "demand", "ask", "say"], a: "demand", explain: "'Demand' = yêu cầu/đòi hỏi (mạnh mẽ).", unit: "Unit 15" },
+            { q: "We ______ a lot of goods to other countries.", options: ["import", "export", "transport", "report"], a: "export", explain: "'Export' = xuất khẩu.", unit: "Unit 15" },
+            { q: "The admission ______ for the museum is $10.", options: ["cost", "fee", "price", "money"], a: "fee", explain: "'Fee' = lệ phí (học phí, vé vào cửa...).", unit: "Unit 15" },
+            { q: "Buying a house is a good ______.", options: ["invest", "investor", "investment", "investing"], a: "investment", explain: "'Investment' = khoản đầu tư.", unit: "Unit 15" },
+            { q: "The company made a huge ______ this year.", options: ["benefit", "profit", "money", "earn"], a: "profit", explain: "'Make a profit' = tạo ra lợi nhuận.", unit: "Unit 15" },
+            { q: "This house is my private ______.", options: ["proper", "property", "own", "wealth"], a: "property", explain: "'Property' = tài sản/bất động sản.", unit: "Unit 15" },
+            { q: "Don't ______ your money on useless things.", options: ["spend", "waste", "lose", "miss"], a: "waste", explain: "'Waste money on' = lãng phí tiền vào...", unit: "Unit 15" },
+            { q: "The bill ______ up to $50.", options: ["added", "counted", "made", "took"], a: "added", explain: "'Add up to' = có tổng là.", unit: "Unit 15" },
+            { q: "I will ______ back the money I borrowed soon.", options: ["give", "pay", "take", "bring"], a: "pay", explain: "'Pay back' = trả lại tiền nợ.", unit: "Unit 15" },
+            { q: "The shops are ______ away free samples.", options: ["giving", "taking", "making", "doing"], a: "giving", explain: "'Give away' = tặng miễn phí.", unit: "Unit 15" },
+            { q: "Please ______ up, we are late!", options: ["speed", "hurry", "fast", "quick"], a: "hurry", explain: "'Hurry up' = nhanh lên.", unit: "Unit 15" },
+            { q: "Prices have gone ______ recently.", options: ["up", "out", "off", "in"], a: "up", explain: "'Go up' = tăng giá.", unit: "Unit 15" },
+            { q: "We need to ______ some money from the bank.", options: ["lend", "borrow", "rent", "hire"], a: "borrow", explain: "'Borrow' = vay mượn.", unit: "Unit 15" },
+            { q: "You can ______ a suit for the wedding.", options: ["hire", "borrow", "lend", "employ"], a: "hire", explain: "'Hire' = thuê (đồ vật/người) trong thời gian ngắn.", unit: "Unit 15" },
+
+            // Unit 18: Inventions & Discoveries
+            { q: "This door opens ______ when you walk near it.", options: ["automatic", "automatically", "automation", "automate"], a: "automatically", explain: "Cần trạng từ bổ nghĩa cho động từ opens -> 'automatically' (tự động).", unit: "Unit 18" },
+            { q: "The instructions are too ______.", options: ["complicate", "complicated", "complexion", "easy"], a: "complicated", explain: "'Complicated' = phức tạp.", unit: "Unit 18" },
+            { q: "The temperature has ______ by 5 degrees.", options: ["dropped", "decreased", "lowered", "fallen"], a: "decreased", explain: "'Decrease' = giảm xuống.", unit: "Unit 18" },
+            { q: "The exact ______ of the bridge is unknown.", options: ["long", "length", "lengthen", "longer"], a: "length", explain: "'Length' (danh từ) = chiều dài.", unit: "Unit 18" },
+            { q: "This is a ______ opportunity, don't miss it.", options: ["unique", "single", "only", "one"], a: "unique", explain: "'Unique' = độc nhất vô nhị.", unit: "Unit 18" },
+            { q: "We need to ______ the heating on; it's cold.", options: ["turn", "put", "make", "get"], a: "turn", explain: "'Turn on' = bật.", unit: "Unit 18" },
+            { q: "He made ______ a story about being a spy.", options: ["up", "out", "in", "off"], a: "up", explain: "'Make up' = bịa đặt.", unit: "Unit 18" },
+            { q: "The scientist ______ a new theory.", options: ["developed", "invented", "built", "grew"], a: "developed", explain: "'Develop a theory' = phát triển một lý thuyết.", unit: "Unit 18" },
+            { q: "I can't ______ how difficult this is.", options: ["explain", "explanation", "explaining", "explained"], a: "explain", explain: "Cần động từ nguyên thể sau 'can't'.", unit: "Unit 18" },
+            { q: "The project will ______ a lot of work.", options: ["contain", "involve", "include", "consist"], a: "involve", explain: "'Involve' = bao gồm/đòi hỏi (liên quan đến hành động).", unit: "Unit 18" },
+            { q: "There is a ______ of water in the desert.", options: ["short", "lack", "need", "miss"], a: "lack", explain: "'A lack of' = sự thiếu hụt.", unit: "Unit 18" },
+            { q: "What is the ______ speed of this car?", options: ["maximum", "maximal", "most", "high"], a: "maximum", explain: "'Maximum speed' = tốc độ tối đa.", unit: "Unit 18" },
+            { q: "The machine is easy to ______.", options: ["operate", "work", "do", "make"], a: "operate", explain: "'Operate' = vận hành (máy móc).", unit: "Unit 18" },
+            { q: "Most toys are made of ______ nowadays.", options: ["plastic", "paper", "wood", "rock"], a: "plastic", explain: "'Plastic' = nhựa.", unit: "Unit 18" },
+            { q: "The car stopped ______.", options: ["sudden", "suddenly", "quick", "fast"], a: "suddenly", explain: "Cần trạng từ -> 'suddenly' (đột ngột).", unit: "Unit 18" },
+            { q: "Can you ______ off the lights?", options: ["turn", "get", "take", "make"], a: "turn", explain: "'Turn off' = tắt.", unit: "Unit 18" }
+        ];
+
+        // --- App State ---
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false; 
+        let selectedAnswer = null; 
+        let userAnswers = [];
+
+        // --- DOM Elements ---
+        const appContent = document.getElementById('app-content');
+        const scoreDisplay = document.getElementById('score-display');
+
+        // --- Utility Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Logic Functions ---
+
+        function startQuiz() {
+            // Shuffle full bank and take first 50 (or less if bank is smaller)
+            const shuffled = shuffleArray([...questionBank]);
+            // Take up to 50 questions for one session
+            const limit = Math.min(50, shuffled.length);
+            currentQuestions = shuffled.slice(0, limit);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            answered = false;
+            selectedAnswer = null;
+
+            scoreDisplay.classList.remove('hidden');
+            updateScoreDisplay();
+            renderQuestion(true); 
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = `Score: ${score}/${currentQuestions.length}`;
+        }
+
+        function handleAnswer(opt) {
+            if (answered) return; 
+
+            answered = true;
+            selectedAnswer = opt;
+            const question = currentQuestions[currentQuestionIndex];
+            const isCorrect = (opt === question.a);
+
+            if (isCorrect) score++;
+
+            userAnswers.push({
+                question: question,
+                selected: opt,
+                isCorrect: isCorrect
+            });
+
+            updateScoreDisplay();
+            renderQuestion(false); 
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                currentQuestionIndex++;
+                answered = false;
+                selectedAnswer = null;
+                renderQuestion(true); 
+            } else {
+                renderResults();
+            }
+        }
+
+        // --- Render Functions ---
+
+        function renderStartScreen() {
+            scoreDisplay.classList.add('hidden');
+            appContent.innerHTML = `
+                <div class="text-center fade-in space-y-6 flex flex-col items-center justify-center h-full">
+                    <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mb-2">
+                        <i class="fas fa-flask text-4xl text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Review: Units 12, 15, 18</h2>
+                        <p class="text-gray-500 text-sm mt-2 max-w-md mx-auto">
+                            Mỗi lượt chơi sẽ lấy ngẫu nhiên 50 câu.
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-500 w-full max-w-sm">
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-user-friends text-indigo-500 mr-2"></i>Unit 12: Friends</div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-shopping-cart text-indigo-500 mr-2"></i>Unit 15: Shopping</div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-200"><i class="fas fa-lightbulb text-indigo-500 mr-2"></i>Unit 18: Inventions</div>
+                    </div>
+
+                    <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition transform hover:-translate-y-1 mt-4">
+                        Bắt đầu
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderQuestion(animate = true) {
+            const question = currentQuestions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            
+            const animClass = animate ? "fade-in" : "";
+
+            const optionsHtml = question.options.map((opt, index) => {
+                let btnClass = "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-400";
+                let icon = "";
+                
+                if (answered) {
+                    if (opt === question.a) {
+                        btnClass = "bg-green-100 border-2 border-green-500 text-green-800 font-bold";
+                        icon = '<i class="fas fa-check-circle text-green-600 float-right mt-1"></i>';
+                    } else if (opt === selectedAnswer && opt !== question.a) {
+                        btnClass = "bg-red-50 border-2 border-red-400 text-red-800";
+                        icon = '<i class="fas fa-times-circle text-red-500 float-right mt-1"></i>';
+                    } else {
+                        btnClass = "bg-gray-50 border-gray-100 text-gray-400 opacity-60";
+                    }
+                }
+
+                return `
+                    <button onclick="handleAnswer('${opt}')" 
+                        ${answered ? 'disabled' : ''}
+                        class="option-btn w-full p-4 rounded-xl text-left relative group ${btnClass}">
+                        <span class="inline-block w-6 font-bold opacity-50 mr-2">${String.fromCharCode(65 + index)}.</span>
+                        ${opt}
+                        ${icon}
+                    </button>
+                `;
+            }).join('');
+
+            let feedbackHtml = '';
+            if (answered) {
+                const isCorrect = selectedAnswer === question.a;
+                const feedbackColor = isCorrect ? "text-green-600 bg-green-50 border-green-200" : "text-red-600 bg-red-50 border-red-200";
+                const feedbackIcon = isCorrect ? "fa-check" : "fa-times";
+                const feedbackText = isCorrect ? "Chính xác!" : "Chưa chính xác!";
+
+                feedbackHtml = `
+                    <div class="mt-6 explain-fade">
+                        <div class="${feedbackColor} border rounded-lg p-4 mb-4">
+                            <div class="font-bold flex items-center gap-2 mb-1">
+                                <i class="fas ${feedbackIcon}"></i> ${feedbackText}
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed">
+                                <span class="font-semibold text-indigo-600">Giải thích:</span> ${question.explain}
+                            </p>
+                        </div>
+                        <button onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow transition">
+                            Câu tiếp theo <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="${animClass} w-full max-w-xl mx-auto">
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span>Câu hỏi ${currentQuestionIndex + 1}/${currentQuestions.length}</span>
+                            <span>${Math.round(progress)}%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5">
+                            <div class="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="mb-6">
+                        <span class="inline-block bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide mb-2">${question.unit}</span>
+                        <h3 class="text-xl text-gray-800 font-medium leading-relaxed">
+                            ${question.q.replace('______', '<span class="border-b-2 border-indigo-300 text-indigo-600 px-1 mx-1 font-bold">.......</span>')}
+                        </h3>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="grid grid-cols-1 gap-3">
+                        ${optionsHtml}
+                    </div>
+
+                    <!-- Feedback Area -->
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+
+        function renderResults() {
+            scoreDisplay.classList.add('hidden');
+            const total = currentQuestions.length;
+            const percentage = Math.round((score / total) * 100);
+            let message = "";
+            let colorClass = "";
+
+            if (percentage >= 90) { message = "Xuất sắc! Bạn nắm rất vững từ vựng."; colorClass = "text-green-600"; }
+            else if (percentage >= 70) { message = "Làm tốt lắm! Kiến thức khá vững."; colorClass = "text-blue-600"; }
+            else if (percentage >= 50) { message = "Tạm ổn, nhưng cần ôn thêm."; colorClass = "text-yellow-600"; }
+            else { message = "Cần cố gắng nhiều hơn!"; colorClass = "text-red-600"; }
+
+            const wrongList = userAnswers.filter(a => !a.isCorrect);
+            let wrongHtml = '';
+            
+            if (wrongList.length > 0) {
+                wrongHtml = `
+                    <div class="w-full mt-6 text-left border-t pt-4">
+                        <h4 class="font-bold text-gray-700 mb-3">Xem lại các câu sai (${wrongList.length})</h4>
+                        <div class="space-y-3 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                            ${wrongList.map(item => `
+                                <div class="bg-red-50 p-3 rounded border border-red-100 text-sm">
+                                    <p class="text-gray-800 mb-1 font-medium">${item.question.q}</p>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span class="text-red-500">Bạn chọn: ${item.selected}</span>
+                                        <span class="text-green-600 font-bold">Đúng: ${item.question.a}</span>
+                                    </div>
+                                    <p class="text-xs text-indigo-600 mt-1 italic">${item.question.explain}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            appContent.innerHTML = `
+                <div class="text-center fade-in flex flex-col items-center justify-center w-full h-full">
+                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 relative">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path class="${percentage >= 70 ? 'text-green-500' : 'text-indigo-500'}" stroke-dasharray="${percentage}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                        </svg>
+                        <span class="absolute text-lg font-bold text-gray-700">${score}/${total}</span>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 mb-1">Kết quả</h2>
+                    <p class="${colorClass} font-medium mb-6 text-sm">${message}</p>
+                    
+                    <button onclick="renderStartScreen()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-8 rounded-full shadow transition text-sm">
+                        <i class="fas fa-redo mr-2"></i> Làm lại
+                    </button>
+
+                    ${wrongHtml}
+                </div>
+            `;
+        }
+
+        renderStartScreen();
+
+    </script>
+</body>
+</html>
