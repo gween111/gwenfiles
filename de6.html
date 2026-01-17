@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Thi Số 6 - So Sánh & Phân Biệt (Font Be Vietnam Pro)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1e3a8a; /* Xanh Navy đậm */
+            --primary-light: #eff6ff;
+            --accent: #3b82f6; /* Xanh sáng */
+            --text: #1e293b;
+            --bg: #f8fafc;
+            --success: #10b981;
+            --error: #ef4444;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif; /* Đã đổi font theo yêu cầu */
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0; padding-bottom: 100px;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        .header {
+            background: white; padding: 20px 30px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 10px 30px -10px rgba(30, 58, 138, 0.15);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+            border-top: 6px solid var(--primary);
+        }
+
+        .timer {
+            font-size: 1.4rem; font-weight: 700; color: var(--primary);
+            background: var(--primary-light); padding: 8px 18px;
+            border-radius: 10px; 
+            font-feature-settings: "tnum";
+        }
+
+        /* Question Card */
+        .card {
+            background: white; border-radius: 16px;
+            padding: 30px; margin-top: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            position: relative; overflow: hidden;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        
+        .card::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 5px; background: #cbd5e1; transition: 0.3s;
+        }
+        .card:hover::before { background: var(--accent); }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.1); }
+
+        .tag {
+            display: inline-block; background: #eff6ff; color: var(--primary);
+            font-size: 0.8rem; font-weight: 800; text-transform: uppercase;
+            padding: 5px 12px; border-radius: 6px; margin-bottom: 15px;
+            border: 1px solid #bfdbfe; letter-spacing: 0.5px;
+        }
+
+        .q-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; color: #0f172a; }
+
+        /* Options */
+        .opt-group { display: grid; gap: 12px; }
+        .opt {
+            display: flex; align-items: flex-start; padding: 15px 20px;
+            border: 2px solid #f1f5f9; border-radius: 10px;
+            cursor: pointer; transition: 0.2s; font-size: 1rem;
+        }
+        .opt:hover { border-color: #93c5fd; background: #f8fafc; }
+        .opt input { margin-right: 15px; margin-top: 5px; width: 20px; height: 20px; accent-color: var(--primary); flex-shrink: 0; }
+
+        /* Status Classes */
+        .opt.selected { border-color: var(--primary); background: #eff6ff; font-weight: 600; }
+        .opt.correct { border-color: var(--success); background: #ecfdf5; color: #064e3b; }
+        .opt.wrong { border-color: var(--error); background: #fef2f2; opacity: 0.8; }
+
+        /* Explanation */
+        .explain {
+            margin-top: 25px; padding: 20px;
+            background: #ffffff; border: 1px solid #e2e8f0;
+            border-left: 5px solid var(--accent);
+            border-radius: 8px; display: none;
+            font-size: 1rem; color: #334155;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--primary); color: white;
+            padding: 16px 40px; border-radius: 50px;
+            font-size: 1.1rem; font-weight: 700; border: none;
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.4);
+            cursor: pointer; transition: 0.3s; z-index: 200;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        .btn-submit:hover { background: #172554; transform: scale(1.05); }
+
+        /* Modal */
+        .modal {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: white; padding: 50px; border-radius: 20px;
+            text-align: center; max-width: 500px; width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .score { font-size: 4rem; font-weight: 800; color: var(--primary); margin: 15px 0; line-height: 1; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h2 style="margin:0; font-weight: 700;">ĐỀ THI SỐ 06</h2>
+            <small style="color: #64748b;">Chuyên đề: So sánh & Phân biệt (Font Mới)</small>
+        </div>
+        <div class="timer" id="timer">60:00</div>
+    </div>
+
+    <div id="quiz-list"></div>
+</div>
+
+<button class="btn-submit" onclick="finishExam()">NỘP BÀI THI</button>
+
+<div class="modal" id="resultModal">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color: #64748b;">KẾT QUẢ CỦA BẠN</h3>
+        <div class="score" id="scoreValue">0.0</div>
+        <p id="feedbackText" style="font-size: 1.1rem;">...</p>
+        <button onclick="document.getElementById('resultModal').style.display='none'" style="padding:12px 24px; background:#f1f5f9; border:none; border-radius:8px; cursor:pointer; font-weight:600; margin-top:15px;">Xem lại bài làm</button>
+    </div>
+</div>
+
+<script>
+    const data = [
+        // --- CHỦ ĐỀ 1: NHÀ NƯỚC (6 Câu) ---
+        {
+            topic: "1. So sánh Nhà nước",
+            q: "Sự khác biệt cơ bản nhất giữa <B>Nhà nước</B> và <B>Các tổ chức chính trị - xã hội khác</B> (Đảng, Đoàn thanh niên...) là gì?",
+            a: ["Nhà nước có đông thành viên hơn.", "Nhà nước có quyền lực công đặc biệt (tách ra khỏi xã hội) và độc quyền ban hành pháp luật.", "Nhà nước có nhiều tiền hơn.", "Nhà nước hoạt động vì mục đích từ thiện."],
+            c: 1,
+            e: "Chỉ Nhà nước mới có 'Quyền lực công' (bộ máy cưỡng chế: quân đội, cảnh sát, nhà tù) và quyền ban hành thuế, pháp luật."
+        },
+        {
+            topic: "1. So sánh Nhà nước",
+            q: "Phân biệt <B>Nhà nước đơn nhất</B> và <B>Nhà nước liên bang</B>?",
+            a: ["Nhà nước đơn nhất chỉ có một bộ máy nhà nước và một hệ thống pháp luật chung; Liên bang có 2 hệ thống (của liên bang và của bang thành viên).", "Nhà nước đơn nhất nhỏ hơn Liên bang.", "Nhà nước đơn nhất không có quân đội.", "Liên bang không có Hiến pháp chung."],
+            c: 0,
+            e: "Sự khác biệt nằm ở cấu trúc chủ quyền: Đơn nhất (Toàn vẹn, 1 hệ thống), Liên bang (Phân chia quyền lực, 2 hệ thống)."
+        },
+        {
+            topic: "1. So sánh Nhà nước",
+            q: "Sự khác biệt giữa <B>Dân chủ trực tiếp</B> và <B>Dân chủ đại diện</B>?",
+            a: ["Trực tiếp là dân tự quyết định; Đại diện là dân bầu người khác thay mình quyết định.", "Trực tiếp là dân đi biểu tình; Đại diện là dân ở nhà.", "Trực tiếp tốn kém hơn; Đại diện rẻ hơn.", "Trực tiếp chỉ áp dụng ở xã; Đại diện áp dụng ở trung ương."],
+            c: 0,
+            e: "Dân chủ trực tiếp: Dân - Quyết định. Dân chủ đại diện: Dân - Bầu - Người đại diện - Quyết định."
+        },
+        {
+            topic: "1. So sánh Nhà nước",
+            q: "So sánh <B>Chủ quyền quốc gia</B> và <B>Quyền con người</B> trong luật pháp quốc tế hiện đại?",
+            a: ["Chủ quyền quốc gia là tuyệt đối, không ai được can thiệp dù vi phạm nhân quyền.", "Quyền con người là tuyệt đối, xóa bỏ chủ quyền quốc gia.", "Chủ quyền quốc gia vẫn là nguyên tắc cơ bản, nhưng không được dùng làm lá chắn để che đậy hành vi vi phạm nhân quyền nghiêm trọng.", "Hai khái niệm này không liên quan."],
+            c: 2,
+            e: "Trong luật pháp hiện đại, Chủ quyền quốc gia phải được thực thi trong sự tôn trọng các chuẩn mực nhân quyền phổ quát."
+        },
+        {
+            topic: "1. So sánh Nhà nước",
+            q: "Khác biệt giữa <B>Quản lý nhà nước</B> và <B>Quản lý của các tổ chức xã hội</B>?",
+            a: ["Quản lý nhà nước mang tính quyền lực, cưỡng chế và bắt buộc chung; Quản lý xã hội dựa trên tự nguyện, điều lệ.", "Quản lý nhà nước kém hiệu quả hơn.", "Quản lý xã hội không có kỷ luật.", "Giống hệt nhau."],
+            c: 0,
+            e: "Tính 'Cưỡng chế' và 'Bắt buộc chung' là đặc trưng của quản lý nhà nước."
+        },
+        {
+            topic: "1. So sánh Nhà nước",
+            q: "Sự khác nhau giữa <B>Cai trị bằng pháp luật</B> (Rule by Law) và <B>Nhà nước pháp quyền</B> (Rule of Law)?",
+            a: ["Rule by Law: Nhà nước dùng luật để cai trị dân (nhà nước đứng trên luật); Rule of Law: Nhà nước cũng phải tuân thủ luật (luật đứng trên nhà nước).", "Hai thuật ngữ là một.", "Rule by Law tốt hơn.", "Rule of Law không cần chính phủ."],
+            c: 0,
+            e: "Điểm mấu chốt: Ở Nhà nước pháp quyền, Nhà nước bị ràng buộc bởi pháp luật (Tự hạn chế quyền lực)."
+        },
+
+        // --- CHỦ ĐỀ 2: BỘ MÁY (8 Câu) ---
+        {
+            topic: "2. So sánh Bộ máy",
+            q: "Phân biệt chức năng của <B>Quốc hội</B> và <B>Chính phủ</B>?",
+            a: ["Quốc hội bắt người; Chính phủ xét xử.", "Quốc hội làm luật (Lập pháp); Chính phủ tổ chức thi hành luật (Hành pháp).", "Quốc hội lo đối ngoại; Chính phủ lo đối nội.", "Chính phủ to hơn Quốc hội."],
+            c: 1,
+            e: "Quốc hội: Quyết định chính sách, làm luật. Chính phủ: 'Tay chân' thực hiện, đưa luật vào đời sống."
+        },
+        {
+            topic: "2. So sánh Bộ máy",
+            q: "Sự khác biệt giữa <B>Tòa án nhân dân</B> và <B>Viện kiểm sát nhân dân</B>?",
+            a: ["Tòa án buộc tội; Viện kiểm sát xét xử.", "Tòa án xét xử (Tư pháp); Viện kiểm sát công tố và kiểm sát hoạt động tư pháp.", "Viện kiểm sát là cấp trên của Tòa án.", "Tòa án thuộc Chính phủ; VKS thuộc Quốc hội."],
+            c: 1,
+            e: "Tòa án: Phán quyết (Đúng/Sai, Có tội/Không). VKS: Buộc tội (Công tố) và giám sát việc tuân thủ pháp luật trong tố tụng."
+        },
+        {
+            topic: "2. So sánh Bộ máy",
+            q: "Phân biệt <B>Đại biểu Quốc hội</B> và <B>Đại biểu Hội đồng nhân dân</B>?",
+            a: ["ĐBQH đại diện cho ý chí nhân dân cả nước; ĐB HĐND đại diện cho ý chí nhân dân ở địa phương bầu ra mình.", "ĐBQH lương cao hơn.", "ĐB HĐND không có quyền chất vấn.", "Giống nhau, chỉ khác tên gọi."],
+            c: 0,
+            e: "Khác biệt ở phạm vi đại diện (Toàn quốc vs Địa phương)."
+        },
+        {
+            topic: "2. So sánh Bộ máy",
+            q: "So sánh <B>Giám đốc thẩm</B> và <B>Phúc thẩm</B>?",
+            a: ["Phúc thẩm là xét xử lại vụ án chưa có hiệu lực pháp luật (do có kháng cáo/kháng nghị); Giám đốc thẩm là xét lại bản án ĐÃ có hiệu lực pháp luật (do có sai lầm).", "Phúc thẩm là cấp xét xử thứ 3.", "Giám đốc thẩm là xét xử lần đầu.", "Hai thủ tục này là một."],
+            c: 0,
+            e: "Phúc thẩm là cấp xét xử thứ 2 (chưa xong). Giám đốc thẩm là thủ tục đặc biệt (xét lại cái đã xong rồi)."
+        },
+        {
+            topic: "2. So sánh Bộ máy",
+            q: "Sự khác nhau giữa <B>Bộ</B> và <B>Cơ quan ngang Bộ</B>?",
+            a: ["Bộ quyền lực hơn.", "Về cơ bản có chức năng, thẩm quyền tương đương nhau trong Chính phủ (đều thực hiện chức năng quản lý nhà nước đối với ngành/lĩnh vực).", "Cơ quan ngang Bộ không có Bộ trưởng.", "Bộ do Quốc hội lập, Cơ quan ngang bộ do Chính phủ lập."],
+            c: 1,
+            e: "Về địa vị pháp lý là tương đương. Người đứng đầu đều là thành viên Chính phủ."
+        },
+        {
+            topic: "2. So sánh Bộ máy",
+            q: "Phân biệt <B>Bãi nhiệm</B> và <B>Miễn nhiệm</B>?",
+            a: ["Bãi nhiệm: Buộc thôi giữ chức do vi phạm khuyết điểm (mang tính kỷ luật/trừng phạt); Miễn nhiệm: Cho thôi giữ chức do sức khỏe, năng lực hoặc lý do khác (nhẹ nhàng hơn).", "Bãi nhiệm là tự xin nghỉ.", "Miễn nhiệm là bị đuổi việc ngay lập tức.", "Hai từ này dùng thế nào cũng được."],
+            c: 0,
+            e: "Bãi nhiệm thể hiện sự mất tín nhiệm nặng nề. Miễn nhiệm thường là 'cho nghỉ' theo nguyện vọng hoặc do không đủ năng lực."
+        },
+        {
+            topic: "2. So sánh Bộ máy",
+            q: "Khác biệt giữa <B>Ủy ban nhân dân</B> (UBND) và <B>Hội đồng nhân dân</B> (HĐND)?",
+            a: ["UBND là cơ quan quyền lực; HĐND là cơ quan hành chính.", "HĐND (do dân bầu) quyết định các vấn đề quan trọng; UBND (do HĐND bầu) tổ chức thực hiện các quyết định đó.", "UBND giám sát HĐND.", "HĐND làm việc thường xuyên; UBND làm việc theo kỳ họp."],
+            c: 1,
+            e: "HĐND: Quyết định (Ra Nghị quyết). UBND: Thi hành (Ra Quyết định, Chỉ thị thực hiện)."
+        },
+        {
+            topic: "2. So sánh Bộ máy",
+            q: "Sự khác biệt giữa <B>Chánh án TAND Tối cao</B> và <B>Bộ trưởng Bộ Tư pháp</B>?",
+            a: ["Chánh án đứng đầu ngành xét xử (Tòa án); Bộ trưởng Tư pháp đứng đầu ngành hành chính tư pháp (Thi hành án, công chứng, luật sư, xây dựng luật...).", "Chánh án là cấp dưới của Bộ trưởng.", "Bộ trưởng Tư pháp xét xử các vụ án lớn.", "Chánh án do Thủ tướng bổ nhiệm."],
+            c: 0,
+            e: "Tòa án (Xét xử) độc lập với Chính phủ (Bộ Tư pháp thuộc Chính phủ)."
+        },
+
+        // --- CHỦ ĐỀ 3: PL ĐẠI CƯƠNG (6 Câu) ---
+        {
+            topic: "3. So sánh PL Đại cương",
+            q: "Phân biệt <B>Văn bản quy phạm pháp luật</B> (VBQPPL) và <B>Văn bản áp dụng pháp luật</B>?",
+            a: ["VBQPPL áp dụng chung, nhiều lần cho nhiều đối tượng; VB áp dụng PL áp dụng cá biệt, 1 lần cho đối tượng cụ thể.", "VB áp dụng PL do Quốc hội ban hành.", "VBQPPL là Quyết định xử phạt; VB áp dụng là Luật.", "Giống nhau."],
+            c: 0,
+            e: "QPPL: Luật Giao thông (áp dụng cho mọi người). Áp dụng PL: Quyết định phạt anh A (chỉ áp dụng cho anh A)."
+        },
+        {
+            topic: "3. So sánh PL Đại cương",
+            q: "So sánh <B>Pháp luật</B> và <B>Đạo đức</B>?",
+            a: ["Pháp luật được đảm bảo bằng cưỡng chế nhà nước; Đạo đức được đảm bảo bằng dư luận xã hội và lương tâm.", "Đạo đức có văn bản chính thức; Pháp luật thì không.", "Pháp luật có trước Đạo đức.", "Đạo đức chỉ áp dụng cho người tốt."],
+            c: 0,
+            e: "Tính cưỡng chế nhà nước là điểm khác biệt lớn nhất."
+        },
+        {
+            topic: "3. So sánh PL Đại cương",
+            q: "Phân biệt <B>Nghị định</B> (Decree) và <B>Thông tư</B> (Circular)?",
+            a: ["Nghị định do Chính phủ ban hành; Thông tư do Bộ trưởng ban hành.", "Thông tư cao hơn Nghị định.", "Nghị định hướng dẫn Thông tư.", "Nghị định do Quốc hội ban hành."],
+            c: 0,
+            e: "Thứ bậc: Luật -> Nghị định (Chính phủ) -> Thông tư (Bộ trưởng)."
+        },
+        {
+            topic: "3. So sánh PL Đại cương",
+            q: "Sự khác nhau giữa <B>Tuân thủ pháp luật</B> và <B>Thi hành pháp luật</B>?",
+            a: ["Tuân thủ là dạng thụ động (không làm điều cấm); Thi hành là dạng chủ động (làm điều luật bắt buộc).", "Tuân thủ là của công dân; Thi hành là của công an.", "Thi hành là không làm điều cấm.", "Tuân thủ là làm điều luật cho phép."],
+            c: 0,
+            e: "Tuân thủ: Kiềm chế (không vượt đèn đỏ). Thi hành: Hành động (đóng thuế, đi nghĩa vụ)."
+        },
+        {
+            topic: "3. So sánh PL Đại cương",
+            q: "Phân biệt <B>Tập hợp hóa</B> và <B>Pháp điển hóa</B>?",
+            a: ["Tập hợp hóa: Sắp xếp lại văn bản (cơ học); Pháp điển hóa: Xây dựng lại, chỉnh sửa thành bộ luật thống nhất (nội dung).", "Tập hợp hóa khó hơn.", "Pháp điển hóa là in sách luật.", "Hai khái niệm là một."],
+            c: 0,
+            e: "Pháp điển hóa là hoạt động xây dựng pháp luật trình độ cao (tạo ra Bộ luật mới). Tập hợp hóa chỉ là gom lại cho dễ tra cứu."
+        },
+        {
+            topic: "3. So sánh PL Đại cương",
+            q: "So sánh <B>Chế định pháp luật</B> và <B>Ngành luật</B>?",
+            a: ["Ngành luật nhỏ hơn Chế định.", "Ngành luật bao gồm nhiều Chế định pháp luật.", "Chế định pháp luật bao gồm nhiều Ngành luật.", "Hai cái này độc lập."],
+            c: 1,
+            e: "Cấu trúc: Quy phạm -> Chế định (nhóm quy phạm cùng tính chất) -> Ngành luật (lĩnh vực lớn)."
+        },
+
+        // --- CHỦ ĐỀ 4: QUY PHẠM & QHPL (6 Câu) ---
+        {
+            topic: "4. So sánh QP & QHPL",
+            q: "Phân biệt <B>Năng lực pháp luật</B> và <B>Năng lực hành vi</B>?",
+            a: ["Năng lực pháp luật là khả năng hưởng quyền (có từ khi sinh); Năng lực hành vi là khả năng tự mình thực hiện quyền (phụ thuộc độ tuổi/nhận thức).", "Năng lực hành vi có trước năng lực pháp luật.", "Người điên vẫn có năng lực hành vi đầy đủ.", "Trẻ em không có năng lực pháp luật."],
+            c: 0,
+            e: "Trẻ sơ sinh có Năng lực pháp luật (quyền sống, thừa kế...) nhưng chưa có Năng lực hành vi (chưa tự ký hợp đồng được)."
+        },
+        {
+            topic: "4. So sánh QP & QHPL",
+            q: "Sự khác nhau giữa <B>Sự biến pháp lý</B> và <B>Hành vi pháp lý</B>?",
+            a: ["Sự biến xảy ra ngoài ý chí (bão, lũ, cái chết tự nhiên); Hành vi phụ thuộc ý chí con người.", "Sự biến luôn hợp pháp.", "Hành vi luôn trái pháp luật.", "Sự biến không làm phát sinh quan hệ pháp luật."],
+            c: 0,
+            e: "Từ khóa phân biệt: 'Ý chí con người'."
+        },
+        {
+            topic: "4. So sánh QP & QHPL",
+            q: "Phân biệt <B>Quy phạm tùy nghi</B> và <B>Quy phạm mệnh lệnh</B>?",
+            a: ["Tùy nghi: Cho phép lựa chọn; Mệnh lệnh: Bắt buộc phải làm (hoặc cấm).", "Tùy nghi là quy phạm bắt buộc.", "Mệnh lệnh cho phép thỏa thuận.", "Tùy nghi chỉ dùng trong Hình sự."],
+            c: 0,
+            e: "Tùy nghi (thường gặp trong Dân sự): 'Các bên có quyền thỏa thuận...'. Mệnh lệnh (Hành chính/Hình sự): 'Phải...', 'Cấm...'."
+        },
+        {
+            topic: "4. So sánh QP & QHPL",
+            q: "So sánh <B>Người đại diện theo pháp luật</B> và <B>Người đại diện theo ủy quyền</B>?",
+            a: ["Đại diện theo pháp luật: Do luật quy định (đương nhiên); Đại diện theo ủy quyền: Do thỏa thuận giữa các bên.", "Đại diện theo pháp luật chỉ dành cho công ty.", "Đại diện ủy quyền không cần văn bản.", "Cha mẹ đại diện cho con là đại diện theo ủy quyền."],
+            c: 0,
+            e: "Cha mẹ đại diện cho con chưa thành niên -> Theo pháp luật. A nhờ B đi họp hộ -> Theo ủy quyền."
+        },
+        {
+            topic: "4. So sánh QP & QHPL",
+            q: "Phân biệt <B>Quyền chủ thể</B> và <B>Nghĩa vụ pháp lý</B>?",
+            a: ["Quyền chủ thể: Cách xử sự được phép (lợi ích); Nghĩa vụ pháp lý: Cách xử sự bắt buộc (trách nhiệm).", "Quyền chủ thể là tuyệt đối.", "Nghĩa vụ pháp lý luôn đi kèm hình phạt.", "Quyền chủ thể chỉ dành cho nhà nước."],
+            c: 0,
+            e: "Quyền = Được làm/Yêu cầu người khác làm. Nghĩa vụ = Phải làm/Không được làm."
+        },
+        {
+            topic: "4. So sánh QP & QHPL",
+            q: "Khác biệt giữa <B>Giả định</B> và <B>Quy định</B> trong cấu trúc quy phạm?",
+            a: ["Giả định: Nêu hoàn cảnh/điều kiện; Quy định: Nêu cách xử sự.", "Giả định: Nêu hình phạt; Quy định: Nêu người thực hiện.", "Giả định luôn đứng sau Quy định.", "Giả định là phần không quan trọng."],
+            c: 0,
+            e: "Giả định: 'Người nào...' (Ai? Khi nào?). Quy định: 'Được/Phải/Cấm...' (Làm gì?)."
+        },
+
+        // --- CHỦ ĐỀ 5: VI PHẠM & TNPL (6 Câu) ---
+        {
+            topic: "5. So sánh Vi phạm & TNPL",
+            q: "Phân biệt <B>Lỗi cố ý trực tiếp</B> và <B>Lỗi cố ý gián tiếp</B>?",
+            a: ["Trực tiếp: Mong muốn hậu quả xảy ra; Gián tiếp: Không mong muốn nhưng để mặc hậu quả xảy ra.", "Trực tiếp là tự tay làm; Gián tiếp là thuê người làm.", "Gián tiếp nhẹ tội hơn.", "Trực tiếp là vô ý."],
+            c: 0,
+            e: "Khác biệt ở yếu tố 'Ý chí': Mong muốn vs Để mặc."
+        },
+        {
+            topic: "5. So sánh Vi phạm & TNPL",
+            q: "Sự khác nhau cơ bản giữa <B>Trách nhiệm Hình sự</B> và <B>Trách nhiệm Hành chính</B>?",
+            a: ["Hình sự: Áp dụng cho Tội phạm (nguy hiểm cao, chế tài nghiêm khắc nhất); Hành chính: Áp dụng cho vi phạm hành chính (nguy hiểm thấp hơn).", "Hành chính có thể phạt tù.", "Hình sự do Công an phường xử lý.", "Hình sự chỉ phạt tiền."],
+            c: 0,
+            e: "Mức độ nguy hiểm cho xã hội là tiêu chí phân biệt quan trọng nhất."
+        },
+        {
+            topic: "5. So sánh Vi phạm & TNPL",
+            q: "Phân biệt <B>Trách nhiệm Dân sự</B> và <B>Trách nhiệm Hình sự</B> về mục đích?",
+            a: ["Dân sự: Khôi phục tình trạng tài sản/bồi thường (lợi ích tư); Hình sự: Trừng trị/giáo dục (lợi ích công).", "Dân sự nhằm bỏ tù người vi phạm.", "Hình sự nhằm đòi tiền cho nạn nhân.", "Giống nhau."],
+            c: 0,
+            e: "Dân sự hướng tới 'đền bù'. Hình sự hướng tới 'trừng phạt'."
+        },
+        {
+            topic: "5. So sánh Vi phạm & TNPL",
+            q: "So sánh <B>Vô ý do cẩu thả</B> và <B>Vô ý vì quá tự tin</B>?",
+            a: ["Cẩu thả: Không thấy trước hậu quả (dù phải thấy); Quá tự tin: Thấy trước hậu quả nhưng tin rằng không xảy ra.", "Cẩu thả là cố ý.", "Quá tự tin là lỗi cố ý gián tiếp.", "Hai lỗi này hình phạt bằng nhau."],
+            c: 0,
+            e: "Cẩu thả = Không biết (do bất cẩn). Quá tự tin = Biết (nhưng chủ quan)."
+        },
+        {
+            topic: "5. So sánh Vi phạm & TNPL",
+            q: "Phân biệt <B>Phòng vệ chính đáng</B> và <B>Tình thế cấp thiết</B>?",
+            a: ["Phòng vệ: Chống trả lại chính kẻ tấn công; Cấp thiết: Gây thiệt hại cho một bên thứ ba (nhỏ hơn) để tránh thiệt hại lớn hơn.", "Phòng vệ là phạm pháp.", "Tình thế cấp thiết là tự vệ.", "Phòng vệ chỉ dùng tay không."],
+            c: 0,
+            e: "Đối tượng bị gây thiệt hại khác nhau: Kẻ tấn công (Phòng vệ) vs Bên thứ ba/Lợi ích khác (Cấp thiết)."
+        },
+        {
+            topic: "5. So sánh Vi phạm & TNPL",
+            q: "Sự khác biệt giữa <B>Miễn trách nhiệm hình sự</B> và <B>Hình phạt cảnh cáo</B>?",
+            a: ["Miễn TNHS: Không coi là có án tích/không phải chịu chế tài; Cảnh cáo: Là một hình phạt (có án tích).", "Miễn TNHS là vô tội.", "Cảnh cáo nhẹ hơn Miễn TNHS.", "Giống nhau."],
+            c: 0,
+            e: "Miễn TNHS là xóa bỏ hậu quả pháp lý hình sự. Cảnh cáo vẫn là một loại hình phạt chính thức."
+        },
+
+        // --- CHỦ ĐỀ 6: CÁC NGÀNH LUẬT (8 Câu) ---
+        {
+            topic: "6. So sánh Ngành luật",
+            q: "Phân biệt <B>Sở hữu chung hợp nhất</B> (Vợ chồng) và <B>Sở hữu chung theo phần</B> (Góp vốn)?",
+            a: ["Hợp nhất: Không xác định được phần quyền của mỗi bên (trừ khi chia); Theo phần: Xác định rõ tỷ lệ % của mỗi người.", "Hợp nhất là mỗi người 50%.", "Theo phần là của vợ chồng.", "Hợp nhất chỉ áp dụng cho đất đai."],
+            c: 0,
+            e: "Tài sản vợ chồng là hợp nhất (của chung 1 khối). Góp vốn làm ăn là theo phần (anh 30%, tôi 70%)."
+        },
+        {
+            topic: "6. So sánh Ngành luật",
+            q: "Sự khác nhau giữa <B>Quyền sử dụng đất</B> và <B>Quyền sở hữu đất</B> tại Việt Nam?",
+            a: ["Cá nhân chỉ có Quyền sử dụng; Quyền sở hữu thuộc về Toàn dân (Nhà nước đại diện).", "Người dân có quyền sở hữu đất.", "Người nước ngoài có quyền sở hữu đất.", "Hai khái niệm là một."],
+            c: 0,
+            e: "Việt Nam không công nhận sở hữu tư nhân về đất đai."
+        },
+        {
+            topic: "6. So sánh Ngành luật",
+            q: "Phân biệt <B>Hợp đồng lao động</B> và <B>Hợp đồng dân sự (dịch vụ)</B>?",
+            a: ["HĐ Lao động: Có sự quản lý, điều hành của người sử dụng lao động (làm công ăn lương); HĐ Dân sự: Bình đẳng, chỉ quan tâm kết quả công việc.", "HĐ Lao động không cần đóng bảo hiểm.", "HĐ Dân sự phải đóng bảo hiểm xã hội.", "HĐ Lao động là khoán việc."],
+            c: 0,
+            e: "Yếu tố 'Quản lý, điều hành, giám sát' là đặc trưng của quan hệ lao động."
+        },
+        {
+            topic: "6. So sánh Ngành luật",
+            q: "So sánh <B>Kết hôn</B> và <B>Chung sống như vợ chồng</B>?",
+            a: ["Kết hôn: Được pháp luật công nhận và bảo vệ (phát sinh quyền nghĩa vụ); Chung sống: Không làm phát sinh quyền nghĩa vụ vợ chồng hợp pháp.", "Chung sống lâu năm tự động thành kết hôn.", "Kết hôn tốn tiền hơn.", "Chung sống như vợ chồng là phạm pháp."],
+            c: 0,
+            e: "Chỉ có đăng ký kết hôn mới tạo ra hiệu lực pháp lý."
+        },
+        {
+            topic: "6. So sánh Ngành luật",
+            q: "Phân biệt <B>Phạt tiền (Hình sự)</B> và <B>Phạt tiền (Hành chính)</B>?",
+            a: ["Phạt tiền Hình sự: Là hình phạt đối với tội phạm (có án tích); Phạt tiền Hành chính: Là biện pháp xử lý vi phạm hành chính (không có án tích).", "Phạt tiền Hình sự nộp cho Công an; Hành chính nộp Kho bạc.", "Phạt tiền Hành chính cao hơn.", "Giống nhau."],
+            c: 0,
+            e: "Khác nhau ở bản chất pháp lý và hậu quả (Án tích)."
+        },
+        {
+            topic: "6. So sánh Ngành luật",
+            q: "Sự khác biệt giữa <B>Sa thải</B> và <B>Đơn phương chấm dứt HĐLĐ</B> của doanh nghiệp?",
+            a: ["Sa thải: Là hình thức kỷ luật (do người lao động có lỗi); Đơn phương chấm dứt: Là quyền của doanh nghiệp (có thể do kinh tế khó khăn, thiên tai...).", "Sa thải phải báo trước.", "Đơn phương chấm dứt không cần báo trước.", "Sa thải nhẹ hơn."],
+            c: 0,
+            e: "Sa thải là trừng phạt. Đơn phương chấm dứt là quyền hủy bỏ hợp đồng (có điều kiện)."
+        },
+        {
+            topic: "6. So sánh Ngành luật",
+            q: "Phân biệt <B>Thừa kế theo di chúc</B> và <B>Thừa kế theo pháp luật</B>?",
+            a: ["Theo di chúc: Ưu tiên áp dụng trước (theo ý chí người chết); Theo pháp luật: Chỉ áp dụng khi không có di chúc hoặc di chúc vô hiệu.", "Theo pháp luật ưu tiên hơn.", "Theo di chúc phải chia đều.", "Theo pháp luật ai cũng được hưởng."],
+            c: 0,
+            e: "Pháp luật tôn trọng quyền định đoạt (Di chúc) trước. Khi không có di chúc mới chia theo hàng thừa kế (Pháp luật)."
+        },
+        {
+            topic: "6. So sánh Ngành luật",
+            q: "So sánh <B>Tội phạm ít nghiêm trọng</B> và <B>Tội phạm nghiêm trọng</B>?",
+            a: ["Ít nghiêm trọng: Phạt tù đến 3 năm; Nghiêm trọng: Phạt tù từ trên 3 năm đến 7 năm.", "Ít nghiêm trọng không bị đi tù.", "Nghiêm trọng là tử hình.", "Ít nghiêm trọng là phạt hành chính."],
+            c: 0,
+            e: "Phân loại dựa trên mức cao nhất của khung hình phạt (3 năm vs 7 năm)."
+        }
+    ];
+
+    const quizList = document.getElementById('quiz-list');
+    let userAns = new Array(data.length).fill(null);
+
+    function render() {
+        quizList.innerHTML = data.map((item, idx) => `
+            <div class="card" id="q-${idx}">
+                <span class="tag">${item.topic}</span>
+                <div class="q-text">Câu ${idx + 1}: ${item.q}</div>
+                <div class="opt-group">
+                    ${item.a.map((opt, i) => `
+                        <label class="opt" id="opt-${idx}-${i}" onclick="select(${idx}, ${i})">
+                            <input type="radio" name="name-${idx}" value="${i}">
+                            ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explain" id="exp-${idx}"></div>
+            </div>
+        `).join('');
+    }
+
+    window.select = (qIdx, oIdx) => {
+        userAns[qIdx] = oIdx;
+        document.querySelectorAll(`#q-${qIdx} .opt`).forEach(e => e.classList.remove('selected'));
+        document.getElementById(`opt-${qIdx}-${oIdx}`).classList.add('selected');
+        document.querySelector(`input[name="name-${qIdx}"][value="${oIdx}"]`).checked = true;
+    }
+
+    window.finishExam = () => {
+        if (!confirm("Bạn có chắc chắn muốn nộp bài?")) return;
+        clearInterval(timerInt);
+
+        let score = 0;
+        data.forEach((item, i) => {
+            const u = userAns[i];
+            const exp = document.getElementById(`exp-${i}`);
+            
+            exp.innerHTML = `<strong>💡 Phân biệt:</strong> ${item.e}`;
+            exp.style.display = "block";
+
+            const correctOpt = document.getElementById(`opt-${i}-${item.c}`);
+            if(correctOpt) correctOpt.classList.add("correct");
+
+            if(u === item.c) {
+                score += 0.25;
+            } else if (u !== null) {
+                document.getElementById(`opt-${i}-${u}`).classList.add("wrong");
+            }
+        });
+
+        const finalScore = score.toFixed(2);
+        document.getElementById("scoreValue").innerText = finalScore;
+        
+        let fb = "";
+        if(score >= 9) fb = "Xuất sắc! Tư duy phân tích của bạn rất sắc bén.";
+        else if(score >= 7) fb = "Tốt! Bạn nắm chắc các điểm khác biệt cơ bản.";
+        else if(score >= 5) fb = "Khá. Cần chú ý hơn các chi tiết nhỏ để tránh nhầm lẫn.";
+        else fb = "Cần cố gắng. Hãy ôn lại kỹ các khái niệm đối lập nhau.";
+        
+        document.getElementById("feedbackText").innerText = fb;
+        document.getElementById("resultModal").style.display = "flex";
+    }
+
+    let t = 3600;
+    const timerEl = document.getElementById('timer');
+    const timerInt = setInterval(() => {
+        t--;
+        let m = Math.floor(t/60).toString().padStart(2,'0');
+        let s = (t%60).toString().padStart(2,'0');
+        timerEl.innerText = `${m}:${s}`;
+        if(t <= 0) finishExam();
+    }, 1000);
+
+    render();
+</script>
+
+</body>
+</html>

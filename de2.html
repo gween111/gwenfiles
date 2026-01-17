@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Thi Nâng Cao Số 2 - Pháp Luật Đại Cương</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #f8fafc;
+            --text: #1e293b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #e2e8f0;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: var(--text); margin: 0; padding-bottom: 60px; }
+        
+        /* Sticky Header */
+        .header {
+            background: white; padding: 1rem 2rem;
+            position: sticky; top: 0; z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .timer-badge {
+            background: #fee2e2; color: #991b1b;
+            padding: 0.5rem 1rem; border-radius: 9999px;
+            font-weight: 700; font-feature-settings: "tnum";
+            border: 2px solid #fecaca;
+        }
+
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+
+        /* Question Cards */
+        .q-card {
+            background: white; border-radius: 12px;
+            padding: 1.5rem; margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+        .q-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
+        .q-meta {
+            display: flex; justify-content: space-between; margin-bottom: 1rem;
+            font-size: 0.85rem; color: #64748b;
+        }
+        .badge {
+            background: #e0f2fe; color: #0369a1;
+            padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 600;
+        }
+
+        .q-content { font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem; line-height: 1.5; }
+
+        /* Options */
+        .opt-label {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 1rem; border: 2px solid var(--border);
+            border-radius: 8px; cursor: pointer;
+            margin-bottom: 0.75rem; transition: all 0.2s;
+        }
+        .opt-label:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .opt-label input { margin-top: 4px; transform: scale(1.2); }
+        
+        .opt-label.selected { border-color: var(--primary); background: #eff6ff; }
+        .opt-label.correct { border-color: var(--success); background: #ecfdf5; color: #064e3b; }
+        .opt-label.wrong { border-color: var(--danger); background: #fef2f2; opacity: 0.7; }
+
+        /* Explanation */
+        .explain-box {
+            margin-top: 1rem; padding: 1rem;
+            background: #fffbeb; border-left: 4px solid var(--warning);
+            color: #92400e; font-size: 0.95rem; display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+
+        /* Submit Button */
+        .fab-submit {
+            position: fixed; bottom: 2rem; right: 2rem;
+            background: var(--primary); color: white;
+            padding: 1rem 2rem; border-radius: 50px;
+            font-weight: 700; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+            border: none; cursor: pointer; transition: all 0.2s;
+            z-index: 100;
+        }
+        .fab-submit:hover { transform: scale(1.05); background: var(--primary-dark); }
+
+        /* Modal */
+        .modal-bg {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; place-items: center; z-index: 200;
+            backdrop-filter: blur(4px);
+        }
+        .modal {
+            background: white; padding: 2.5rem; border-radius: 16px;
+            text-align: center; max-width: 400px; width: 90%;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes popIn { from {opacity:0; transform:scale(0.8);} to {opacity:1; transform:scale(1);} }
+        
+        .score-big { font-size: 3rem; font-weight: 800; color: var(--primary); margin: 0.5rem 0; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h2 style="margin:0; font-size:1.25rem;">ĐỀ THI SỐ 02</h2>
+        <small style="color:#64748b">Mức độ: Nâng cao | Dạng câu hỏi: Tình huống & Phân tích</small>
+    </div>
+    <div class="timer-badge" id="timer">60:00</div>
+</div>
+
+<div class="container" id="quiz-body">
+    </div>
+
+<button class="fab-submit" onclick="submitExam()">NỘP BÀI</button>
+
+<div class="modal-bg" id="resultModal">
+    <div class="modal">
+        <h3 style="margin-top:0">KẾT QUẢ CỦA BẠN</h3>
+        <div class="score-big" id="scoreValue">0.0</div>
+        <p id="scoreComment" style="color:#64748b">...</p>
+        <button onclick="closeModal()" style="background:#e2e8f0; border:none; padding:10px 20px; border-radius:8px; font-weight:600; cursor:pointer;">Xem Chi Tiết Lời Giải</button>
+    </div>
+</div>
+
+<script>
+    /* DỮ LIỆU CÂU HỎI MỚI - KHÓ HƠN - PHÂN TÍCH & TÌNH HUỐNG
+       Cấu trúc Ma trận: 6 - 8 - 6 - 6 - 6 - 8
+    */
+    const questions = [
+        // --- CHỦ ĐỀ 1: NHÀ NƯỚC PHÁP QUYỀN (6 Câu) ---
+        {
+            topic: "1. Nhà nước pháp quyền",
+            q: "Nhận định nào sau đây là SAI khi nói về sự lãnh đạo của Đảng Cộng sản Việt Nam đối với Nhà nước?",
+            a: ["Đảng lãnh đạo bằng cương lĩnh, chiến lược, định hướng chính sách.", "Đảng lãnh đạo thông qua công tác cán bộ.", "Đảng làm thay công việc quản lý, điều hành của Nhà nước.", "Đảng lãnh đạo thông qua việc gương mẫu của đảng viên."],
+            correct: 2,
+            explain: "Đảng lãnh đạo nhưng không làm thay nhà nước. Nhà nước quản lý xã hội bằng pháp luật, Đảng định hướng đường lối."
+        },
+        {
+            topic: "1. Nhà nước pháp quyền",
+            q: "Trong NN pháp quyền, mối quan hệ giữa 'Quyền lực nhà nước' và 'Quyền công dân' được hiểu như thế nào là đúng nhất?",
+            a: ["Quyền lực nhà nước là vô hạn, quyền công dân là có hạn.", "Quyền lực nhà nước bị giới hạn bởi quyền con người, quyền công dân.", "Nhà nước ban phát quyền cho công dân.", "Công dân phải phục tùng tuyệt đối mọi mệnh lệnh của nhà nước."],
+            correct: 1,
+            explain: "Nhà nước pháp quyền tự hạn chế quyền lực của mình để tôn trọng và bảo vệ quyền con người."
+        },
+        {
+            topic: "1. Nhà nước pháp quyền",
+            q: "Yếu tố nào đảm bảo cho sự 'thượng tôn pháp luật' được thực thi trên thực tế?",
+            a: ["Chỉ cần ban hành nhiều văn bản luật.", "Hệ thống tư pháp độc lập và xét xử nghiêm minh.", "Tăng cường lực lượng công an.", "Tuyên truyền đạo đức truyền thống."],
+            correct: 1,
+            explain: "Một hệ thống tư pháp mạnh, độc lập là chốt chặn cuối cùng để bảo vệ tính tối cao của pháp luật."
+        },
+        {
+            topic: "1. Nhà nước pháp quyền",
+            q: "Quyền lực nhà nước thống nhất ở Việt Nam nằm ở điểm nào?",
+            a: ["Tất cả quyền lực tập trung vào tay một người đứng đầu.", "Tất cả quyền lực thuộc về Nhân dân.", "Chỉ có Quốc hội mới có quyền lực.", "Chính phủ quyết định mọi vấn đề."],
+            correct: 1,
+            explain: "Thống nhất ở đây là thống nhất ở nguồn gốc: Tất cả quyền lực nhà nước thuộc về Nhân dân."
+        },
+        {
+            topic: "1. Nhà nước pháp quyền",
+            q: "Việc tổ chức lấy ý kiến Nhân dân khi sửa đổi Hiến pháp thể hiện bản chất gì của Nhà nước ta?",
+            a: ["Tính giai cấp.", "Tính dân chủ xã hội chủ nghĩa.", "Tính cưỡng chế.", "Tính quan liêu."],
+            correct: 1,
+            explain: "Thể hiện quyền làm chủ của nhân dân, tham gia vào công việc quan trọng nhất của quốc gia."
+        },
+        {
+            topic: "1. Nhà nước pháp quyền",
+            q: "Đặc điểm nào KHÔNG thuộc về Nhà nước pháp quyền XHCN Việt Nam?",
+            a: ["Quyền lực nhà nước là thống nhất.", "Có sự phân công, phối hợp, kiểm soát quyền lực.", "Tam quyền phân lập đối trọng cứng nhắc.", "Thượng tôn Hiến pháp và pháp luật."],
+            correct: 2,
+            explain: "Việt Nam không áp dụng 'Tam quyền phân lập' (tách rời 3 quyền) mà áp dụng nguyên tắc 'Quyền lực thống nhất, có sự phân công và phối hợp'."
+        },
+
+        // --- CHỦ ĐỀ 2: BỘ MÁY NHÀ NƯỚC (8 Câu) ---
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Quốc hội thực hiện quyền 'giám sát tối cao' thông qua hoạt động nào dưới đây?",
+            a: ["Xét xử các vụ án tham nhũng lớn.", "Lấy phiếu tín nhiệm đối với người giữ chức vụ do Quốc hội bầu hoặc phê chuẩn.", "Bắt giam tội phạm.", "Trực tiếp điều hành nền kinh tế."],
+            correct: 1,
+            explain: "Lấy phiếu tín nhiệm là một hình thức giám sát tối cao điển hình của Quốc hội."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Cơ quan nào có quyền quyết định 'Đại xá' (tha tội hoàn toàn cho hàng loạt người phạm tội nhân dịp sự kiện trọng đại)?",
+            a: ["Chủ tịch nước.", "Quốc hội.", "Thủ tướng Chính phủ.", "Tòa án nhân dân tối cao."],
+            correct: 1,
+            explain: "Đại xá (tha tội phạm vi rộng) thuộc thẩm quyền của Quốc hội. (Lưu ý: Đặc xá - tha tù trước thời hạn cho cá nhân cụ thể - thuộc về Chủ tịch nước)."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Sự khác biệt giữa Ủy ban nhân dân (UBND) và Hội đồng nhân dân (HĐND) cùng cấp là gì?",
+            a: ["UBND là cơ quan quyền lực; HĐND là cơ quan chấp hành.", "HĐND ra nghị quyết; UBND tổ chức thực hiện nghị quyết đó.", "UBND do dân bầu trực tiếp; HĐND do cấp trên bổ nhiệm.", "Hai cơ quan này hoạt động độc lập, không liên quan nhau."],
+            correct: 1,
+            explain: "HĐND là cơ quan quyết định (quyền lực), UBND là cơ quan thực hiện (chấp hành - hành chính)."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Ủy ban Thường vụ Quốc hội là cơ quan gì?",
+            a: ["Cơ quan chuyên môn của Chính phủ.", "Cơ quan thường trực của Quốc hội, hoạt động khi Quốc hội không họp.", "Cơ quan giúp việc cho Chủ tịch nước.", "Cơ quan xét xử đặc biệt."],
+            correct: 1,
+            explain: "Là cơ quan thường trực, giải quyết công việc giữa hai kỳ họp Quốc hội."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Chế độ làm việc của Chính phủ Việt Nam dựa trên nguyên tắc nào?",
+            a: ["Thủ trưởng chế (một người quyết định tất cả).", "Kết hợp chế độ tập thể lãnh đạo với trách nhiệm cá nhân của Thủ tướng và từng thành viên.", "Thảo luận bình đẳng, biểu quyết theo đa số tuyệt đối.", "Làm việc theo mệnh lệnh của Chủ tịch nước."],
+            correct: 1,
+            explain: "Chính phủ làm việc theo chế độ tập thể kết hợp trách nhiệm cá nhân."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Viện Kiểm sát nhân dân thực hiện chức năng 'thực hành quyền công tố' nghĩa là gì?",
+            a: ["Buộc tội người phạm tội thay mặt Nhà nước tại phiên tòa.", "Xét xử người phạm tội.", "Bào chữa cho người bị buộc tội.", "Điều tra thu thập chứng cứ ban đầu."],
+            correct: 0,
+            explain: "Quyền công tố là quyền truy tố tội phạm ra trước tòa án để xét xử."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Trong hệ thống Tòa án nhân dân, cơ quan nào là cao nhất?",
+            a: ["Tòa án nhân dân thành phố Hà Nội.", "Tòa án Quân sự trung ương.", "Tòa án nhân dân tối cao.", "Tòa án Hiến pháp."],
+            correct: 2,
+            explain: "TAND Tối cao là cơ quan xét xử cao nhất, có nhiệm vụ giám đốc thẩm, tái thẩm và phát triển án lệ."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Nguyên tắc 'Thẩm phán, Hội thẩm xét xử độc lập và chỉ tuân theo pháp luật' nhằm mục đích gì?",
+            a: ["Để Thẩm phán muốn xử sao thì xử.", "Để đảm bảo bản án khách quan, công bằng, không bị can thiệp bởi các cơ quan hay cá nhân khác.", "Để Thẩm phán có quyền lực cao hơn Viện kiểm sát.", "Để giảm tải công việc cho Tòa án."],
+            correct: 1,
+            explain: "Đây là nguyên tắc cốt tử của hoạt động tư pháp để đảm bảo công lý."
+        },
+
+        // --- CHỦ ĐỀ 3: PHÁP LUẬT ĐẠI CƯƠNG (6 Câu) ---
+        {
+            topic: "3. Lý luận pháp luật",
+            q: "Tại sao nói 'Văn bản quy phạm pháp luật' ưu việt hơn 'Tập quán pháp' trong xã hội hiện đại?",
+            a: ["Vì nó dễ thay đổi.", "Vì nó có phạm vi tác động rộng, rõ ràng, cụ thể và thống nhất trên toàn quốc.", "Vì nó do người nước ngoài soạn thảo.", "Vì tập quán pháp là lạc hậu."],
+            correct: 1,
+            explain: "Ưu điểm của văn bản luật là sự rõ ràng, chính xác và tính thống nhất cao, phù hợp với xã hội phức tạp."
+        },
+        {
+            topic: "3. Lý luận pháp luật",
+            q: "Văn bản nào dưới đây KHÔNG phải là văn bản quy phạm pháp luật?",
+            a: ["Luật Giáo dục.", "Nghị định 100/2019/NĐ-CP.", "Quyết định bổ nhiệm Giám đốc Sở Tư pháp của Chủ tịch UBND Tỉnh.", "Thông tư của Bộ trưởng Bộ Y tế."],
+            correct: 2,
+            explain: "Quyết định bổ nhiệm là văn bản áp dụng pháp luật (cá biệt), chỉ áp dụng cho 1 người cụ thể, không phải quy phạm phổ biến."
+        },
+        {
+            topic: "3. Lý luận pháp luật",
+            q: "Hiệu lực hồi tố (hiệu lực trở về trước) của văn bản pháp luật thường chỉ được áp dụng trong trường hợp nào?",
+            a: ["Khi quy định trách nhiệm pháp lý nặng hơn.", "Khi quy định mới có lợi cho đối tượng áp dụng (nhẹ hơn hoặc xóa bỏ trách nhiệm).", "Bất cứ khi nào cơ quan ban hành muốn.", "Không bao giờ được phép hồi tố."],
+            correct: 1,
+            explain: "Nguyên tắc nhân đạo: Chỉ hồi tố khi quy định mới có lợi cho người vi phạm (nhẹ hơn)."
+        },
+        {
+            topic: "3. Lý luận pháp luật",
+            q: "Chức năng 'điều chỉnh' của pháp luật được thực hiện như thế nào?",
+            a: ["Ghi nhận các quan hệ xã hội chủ yếu và xác định quyền, nghĩa vụ của các bên tham gia.", "Bắt giữ người dân.", "Tuyên truyền trên tivi.", "Xây dựng nhà tù."],
+            correct: 0,
+            explain: "Điều chỉnh là việc định hướng hành vi bằng cách đặt ra khuôn khổ quyền và nghĩa vụ."
+        },
+        {
+            topic: "3. Lý luận pháp luật",
+            q: "Mối quan hệ giữa Pháp luật và Kinh tế là gì?",
+            a: ["Pháp luật đứng trên kinh tế.", "Kinh tế quyết định pháp luật, pháp luật tác động trở lại kinh tế.", "Pháp luật và kinh tế không liên quan.", "Pháp luật luôn kìm hãm kinh tế."],
+            correct: 1,
+            explain: "Cơ sở hạ tầng (kinh tế) quyết định kiến trúc thượng tầng (pháp luật), nhưng pháp luật có tính độc lập tương đối và tác động lại."
+        },
+        {
+            topic: "3. Lý luận pháp luật",
+            q: "Việc Tòa án Việt Nam được phép áp dụng 'Án lệ' từ năm 2015 thể hiện điều gì?",
+            a: ["Việt Nam đã chuyển sang hệ thống Thông luật (Common Law).", "Việt Nam thừa nhận thêm một nguồn bổ trợ của pháp luật để khắc phục lỗ hổng của văn bản luật.", "Văn bản luật không còn giá trị.", "Thẩm phán được tự ý sáng tạo pháp luật."],
+            correct: 1,
+            explain: "Án lệ là nguồn bổ trợ, áp dụng khi văn bản luật chưa quy định hoặc quy định chưa rõ."
+        },
+
+        // --- CHỦ ĐỀ 4: QUY PHẠM & QHPL (6 Câu) ---
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Tình huống: Điều luật quy định 'Người nào xúc phạm nghiêm trọng nhân phẩm, danh dự của người khác, thì bị phạt cảnh cáo, phạt tiền...'. Đâu là bộ phận 'Quy định'?",
+            a: ["Người nào.", "Xúc phạm nghiêm trọng nhân phẩm, danh dự người khác.", "Bị phạt cảnh cáo, phạt tiền.", "Quy phạm này bị khuyết bộ phận Quy định (ẩn đi)."],
+            correct: 3,
+            explain: "Câu hỏi khó! Đây là quy phạm Luật Hình sự. 'Người nào...' là Giả định. 'Thì bị phạt...' là Chế tài. Bộ phận Quy định (cấm xúc phạm) đã bị ẩn đi (ngầm hiểu là: Nghiêm cấm xúc phạm...)."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Sự kiện pháp lý nào sau đây thuộc loại 'Sự biến' (không phụ thuộc ý chí con người)?",
+            a: ["Ký hợp đồng thuê nhà.", "Đánh người gây thương tích.", "Bão lũ làm trôi tài sản đã bảo hiểm.", "Viết di chúc."],
+            correct: 2,
+            explain: "Bão lũ là hiện tượng tự nhiên, con người không điều khiển được -> Sự biến pháp lý."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Trong quan hệ pháp luật dân sự, 'Khách thể' là gì?",
+            a: ["Là các bên tham gia.", "Là lợi ích vật chất hoặc tinh thần mà các bên hướng tới.", "Là văn bản luật.", "Là Tòa án."],
+            correct: 1,
+            explain: "Khách thể là cái mà các chủ thể mong muốn đạt được khi tham gia quan hệ (ví dụ: chiếc xe trong hợp đồng mua bán)."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Năng lực hành vi dân sự của cá nhân phụ thuộc chủ yếu vào yếu tố nào?",
+            a: ["Độ tuổi và khả năng nhận thức, làm chủ hành vi.", "Tài sản của người đó.", "Địa vị xã hội.", "Trình độ học vấn."],
+            correct: 0,
+            explain: "Để có năng lực hành vi đầy đủ, phải đủ tuổi (thường là 18) và không bị bệnh tâm thần."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Hình thức thực hiện pháp luật nào KHÔNG đòi hỏi chủ thể phải thực hiện hành động thực tế?",
+            a: ["Sử dụng pháp luật.", "Thi hành pháp luật.", "Tuân thủ pháp luật.", "Áp dụng pháp luật."],
+            correct: 2,
+            explain: "Tuân thủ pháp luật là dạng 'Không hành động' (Kiềm chế không làm điều cấm)."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Việc Công ty A đóng thuế thu nhập doanh nghiệp cho Nhà nước là hình thức thực hiện pháp luật nào?",
+            a: ["Tuân thủ pháp luật.", "Thi hành pháp luật.", "Sử dụng pháp luật.", "Áp dụng pháp luật."],
+            correct: 1,
+            explain: "Thi hành pháp luật là chủ động thực hiện nghĩa vụ pháp lý (nghĩa vụ đóng thuế)."
+        },
+
+        // --- CHỦ ĐỀ 5: VI PHẠM & TNPL (6 Câu) ---
+        {
+            topic: "5. Vi phạm & TNPL",
+            q: "Tình huống: A (bác sĩ) vô ý tiêm nhầm thuốc khiến bệnh nhân tử vong. Lỗi của A thuộc loại nào?",
+            a: ["Cố ý trực tiếp.", "Cố ý gián tiếp.", "Vô ý vì quá tự tin.", "Vô ý do cẩu thả."],
+            correct: 3,
+            explain: "Vô ý do cẩu thả: Lẽ ra A phải biết và tuân thủ quy trình (kiểm tra thuốc) nhưng A đã không làm nên gây hậu quả."
+        },
+        {
+            topic: "5. Vi phạm & TNPL",
+            q: "Tình huống: B bị tâm thần phân liệt, trong cơn phát bệnh đã đập phá tài sản của hàng xóm. B có vi phạm pháp luật không?",
+            a: ["Có, nhưng được giảm nhẹ.", "Có, nhưng không bị phạt tù.", "Không, vì B mất năng lực trách nhiệm pháp lý.", "Có, người giám hộ của B phải chịu tù thay."],
+            correct: 2,
+            explain: "Người mất khả năng nhận thức (tâm thần) không phải là chủ thể của vi phạm pháp luật -> Không cấu thành vi phạm."
+        },
+        {
+            topic: "5. Vi phạm & TNPL",
+            q: "Chế tài nào sau đây KHÔNG phải là chế tài Hình sự?",
+            a: ["Phạt tiền.", "Cảnh cáo.", "Tước danh hiệu Công an nhân dân.", "Trục xuất."],
+            correct: 2,
+            explain: "Tước danh hiệu CAND là chế tài Kỷ luật (nội bộ ngành). Hình sự cũng có Cảnh cáo, Phạt tiền, Trục xuất."
+        },
+        {
+            topic: "5. Vi phạm & TNPL",
+            q: "Thời hiệu truy cứu trách nhiệm pháp lý là gì?",
+            a: ["Là thời gian điều tra vụ án.", "Là thời hạn mà khi hết đó, người vi phạm không bị truy cứu trách nhiệm nữa.", "Là thời gian ngồi tù.", "Là thời gian thử thách của án treo."],
+            correct: 1,
+            explain: "Hết thời hiệu thì nhà nước không xử lý nữa (để ổn định quan hệ xã hội)."
+        },
+        {
+            topic: "5. Vi phạm & TNPL",
+            q: "Trách nhiệm bồi thường thiệt hại ngoài hợp đồng thuộc loại trách nhiệm pháp lý nào?",
+            a: ["Trách nhiệm Hình sự.", "Trách nhiệm Hành chính.", "Trách nhiệm Dân sự.", "Trách nhiệm Kỷ luật."],
+            correct: 2,
+            explain: "Bồi thường thiệt hại là chế tài đặc trưng của Luật Dân sự (khôi phục tình trạng tài sản)."
+        },
+        {
+            topic: "5. Vi phạm & TNPL",
+            q: "Mục đích cao nhất của Trách nhiệm pháp lý là gì?",
+            a: ["Làm cho người vi phạm đau khổ.", "Thu tiền cho ngân sách.", "Giáo dục, răn đe và phòng ngừa chung cho toàn xã hội.", "Trả thù cho nạn nhân."],
+            correct: 2,
+            explain: "Trừng phạt chỉ là phương tiện, mục đích chính là giáo dục và phòng ngừa."
+        },
+
+        // --- CHỦ ĐỀ 6: CÁC NGÀNH LUẬT (8 Câu) ---
+        {
+            topic: "6. Các ngành luật",
+            q: "Theo Luật Dân sự 2015, lãi suất vay do các bên thỏa thuận không được vượt quá bao nhiêu?",
+            a: ["10%/năm.", "15%/năm.", "20%/năm.", "Không giới hạn."],
+            correct: 2,
+            explain: "Điều 468 BLDS: Lãi suất thỏa thuận không được vượt quá 20%/năm của khoản tiền vay."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Trong Luật Hình sự, 'Phạm tội chưa đạt' nghĩa là gì?",
+            a: ["Mới suy nghĩ về việc phạm tội.", "Đã chuẩn bị công cụ nhưng chưa làm.", "Đã bắt đầu thực hiện hành vi phạm tội nhưng không thực hiện được đến cùng do nguyên nhân khách quan.", "Đã thực hiện xong nhưng hậu quả chưa xảy ra."],
+            correct: 2,
+            explain: "Đã ra tay nhưng không thành công do bị ngăn cản hoặc yếu tố khách quan (ví dụ: bắn nhưng trượt)."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Ai có thẩm quyền xử phạt vi phạm hành chính đối với hành vi vi phạm giao thông?",
+            a: ["Dân phòng.", "Cảnh sát giao thông và Thanh tra giao thông.", "Bảo vệ tổ dân phố.", "Bất kỳ ai bắt gặp."],
+            correct: 1,
+            explain: "Thẩm quyền xử phạt hành chính được quy định chặt chẽ (CSGT, Thanh tra, Chủ tịch UBND...)."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Tài sản nào sau đây là tài sản chung của vợ chồng?",
+            a: ["Tài sản vợ được thừa kế riêng.", "Trang sức chồng tặng riêng cho vợ.", "Tiền lương, tiền thưởng của vợ chồng tạo ra trong thời kỳ hôn nhân.", "Tài sản có trước khi kết hôn."],
+            correct: 2,
+            explain: "Thu nhập hợp pháp trong thời kỳ hôn nhân là tài sản chung (bất kể ai làm ra nhiều hơn)."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Người lao động đơn phương chấm dứt hợp đồng lao động không xác định thời hạn phải báo trước bao nhiêu ngày?",
+            a: ["30 ngày.", "45 ngày.", "60 ngày.", "Không cần báo trước."],
+            correct: 1,
+            explain: "Theo Bộ luật Lao động: HĐLĐ không xác định thời hạn phải báo trước ít nhất 45 ngày."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Quyền nào sau đây là quyền nhân thân không gắn với tài sản?",
+            a: ["Quyền tác giả đối với tác phẩm.", "Quyền sở hữu công nghiệp.", "Quyền đối với họ, tên; quyền xác định lại giới tính.", "Quyền đòi nợ."],
+            correct: 2,
+            explain: "Quyền đối với họ tên, hình ảnh, giới tính... là quyền nhân thân gắn liền với cá nhân, không chuyển giao được."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Biện pháp ngăn chặn 'Tạm giam' trong tố tụng hình sự chỉ được áp dụng khi nào?",
+            a: ["Đối với mọi tội phạm.", "Khi cần ngăn chặn bị can, bị cáo tiếp tục phạm tội hoặc bỏ trốn (thường với tội nghiêm trọng trở lên).", "Khi công an muốn hỏi cung cho dễ.", "Khi người dân yêu cầu."],
+            correct: 1,
+            explain: "Tạm giam là biện pháp nghiêm khắc, chỉ áp dụng có chọn lọc để phục vụ điều tra, truy tố, xét xử."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Theo Hiến pháp 2013, công dân đủ bao nhiêu tuổi thì có quyền ứng cử vào Quốc hội?",
+            a: ["18 tuổi.", "21 tuổi.", "25 tuổi.", "30 tuổi."],
+            correct: 1,
+            explain: "Công dân đủ 18 tuổi có quyền bầu cử, đủ 21 tuổi có quyền ứng cử."
+        }
+    ];
+
+    // --- LOGIC XỬ LÝ (GIỮ NGUYÊN NHƯ PHIÊN BẢN TRƯỚC NHƯNG TỐI ƯU HƠN) ---
+    const quizContainer = document.getElementById('quiz-body');
+    let userAnswers = new Array(questions.length).fill(null);
+
+    // 1. Render câu hỏi
+    function render() {
+        quizContainer.innerHTML = questions.map((item, idx) => `
+            <div class="q-card" id="card-${idx}">
+                <div class="q-meta">
+                    <span class="badge">${item.topic}</span>
+                    <span>Câu ${idx + 1}/${questions.length}</span>
+                </div>
+                <div class="q-content">${item.q}</div>
+                <div>
+                    ${item.a.map((opt, optIdx) => `
+                        <label class="opt-label" id="lbl-${idx}-${optIdx}" onclick="selectAns(${idx}, ${optIdx})">
+                            <input type="radio" name="q${idx}" value="${optIdx}">
+                            <span>${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explain-box" id="explain-${idx}"></div>
+            </div>
+        `).join('');
+    }
+
+    // 2. Chọn đáp án
+    window.selectAns = (qIdx, optIdx) => {
+        userAnswers[qIdx] = optIdx;
+        
+        // UI Update
+        document.querySelectorAll(`#card-${qIdx} .opt-label`).forEach(l => l.classList.remove('selected'));
+        document.getElementById(`lbl-${qIdx}-${optIdx}`).classList.add('selected');
+        
+        // Auto check radio (cho chắc chắn)
+        document.querySelector(`input[name="q${qIdx}"][value="${optIdx}"]`).checked = true;
+    }
+
+    // 3. Nộp bài
+    window.submitExam = () => {
+        if(!confirm("Bạn có chắc chắn muốn nộp bài? Hãy kiểm tra kỹ nhé!")) return;
+
+        clearInterval(timerInterval); // Dừng giờ
+        let score = 0;
+
+        questions.forEach((q, idx) => {
+            const userChoice = userAnswers[idx];
+            const explainDiv = document.getElementById(`explain-${idx}`);
+            
+            // Hiện giải thích
+            explainDiv.innerHTML = `<strong>💡 Giải thích:</strong> ${q.explain}`;
+            explainDiv.style.display = 'block';
+
+            // Xử lý màu sắc
+            const correctLbl = document.getElementById(`lbl-${idx}-${q.correct}`);
+            if(correctLbl) correctLbl.classList.add('correct');
+
+            if(userChoice === q.correct) {
+                score += 0.25; // Thang điểm 10 / 40 câu = 0.25
+            } else if (userChoice !== null) {
+                document.getElementById(`lbl-${idx}-${userChoice}`).classList.add('wrong');
+            }
+        });
+
+        // Hiện kết quả
+        const finalScore = score.toFixed(2);
+        document.getElementById('scoreValue').innerText = finalScore;
+        
+        let comment = "";
+        if(score >= 9) comment = "Tuyệt vời! Kiến thức của bạn rất vững.";
+        else if(score >= 7) comment = "Khá tốt! Bạn đã nắm được các vấn đề trọng tâm.";
+        else if(score >= 5) comment = "Đạt yêu cầu. Cần ôn lại các câu hỏi tình huống.";
+        else comment = "Cần nỗ lực hơn! Hãy xem kỹ lại phần giải thích.";
+        
+        document.getElementById('scoreComment').innerText = comment;
+        document.getElementById('resultModal').style.display = 'grid';
+
+        // Disable input
+        document.querySelectorAll('input').forEach(i => i.disabled = true);
+        document.querySelectorAll('.opt-label').forEach(l => l.style.pointerEvents = 'none');
+    }
+
+    window.closeModal = () => {
+        document.getElementById('resultModal').style.display = 'none';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    // 4. Timer
+    let time = 60 * 60;
+    const timerElem = document.getElementById('timer');
+    const timerInterval = setInterval(() => {
+        time--;
+        const m = Math.floor(time / 60).toString().padStart(2, '0');
+        const s = (time % 60).toString().padStart(2, '0');
+        timerElem.innerText = `${m}:${s}`;
+        
+        if(time <= 0) {
+            clearInterval(timerInterval);
+            alert("Hết giờ làm bài!");
+            submitExam();
+        }
+    }, 1000);
+
+    // Start
+    render();
+
+</script>
+
+</body>
+</html>

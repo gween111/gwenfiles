@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Thi Số 5 - Tình Huống Thực Tế</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c2410c; /* Màu cam đậm (Orange-700) tạo cảm giác thực chiến */
+            --primary-light: #ffedd5;
+            --text-main: #334155;
+            --bg: #fff7ed;
+            --card-bg: #ffffff;
+            --correct-bg: #dcfce7;
+            --correct-border: #22c55e;
+            --wrong-bg: #fee2e2;
+            --wrong-border: #ef4444;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0; padding-bottom: 80px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        .header-sticky {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(194, 65, 12, 0.15);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 15px; z-index: 100;
+            backdrop-filter: blur(5px);
+            border-top: 5px solid var(--primary);
+        }
+
+        .timer {
+            font-family: 'Roboto Slab', serif; font-size: 1.5rem;
+            font-weight: bold; color: var(--primary);
+            background: var(--primary-light); padding: 5px 15px;
+            border-radius: 8px;
+        }
+
+        /* Question Card */
+        .card {
+            background: var(--card-bg); border-radius: 12px;
+            padding: 25px; margin-top: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid #cbd5e1;
+            transition: 0.3s;
+        }
+        .card:hover { border-left-color: var(--primary); transform: translateY(-2px); }
+
+        .scenario-box {
+            background: #f1f5f9; border-left: 4px solid #64748b;
+            padding: 15px; margin-bottom: 15px; border-radius: 0 8px 8px 0;
+            font-style: italic; color: #475569;
+        }
+        .scenario-label { font-weight: bold; color: var(--primary); font-size: 0.9rem; text-transform: uppercase; display: block; margin-bottom: 5px; }
+
+        .question-text { font-size: 1.15rem; font-weight: 600; margin-bottom: 20px; }
+
+        /* Options */
+        .option-group { display: grid; gap: 10px; }
+        .option {
+            display: flex; align-items: center; padding: 12px 15px;
+            border: 2px solid #e2e8f0; border-radius: 8px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .option:hover { background: #fff7ed; border-color: var(--primary-light); }
+        .option input { margin-right: 15px; width: 18px; height: 18px; accent-color: var(--primary); }
+
+        /* States */
+        .option.selected { border-color: var(--primary); background: var(--primary-light); font-weight: 500; }
+        .option.correct { border-color: var(--correct-border); background: var(--correct-bg); color: #14532d; }
+        .option.wrong { border-color: var(--wrong-border); background: var(--wrong-bg); opacity: 0.7; }
+
+        /* Explanation */
+        .explain {
+            margin-top: 15px; padding: 15px;
+            background: #fffbeb; border: 1px dashed #f59e0b;
+            border-radius: 8px; color: #92400e; display: none;
+        }
+
+        /* Submit Button */
+        .float-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--primary); color: white;
+            padding: 15px 35px; border-radius: 50px;
+            font-size: 1.2rem; font-weight: bold; border: none;
+            box-shadow: 0 5px 15px rgba(194, 65, 12, 0.4);
+            cursor: pointer; transition: 0.2s; z-index: 200;
+        }
+        .float-btn:hover { transform: scale(1.05); background: #9a3412; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-box {
+            background: white; padding: 40px; border-radius: 15px;
+            text-align: center; width: 90%; max-width: 450px;
+        }
+        .score-display { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 10px 0; font-family: 'Roboto Slab', serif; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-sticky">
+        <div>
+            <h2 style="margin:0; font-family: 'Roboto Slab', serif;">ĐỀ SỐ 05</h2>
+            <small>Chuyên đề: Tình Huống Thực Tế (Case Study)</small>
+        </div>
+        <div class="timer" id="timer">60:00</div>
+    </div>
+
+    <div id="quiz-content"></div>
+</div>
+
+<button class="float-btn" onclick="submitExam()">NỘP BÀI</button>
+
+<div class="modal-overlay" id="resultModal">
+    <div class="modal-box">
+        <h3>KẾT QUẢ CỦA BẠN</h3>
+        <div class="score-display" id="finalScore">0.0</div>
+        <p id="finalMsg">...</p>
+        <button onclick="document.getElementById('resultModal').style.display='none'" style="padding:10px 20px; border:none; background:#e2e8f0; cursor:pointer; border-radius:5px;">Xem đáp án</button>
+    </div>
+</div>
+
+<script>
+    const db = [
+        // --- CHỦ ĐỀ 1: NHÀ NƯỚC (6 Câu) ---
+        {
+            s: "Ông A là công dân Việt Nam, đi du lịch nước ngoài và phạm tội ở nước sở tại.",
+            q: "Nhà nước Việt Nam có quyền yêu cầu bảo hộ công dân A không và dựa trên cơ sở nào?",
+            a: ["Không, vì A đã ra khỏi lãnh thổ Việt Nam.", "Có, dựa trên chủ quyền quốc gia và mối quan hệ pháp lý giữa Nhà nước và công dân (Quốc tịch).", "Có, nhưng phải nộp tiền bảo lãnh.", "Không, vì A phạm tội nên mất quyền công dân."],
+            c: 1,
+            e: "Mối quan hệ giữa Nhà nước và Công dân (thông qua Quốc tịch) là bền vững, kéo dài cả khi công dân ở nước ngoài."
+        },
+        {
+            s: "Quốc hội thông qua Luật Đất đai (sửa đổi) sau khi lấy ý kiến rộng rãi của nhân dân.",
+            q: "Việc làm này thể hiện bản chất nào của Nhà nước ta?",
+            a: ["Tính giai cấp.", "Tính dân chủ (Nhà nước của dân, do dân, vì dân).", "Tính trấn áp.", "Tính quan liêu."],
+            c: 1,
+            e: "Việc dân tham gia đóng góp ý kiến xây dựng luật thể hiện quyền làm chủ của nhân dân."
+        },
+        {
+            s: "Một nhóm người lợi dụng quyền tự do dân chủ để gây rối trật tự công cộng. Cảnh sát đã bắt giữ và khởi tố.",
+            q: "Hành động của Cảnh sát thể hiện chức năng gì của Nhà nước?",
+            a: ["Chức năng xã hội.", "Chức năng đối ngoại.", "Chức năng trấn áp (bảo vệ trật tự pháp luật).", "Chức năng kinh tế."],
+            c: 2,
+            e: "Nhà nước sử dụng quyền lực cưỡng chế để trấn áp các hành vi vi phạm pháp luật nhằm bảo vệ trật tự chung."
+        },
+        {
+            s: "Chính phủ ban hành Nghị quyết hỗ trợ doanh nghiệp vượt qua khủng hoảng kinh tế.",
+            q: "Đây là biểu hiện của chức năng nào?",
+            a: ["Chức năng trấn áp.", "Chức năng kinh tế (quản lý và điều tiết kinh tế).", "Chức năng tư pháp.", "Chức năng giáo dục."],
+            c: 1,
+            e: "Nhà nước ban hành chính sách vĩ mô để tác động, hỗ trợ nền kinh tế phát triển."
+        },
+        {
+            s: "Công dân B khiếu nại quyết định thu hồi đất của UBND huyện vì cho rằng đền bù không thỏa đáng.",
+            q: "Trong nhà nước pháp quyền, cơ quan nhà nước phải xử lý việc này như thế nào?",
+            a: ["Bắt giam B vì chống đối.", "Phớt lờ đơn thư của B.", "Phải thụ lý và giải quyết khiếu nại theo đúng trình tự pháp luật quy định.", "Đe dọa B rút đơn."],
+            c: 2,
+            e: "Nhà nước pháp quyền đòi hỏi cơ quan công quyền phải có trách nhiệm giải quyết khiếu nại, tố cáo của công dân theo luật định."
+        },
+        {
+            s: "Đảng Cộng sản Việt Nam ra Nghị quyết về phát triển du lịch.",
+            q: "Nghị quyết này có giá trị pháp lý bắt buộc thực hiện đối với toàn thể người dân như Luật Du lịch không?",
+            a: ["Có, vì Đảng lãnh đạo Nhà nước.", "Không, Nghị quyết của Đảng là văn bản chỉ đạo chính trị, cần được Nhà nước thể chế hóa thành Luật thì mới có giá trị bắt buộc chung.", "Có, vì Nghị quyết cao hơn Luật.", "Tùy từng tỉnh."],
+            c: 1,
+            e: "Đảng lãnh đạo, Nhà nước quản lý. Chỉ văn bản của Nhà nước (Luật) mới có tính cưỡng chế thi hành đối với toàn xã hội."
+        },
+
+        // --- CHỦ ĐỀ 2: BỘ MÁY (8 Câu) ---
+        {
+            s: "Ông Chủ tịch UBND tỉnh A ký quyết định bổ nhiệm Giám đốc Sở Y tế.",
+            q: "Quyết định này thuộc loại hành vi quyền lực nào?",
+            a: ["Lập pháp.", "Hành pháp (Quản lý hành chính nhà nước).", "Tư pháp.", "Giám sát."],
+            c: 1,
+            e: "Bổ nhiệm nhân sự trong cơ quan hành chính là hoạt động chấp hành - điều hành (Hành pháp)."
+        },
+        {
+            s: "Bà C muốn khởi kiện tranh chấp đất đai với hàng xóm.",
+            q: "Bà C phải nộp đơn đến cơ quan nào để được xét xử?",
+            a: ["Công an xã.", "Ủy ban nhân dân xã.", "Tòa án nhân dân cấp huyện nơi có đất.", "Viện kiểm sát nhân dân."],
+            c: 2,
+            e: "Thẩm quyền xét xử tranh chấp dân sự thuộc về Tòa án nhân dân."
+        },
+        {
+            s: "Đại biểu Quốc hội X phát hiện một Bộ trưởng ban hành quy định trái luật.",
+            q: "Đại biểu X có quyền làm gì tại kỳ họp Quốc hội?",
+            a: ["Ra lệnh bắt Bộ trưởng.", "Chất vấn Bộ trưởng về vấn đề đó.", "Tự mình hủy bỏ quy định đó.", "Im lặng."],
+            c: 1,
+            e: "Chất vấn là quyền giám sát quan trọng của Đại biểu Quốc hội."
+        },
+        {
+            s: "Ông K bị Tòa án tuyên phạt 5 năm tù giam. Ông K cho rằng bản án oan sai.",
+            q: "Ông K có quyền làm gì tiếp theo?",
+            a: ["Chấp nhận đi tù.", "Kháng cáo lên Tòa án cấp trên để xét xử phúc thẩm.", "Biểu tình.", "Trốn trại."],
+            c: 1,
+            e: "Quyền kháng cáo là quyền cơ bản trong tố tụng để yêu cầu xét xử lại ở cấp cao hơn (Phúc thẩm)."
+        },
+        {
+            s: "Chủ tịch nước muốn ký Hiệp định vay vốn ODA với nước ngoài nhân danh Nhà nước.",
+            q: "Chủ tịch nước thực hiện quyền hạn này với tư cách gì?",
+            a: ["Người đứng đầu Chính phủ.", "Người đứng đầu Quốc hội.", "Nguyên thủ quốc gia, thay mặt Nhà nước về đối nội và đối ngoại.", "Tổng tư lệnh quân đội."],
+            c: 2,
+            e: "Chủ tịch nước là người đại diện cao nhất của Nhà nước trong quan hệ quốc tế."
+        },
+        {
+            s: "Hội đồng nhân dân tỉnh Y muốn ra Nghị quyết về thu phí tham quan danh lam thắng cảnh tại địa phương.",
+            q: "Việc này có đúng thẩm quyền không?",
+            a: ["Không, chỉ Quốc hội mới được quy định.", "Có, HĐND có quyền quyết định các vấn đề kinh tế - xã hội tại địa phương (trong khung luật định).", "Không, việc này của Công ty du lịch.", "Chỉ Chủ tịch tỉnh được quyết."],
+            c: 1,
+            e: "HĐND là cơ quan quyền lực nhà nước ở địa phương, có quyền quyết định các vấn đề thu chi ngân sách/phí lệ phí theo phân cấp."
+        },
+        {
+            s: "Một vụ án giết người nghiêm trọng xảy ra. Viện kiểm sát nhân dân sẽ tham gia với vai trò gì?",
+            a: ["Bào chữa cho bị cáo.", "Xét xử bị cáo.", "Thực hành quyền công tố (truy tố bị cáo ra tòa) và kiểm sát hoạt động tư pháp.", "Điều tra vụ án."],
+            c: 2,
+            e: "Viện kiểm sát giữ vai trò Công tố (buộc tội) và kiểm sát việc tuân theo pháp luật trong tố tụng."
+        },
+        {
+            s: "Thủ tướng Chính phủ phát hiện Chủ tịch UBND tỉnh Z ban hành văn bản trái với Nghị định của Chính phủ.",
+            q: "Thủ tướng có quyền gì?",
+            a: ["Bắt giam Chủ tịch tỉnh.", "Đình chỉ việc thi hành hoặc bãi bỏ văn bản trái pháp luật đó.", "Không có quyền gì, chỉ Quốc hội mới có quyền.", "Kiện ra Tòa."],
+            c: 1,
+            e: "Thủ tướng lãnh đạo hệ thống hành chính, có quyền đình chỉ/bãi bỏ văn bản sai trái của UBND/Chủ tịch UBND cấp tỉnh."
+        },
+
+        // --- CHỦ ĐỀ 3: PL ĐẠI CƯƠNG (6 Câu) ---
+        {
+            s: "Hai công ty ký hợp đồng mua bán nhưng xảy ra tranh chấp. Trong hợp đồng không quy định cách giải quyết, Luật cũng chưa có quy định chi tiết.",
+            q: "Tòa án có thể áp dụng cái gì để giải quyết?",
+            a: ["Tập quán thương mại quốc tế (nếu không trái luật VN).", "Ý kiến cá nhân của Thẩm phán.", "Gieo quẻ.", "Từ chối xử."],
+            c: 0,
+            e: "Khi thiếu luật và thỏa thuận, Tòa án có thể áp dụng tập quán hoặc tương tự pháp luật."
+        },
+        {
+            s: "Một công ty ra quy định: 'Nhân viên nữ kết hôn phải xin phép Giám đốc'.",
+            q: "Quy định này có hiệu lực không? Tại sao?",
+            a: ["Có, vì đây là thỏa thuận nội bộ.", "Không, vì trái với Luật Hôn nhân và gia đình (quyền tự do kết hôn) và Hiến pháp.", "Có, nếu nhân viên đã ký cam kết.", "Tùy Giám đốc quyết định."],
+            c: 1,
+            e: "Mọi văn bản (bao gồm nội quy doanh nghiệp) không được trái với Luật và Hiến pháp. Quy định này vi phạm quyền con người."
+        },
+        {
+            s: "Luật Giao thông đường bộ 2008 và Luật Xử lý vi phạm hành chính có quy định khác nhau về thẩm quyền xử phạt.",
+            q: "Cơ quan chức năng sẽ áp dụng luật nào?",
+            a: ["Luật nào ban hành sau thì áp dụng (nguyên tắc luật sau).", "Luật Giao thông (Luật chuyên ngành).", "Luật Xử lý VPHC.", "Tùy người phạt chọn."],
+            c: 2,
+            e: "Trong xử phạt, thường ưu tiên Luật Xử lý VPHC (luật chung về thủ tục/thẩm quyền) hoặc áp dụng nguyên tắc văn bản ban hành sau nếu cùng cấp độ."
+        },
+        {
+            s: "Anh A mua xe máy. Hợp đồng mua bán xe là văn bản gì?",
+            a: ["Văn bản quy phạm pháp luật.", "Văn bản hành chính.", "Văn bản áp dụng pháp luật.", "Giao dịch dân sự/Hợp đồng dân sự (Văn bản thực hiện pháp luật)."],
+            c: 3,
+            e: "Hợp đồng không phải là VBQPPL (áp dụng chung) mà là thỏa thuận cụ thể giữa các bên."
+        },
+        {
+            s: "Quốc hội ban hành Luật mới tăng nặng mức phạt tù cho tội tham nhũng.",
+            q: "Ông B phạm tội tham nhũng TRƯỚC khi luật mới có hiệu lực nhưng đang bị xét xử. Có áp dụng mức phạt mới nặng hơn cho ông B không?",
+            a: ["Có, để răn đe.", "Không, áp dụng nguyên tắc bất hồi tố (không áp dụng quy định bất lợi cho hành vi xảy ra trước đó).", "Tùy Tòa án.", "Có, nếu ông B đồng ý."],
+            c: 1,
+            e: "Nguyên tắc nhân đạo: Không hồi tố quy định nặng hơn."
+        },
+        {
+            s: "Chị H nhận được 'Thông báo nộp tiền điện' từ công ty điện lực.",
+            q: "Đây có phải là Văn bản quy phạm pháp luật không?",
+            a: ["Phải.", "Không, đây là văn bản giao dịch thông thường/hành chính.", "Có, vì nó bắt buộc phải đóng.", "Có, vì có dấu đỏ."],
+            c: 1,
+            e: "VBQPPL phải chứa quy tắc xử sự chung cho toàn xã hội. Thông báo tiền điện chỉ áp dụng cho chị H (cụ thể)."
+        },
+
+        // --- CHỦ ĐỀ 4: QUY PHẠM & QHPL (6 Câu) ---
+        {
+            s: "Anh A (17 tuổi) tự ý bán chiếc xe máy trị giá 50 triệu đồng của mình cho anh B.",
+            q: "Giao dịch này có hợp pháp không?",
+            a: ["Hợp pháp.", "Vô hiệu, vì A chưa đủ 18 tuổi (người chưa thành niên) nên các giao dịch tài sản lớn cần sự đồng ý của người đại diện.", "Hợp pháp nếu B đồng ý.", "Hợp pháp vì xe của A."],
+            c: 1,
+            e: "Người từ 15 đến dưới 18 tuổi khi giao dịch tài sản là Bất động sản hoặc Động sản phải đăng ký (như xe máy) cần người đại diện đồng ý."
+        },
+        {
+            s: "Điều luật quy định: 'Công dân có quyền tự do kinh doanh'.",
+            q: "Đây là loại quy phạm pháp luật gì?",
+            a: ["Quy phạm bắt buộc.", "Quy phạm cấm đoán.", "Quy phạm cho phép (tùy nghi).", "Quy phạm mệnh lệnh."],
+            c: 2,
+            e: "Quy phạm trao quyền cho chủ thể lựa chọn thực hiện hoặc không thực hiện."
+        },
+        {
+            s: "Bà A chết, để lại di sản. Sự kiện 'Bà A chết' được gọi là gì trong pháp luật?",
+            a: ["Hành vi pháp lý.", "Sự biến pháp lý.", "Vi phạm pháp luật.", "Quan hệ pháp luật."],
+            c: 1,
+            e: "Chết là sự kiện sinh học xảy ra ngoài ý chí (Sự biến) làm phát sinh quan hệ thừa kế."
+        },
+        {
+            s: "Anh C lái xe đúng luật nhưng bị cây đổ đè trúng xe gây hư hỏng.",
+            q: "Có quan hệ pháp luật nào phát sinh không?",
+            a: ["Không.", "Có, quan hệ bồi thường thiệt hại (nếu cây thuộc quản lý của công ty cây xanh) hoặc quan hệ bảo hiểm.", "Quan hệ hình sự.", "Quan hệ hành chính."],
+            c: 1,
+            e: "Sự kiện cây đổ làm phát sinh quan hệ dân sự về bồi thường hoặc bảo hiểm."
+        },
+        {
+            s: "Công ty A ký hợp đồng lao động với anh B.",
+            q: "Khách thể của quan hệ pháp luật này là gì?",
+            a: ["Tiền lương.", "Sức lao động của anh B và tiền lương công ty trả.", "Bản thân anh B.", "Giám đốc công ty."],
+            c: 1,
+            e: "Khách thể là lợi ích mà các bên hướng tới (Người lao động bán sức lao động, Người sử dụng lao động trả tiền)."
+        },
+        {
+            s: "Người tâm thần A đập phá cửa kính nhà hàng xóm.",
+            q: "A có năng lực hành vi dân sự không và ai chịu trách nhiệm bồi thường?",
+            a: ["A có năng lực đầy đủ, A tự bồi thường.", "A mất năng lực hành vi dân sự, người giám hộ của A phải bồi thường.", "Không ai phải bồi thường vì A bị bệnh.", "Nhà nước bồi thường."],
+            c: 1,
+            e: "Người mất năng lực hành vi dân sự gây thiệt hại thì người giám hộ (dùng tài sản của người được giám hộ hoặc của mình) để bồi thường."
+        },
+
+        // --- CHỦ ĐỀ 5: VI PHẠM & TNPL (6 Câu) ---
+        {
+            s: "Anh A vượt đèn đỏ và tông vào chị B gây thương tích 5% (nhẹ).",
+            q: "Anh A phải chịu những trách nhiệm pháp lý nào?",
+            a: ["Chỉ chịu trách nhiệm Hình sự.", "Trách nhiệm Hành chính (phạt tiền vượt đèn đỏ) và Trách nhiệm Dân sự (bồi thường thuốc men, xe hỏng cho B).", "Chỉ bồi thường là xong.", "Không chịu trách nhiệm gì."],
+            c: 1,
+            e: "Vi phạm giao thông là hành chính. Gây thiệt hại cho người khác phải bồi thường dân sự. (Chưa đủ mức hình sự)."
+        },
+        {
+            s: "Bác sĩ K kê đơn nhầm thuốc do không kiểm tra kỹ hồ sơ bệnh án, dẫn đến bệnh nhân bị sốc phản vệ nhẹ.",
+            q: "Lỗi của bác sĩ K là gì?",
+            a: ["Cố ý trực tiếp.", "Cố ý gián tiếp.", "Vô ý do cẩu thả.", "Vô ý vì quá tự tin."],
+            c: 2,
+            e: "Vô ý do cẩu thả: Lẽ ra phải thấy trước hậu quả và phải kiểm tra hồ sơ nhưng đã không làm."
+        },
+        {
+            s: "N (15 tuổi) trộm cắp chiếc xe đạp trị giá 1 triệu đồng.",
+            q: "N có phải chịu trách nhiệm hình sự không?",
+            a: ["Có, vì trộm cắp là xấu.", "Không, vì N chưa đủ 16 tuổi và tội trộm cắp tài sản giá trị nhỏ thường là tội ít nghiêm trọng.", "Có, tù chung thân.", "Có, bố mẹ đi tù thay."],
+            c: 1,
+            e: "Người từ 14 đến dưới 16 tuổi chỉ chịu TNHS về tội rất nghiêm trọng/đặc biệt nghiêm trọng. Trộm 1 triệu là ít nghiêm trọng/nghiêm trọng -> Xử lý hành chính/giáo dục."
+        },
+        {
+            s: "Công ty X xả nước thải chưa qua xử lý ra sông làm cá chết hàng loạt.",
+            q: "Công ty X là pháp nhân thương mại. Công ty có thể bị truy cứu TNHS không?",
+            a: ["Không, chỉ cá nhân mới đi tù.", "Có, pháp nhân thương mại phải chịu TNHS đối với một số tội (trong đó có tội gây ô nhiễm môi trường).", "Chỉ bị phạt hành chính.", "Giám đốc đi tù, công ty vô can."],
+            c: 1,
+            e: "BLHS 2015 quy định Pháp nhân thương mại phải chịu TNHS (phạt tiền, đình chỉ hoạt động...) với tội môi trường."
+        },
+        {
+            s: "Anh M đánh nhau gây thương tích cho anh N (tỷ lệ 15%). N làm đơn bãi nại (xin không khởi tố M).",
+            q: "Công an có khởi tố vụ án không?",
+            a: ["Có, vì đánh nhau là phạm pháp.", "Không, đối với tội Cố ý gây thương tích (khoản 1), nếu người bị hại bãi nại thì không khởi tố.", "Tùy công an.", "Vẫn khởi tố để răn đe."],
+            c: 1,
+            e: "Khởi tố theo yêu cầu của bị hại áp dụng với một số tội (như khoản 1 tội Cố ý gây thương tích). Bãi nại -> Đình chỉ."
+        },
+        {
+            s: "Nhân viên A thường xuyên đi làm muộn không có lý do chính đáng.",
+            q: "Công ty có thể áp dụng hình thức xử lý nào?",
+            a: ["Phạt tiền trừ lương.", "Xử lý kỷ luật lao động (khiển trách, kéo dài thời hạn nâng lương...).", "Phạt tù.", "Đánh đòn."],
+            c: 1,
+            e: "Luật Lao động cấm phạt tiền/cắt lương thay cho kỷ luật. Chỉ được áp dụng các hình thức kỷ luật quy định (khiển trách, sa thải...)."
+        },
+
+        // --- CHỦ ĐỀ 6: CÁC NGÀNH LUẬT (8 Câu) ---
+        {
+            s: "Anh T và chị H sống chung như vợ chồng nhưng không đăng ký kết hôn.",
+            q: "Pháp luật có công nhận họ là vợ chồng không?",
+            a: ["Có, nếu có con chung.", "Có, nếu tổ chức đám cưới.", "Không công nhận quan hệ vợ chồng.", "Có, sau 5 năm."],
+            c: 2,
+            e: "Luật HN&GĐ: Nam nữ sống chung mà không đăng ký kết hôn thì không làm phát sinh quyền, nghĩa vụ giữa vợ và chồng."
+        },
+        {
+            s: "Ông A vay nặng lãi của B với lãi suất 150%/năm.",
+            q: "Thỏa thuận lãi suất này có hiệu lực không?",
+            a: ["Có, thuận mua vừa bán.", "Không, phần lãi suất vượt quá 20%/năm là vô hiệu.", "Có, nhưng phải công chứng.", "Không, ông A không phải trả đồng nào."],
+            c: 1,
+            e: "Bộ luật Dân sự: Lãi suất thỏa thuận không được vượt quá 20%/năm."
+        },
+        {
+            s: "Chị M đang mang thai tháng thứ 5. Công ty ra quyết định sa thải chị vì lý do 'cắt giảm nhân sự'.",
+            q: "Công ty làm vậy đúng hay sai?",
+            a: ["Đúng, quyền của chủ doanh nghiệp.", "Sai, Luật Lao động cấm sa thải người lao động nữ đang mang thai (trừ khi công ty chấm dứt hoạt động).", "Đúng, nếu đền bù 1 tháng lương.", "Sai, phải đợi sinh xong mới sa thải được."],
+            c: 1,
+            e: "Pháp luật bảo vệ thai sản đặc biệt: Cấm đơn phương chấm dứt HĐLĐ với phụ nữ mang thai."
+        },
+        {
+            s: "Anh D nhặt được một chiếc ví có 10 triệu đồng. Anh D dùng hết số tiền đó.",
+            q: "Hành vi của anh D là gì?",
+            a: ["May mắn thì hưởng.", "Chiếm giữ trái phép tài sản (có thể bị xử lý hành chính hoặc hình sự).", "Phạm tội trộm cắp.", "Phạm tội cướp giật."],
+            c: 1,
+            e: "Nhặt được của rơi phải trả lại hoặc giao nộp. Cố tình chiếm giữ là vi phạm pháp luật."
+        },
+        {
+            s: "Ông B lập di chúc để lại toàn bộ tài sản cho cô hàng xóm, không cho vợ và con (10 tuổi) đồng nào.",
+            q: "Vợ và con ông B có được hưởng gì không?",
+            a: ["Không, di chúc là tối thượng.", "Có, họ được hưởng 'thừa kế không phụ thuộc vào nội dung di chúc' (ít nhất 2/3 suất theo luật).", "Chỉ con được hưởng.", "Vợ con phải đi kiện cô hàng xóm."],
+            c: 1,
+            e: "Luật Dân sự bảo vệ những người thân yếu thế (con chưa thành niên, vợ/chồng...) bằng chế định thừa kế bắt buộc."
+        },
+        {
+            s: "Anh X bị bắt quả tang đang vận chuyển 2kg Heroin.",
+            q: "Anh X sẽ bị xét xử theo ngành luật nào?",
+            a: ["Luật Dân sự.", "Luật Hành chính.", "Luật Hình sự.", "Luật Kinh doanh."],
+            c: 2,
+            e: "Vận chuyển ma túy là tội phạm đặc biệt nghiêm trọng -> Luật Hình sự."
+        },
+        {
+            s: "Hai bên ký hợp đồng mua bán nhà đất bằng giấy viết tay, không công chứng.",
+            q: "Hợp đồng này có giá trị pháp lý để sang tên sổ đỏ không?",
+            a: ["Có.", "Không, Luật Đất đai quy định hợp đồng chuyển nhượng QSDĐ phải công chứng/chứng thực.", "Có, nếu có người làm chứng.", "Tùy cán bộ địa chính."],
+            c: 1,
+            e: "Hình thức bắt buộc của giao dịch BĐS là văn bản có công chứng/chứng thực."
+        },
+        {
+            s: "Chủ tịch nước tuyên bố tình trạng khẩn cấp quốc gia.",
+            q: "Văn bản này thuộc loại nào?",
+            a: ["Lệnh của Chủ tịch nước.", "Quyết định cá nhân.", "Luật.", "Nghị định."],
+            c: 0,
+            e: "Chủ tịch nước ban hành Lệnh, Quyết định. Tuyên bố tình trạng khẩn cấp thường bằng Lệnh."
+        }
+    ];
+
+    // Logic xử lý (Render, Check, Score)
+    const quizContent = document.getElementById('quiz-content');
+    let userAnswers = new Array(db.length).fill(null);
+
+    function renderQuiz() {
+        quizContent.innerHTML = db.map((item, index) => `
+            <div class="card" id="card-${index}">
+                <div class="scenario-box">
+                    <span class="scenario-label">TÌNH HUỐNG:</span>
+                    ${item.s}
+                </div>
+                <div class="question-text">Câu ${index + 1}: ${item.q}</div>
+                <div class="option-group">
+                    ${item.a.map((opt, i) => `
+                        <label class="option" id="opt-${index}-${i}" onclick="selectOpt(${index}, ${i})">
+                            <input type="radio" name="q${index}" value="${i}">
+                            <span>${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explain" id="explain-${index}"></div>
+            </div>
+        `).join('');
+    }
+
+    window.selectOpt = (qIdx, oIdx) => {
+        userAnswers[qIdx] = oIdx;
+        document.querySelectorAll(`#card-${qIdx} .option`).forEach(el => el.classList.remove('selected'));
+        document.getElementById(`opt-${qIdx}-${oIdx}`).classList.add('selected');
+        document.querySelector(`input[name="q${qIdx}"][value="${oIdx}"]`).checked = true;
+    };
+
+    window.submitExam = () => {
+        if(!confirm("Bạn chắc chắn muốn nộp bài?")) return;
+        clearInterval(timerInterval);
+        
+        let score = 0;
+        db.forEach((item, index) => {
+            const uAns = userAnswers[index];
+            const explainDiv = document.getElementById(`explain-${index}`);
+            
+            explainDiv.innerHTML = `<strong>Luật áp dụng:</strong> ${item.e}`;
+            explainDiv.style.display = 'block';
+
+            const correctOpt = document.getElementById(`opt-${index}-${item.c}`);
+            if(correctOpt) correctOpt.classList.add('correct');
+
+            if(uAns === item.c) {
+                score += 0.25;
+            } else if (uAns !== null) {
+                document.getElementById(`opt-${index}-${uAns}`).classList.add('wrong');
+            }
+        });
+
+        document.getElementById('finalScore').innerText = score.toFixed(2);
+        const msg = score >= 8 ? "Xuất sắc! Bạn xử lý tình huống rất tốt." : score >= 5 ? "Đạt. Bạn nắm được cơ bản cách vận dụng luật." : "Chưa đạt. Cần luyện tập thêm các tình huống.";
+        document.getElementById('finalMsg').innerText = msg;
+        document.getElementById('resultModal').style.display = 'flex';
+    };
+
+    // Timer
+    let timeLeft = 3600;
+    const timerEl = document.getElementById('timer');
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        const m = Math.floor(timeLeft / 60).toString().padStart(2,'0');
+        const s = (timeLeft % 60).toString().padStart(2,'0');
+        timerEl.innerText = `${m}:${s}`;
+        if(timeLeft <= 0) submitExam();
+    }, 1000);
+
+    renderQuiz();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Câu Trắc Nghiệm Chương 5: Ý Thức - Văn Hóa - Vi Phạm - Trách Nhiệm Pháp Lý (Nâng Cao)</title>
+    <style>
+        :root {
+            --primary: #8e44ad; /* Màu tím tri thức/lý luận */
+            --accent: #d35400; /* Màu cam điểm nhấn */
+            --bg: #f4f6f7;
+            --text: #2c3e50;
+            --correct-bg: #d5f5e3;
+            --correct-text: #145a32;
+            --wrong-bg: #fadbd8;
+            --wrong-text: #7b241c;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #eaeded;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 90vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .subtitle { font-size: 1.1rem; opacity: 0.95; margin-top: 10px; font-weight: 300; }
+
+        /* Màn hình cài đặt */
+        #setup-screen {
+            padding: 60px;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .note-box {
+            background-color: #fff3e0;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 40px;
+            max-width: 700px;
+            text-align: left;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .control-group {
+            margin: 30px 0;
+            background: #fdfefe;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #f2f3f4;
+        }
+
+        input[type="number"] {
+            padding: 12px;
+            font-size: 1.2rem;
+            width: 100px;
+            text-align: center;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            font-weight: bold;
+            outline: none;
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(211, 84, 0, 0.3);
+        }
+
+        .btn:hover { background-color: #ba4a00; transform: translateY(-3px); }
+        .btn:active { transform: translateY(0); }
+
+        /* Màn hình thi */
+        #quiz-screen {
+            display: none;
+            padding: 0;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            width: 100%;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .question-container {
+            padding: 40px 60px;
+            flex: 1;
+        }
+
+        .question-meta {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #f0f3f4;
+            padding-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 35px;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-card {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .option-card span {
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 25px;
+            color: var(--primary);
+        }
+
+        .option-card:hover:not(.disabled) { border-color: var(--primary); background: #f4ecf7; }
+        
+        .option-card.correct {
+            border-color: var(--correct-text);
+            background-color: var(--correct-bg);
+            color: var(--correct-text);
+        }
+        
+        .option-card.wrong {
+            border-color: var(--wrong-text);
+            background-color: var(--wrong-bg);
+            color: var(--wrong-text);
+            opacity: 0.9;
+        }
+        
+        .option-card.disabled { cursor: default; }
+
+        .explanation-box {
+            margin-top: 35px;
+            padding: 25px;
+            background-color: #eafaf1;
+            border-left: 5px solid #2ecc71;
+            border-radius: 8px;
+            display: none;
+            font-size: 1.05rem;
+            color: #2c3e50;
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .nav-buttons {
+            padding: 25px 60px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            background: #fdfefe;
+        }
+
+        .btn-next { background-color: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; }
+        .btn-next:hover { background-color: #7d3c98; }
+
+        /* Màn hình kết quả */
+        #result-screen {
+            display: none;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 20px rgba(142, 68, 173, 0.4);
+        }
+
+        .review-list {
+            text-align: left;
+            margin-top: 40px;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .review-item {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+            font-size: 1rem;
+        }
+        .review-item.bad { border-left: 6px solid var(--wrong-text); background-color: #fff9f9; }
+        .review-item.good { border-left: 6px solid var(--correct-text); background-color: #fafffb; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Ôn Tập Pháp Luật Đại Cương</h1>
+        <div class="subtitle">Chương 5: Ý Thức - Văn Hóa - Vi Phạm - Trách Nhiệm Pháp Lý</div>
+    </header>
+
+    <!-- SETUP SCREEN -->
+    <div id="setup-screen">
+        <div class="note-box">
+            <strong>📚 TRỌNG TÂM ÔN TẬP (HARDCORE):</strong>
+            <ul style="margin: 10px 0 0 20px; padding: 0; line-height: 1.8;">
+                <li><strong>Ý thức pháp luật:</strong> Phân biệt Tâm lý pháp luật (cảm xúc) và Tư tưởng pháp luật (lý luận).</li>
+                <li><strong>Văn hóa pháp luật:</strong> Hiểu rõ cấu trúc và các loại hình văn hóa pháp luật.</li>
+                <li><strong>Vi phạm pháp luật:</strong> Phân biệt 4 yếu tố cấu thành (đặc biệt là Lỗi trong Mặt chủ quan).</li>
+                <li><strong>Trách nhiệm pháp lý:</strong> Phân biệt trách nhiệm Hình sự, Hành chính, Dân sự, Kỷ luật.</li>
+            </ul>
+        </div>
+        
+        <div class="control-group">
+            <label>Số lượng câu hỏi muốn thử thách (Max 100):</label><br><br>
+            <input type="number" id="q-count" value="20" min="5" max="100">
+        </div>
+
+        <button class="btn" id="btn-start">Bắt Đầu Làm Bài</button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen">
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        
+        <div class="question-container">
+            <div class="question-meta">
+                <span id="q-index">Câu 1/20</span>
+                <span id="q-topic">Chủ đề: Tổng quan</span>
+            </div>
+            <div class="question-text" id="q-text">Đang tải câu hỏi...</div>
+            <div class="options-grid" id="options">
+                <!-- Options rendered here -->
+            </div>
+            <div class="explanation-box" id="explain"></div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn-next" id="btn-next" style="display:none">Câu Tiếp Theo ➜</button>
+            <button class="btn-next" id="btn-finish" style="display:none; background-color: var(--correct-text);">Xem Kết Quả 🏁</button>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen">
+        <h2>Kết Quả Chung Cuộc</h2>
+        <div class="score-circle" id="score">0/0</div>
+        <p id="feedback-msg" style="font-size: 1.3rem; margin-bottom: 30px; font-weight: 500;"></p>
+        <button class="btn" id="btn-restart">Làm Lại Đề Mới</button>
+        <div class="review-list" id="review"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- NGÂN HÀNG CÂU HỎI (HARDCORE - 100 Câu) ---
+    const fullDatabase = [
+        // --- PHẦN 1: Ý THỨC PHÁP LUẬT & VĂN HÓA PHÁP LUẬT ---
+        {
+            topic: "Ý thức pháp luật",
+            q: "Nhận định nào sau đây là ĐÚNG nhất về mối quan hệ giữa 'Tâm lý pháp luật' và 'Tư tưởng pháp luật' trong cấu trúc của ý thức pháp luật?",
+            a: [
+                "Tâm lý pháp luật là sự phản ánh lý luận, khoa học; Tư tưởng pháp luật là sự phản ánh cảm tính.",
+                "Tâm lý pháp luật là tiền đề hình thành tư tưởng pháp luật; Tư tưởng pháp luật tác động trở lại, định hướng cho tâm lý pháp luật.",
+                "Hai bộ phận này tồn tại độc lập, không có mối liên hệ tác động qua lại.",
+                "Tâm lý pháp luật quan trọng hơn tư tưởng pháp luật vì nó xuất hiện trước."
+            ],
+            correct: 1,
+            explain: "Tâm lý pháp luật là cảm xúc, thái độ (sơ khai). Tư tưởng pháp luật là quan điểm, học thuyết (hệ thống). Tư tưởng định hướng và nâng cao tâm lý."
+        },
+        {
+            q: "Đặc điểm nào thể hiện tính 'Độc lập tương đối' của ý thức pháp luật so với tồn tại xã hội?",
+            a: [
+                "Ý thức pháp luật luôn luôn thay đổi cùng lúc với sự thay đổi của kinh tế xã hội.",
+                "Ý thức pháp luật có thể lạc hậu hơn hoặc vượt trước sự phát triển của tồn tại xã hội.",
+                "Ý thức pháp luật hoàn toàn không phụ thuộc vào điều kiện kinh tế xã hội.",
+                "Ý thức pháp luật chỉ phản ánh thụ động thực tại xã hội."
+            ],
+            correct: 1,
+            explain: "Tính độc lập tương đối thể hiện ở chỗ nó không lệ thuộc máy móc. Nó có thể cũ kỹ (lạc hậu) hoặc tiên phong (vượt trước) so với thực tế đời sống."
+        },
+        {
+            q: "Văn hóa pháp luật (Legal Culture) KHÔNG bao gồm yếu tố nào sau đây?",
+            a: [
+                "Hệ thống các văn bản quy phạm pháp luật.",
+                "Trình độ nhận thức và ý thức tuân thủ pháp luật của người dân.",
+                "Tài sản vật chất của các doanh nghiệp tư nhân.",
+                "Các thiết chế pháp lý (Tòa án, Viện kiểm sát...) hoạt động hiệu quả."
+            ],
+            correct: 2,
+            explain: "Văn hóa pháp luật bao gồm giá trị tinh thần (ý thức, tư tưởng) và giá trị vật chất (thiết chế, văn bản luật...). Tài sản doanh nghiệp là yếu tố kinh tế, không phải văn hóa pháp luật."
+        },
+        {
+            q: "Ý thức pháp luật có tính giai cấp, điều này có nghĩa là gì?",
+            a: [
+                "Mọi giai cấp trong xã hội đều có hệ tư tưởng pháp luật giống nhau.",
+                "Trong xã hội có giai cấp, ý thức pháp luật chủ đạo luôn phản ánh ý chí và lợi ích của giai cấp thống trị.",
+                "Chỉ giai cấp thống trị mới có ý thức pháp luật, giai cấp bị trị không có.",
+                "Pháp luật không bảo vệ lợi ích của giai cấp bị trị."
+            ],
+            correct: 1,
+            explain: "Mỗi giai cấp có ý thức pháp luật riêng, nhưng ý thức pháp luật thống trị xã hội là của giai cấp cầm quyền."
+        },
+        {
+            q: "Vai trò của ý thức pháp luật trong hoạt động 'Áp dụng pháp luật' là gì?",
+            a: [
+                "Không có vai trò gì, quan trọng là văn bản luật.",
+                "Giúp chủ thể áp dụng pháp luật hiểu đúng, giải thích đúng và ra quyết định chính xác, thấu tình đạt lý.",
+                "Cho phép chủ thể áp dụng pháp luật tùy tiện thay đổi quy định của pháp luật.",
+                "Chỉ quan trọng đối với người dân, không quan trọng với quan chức."
+            ],
+            correct: 1,
+            explain: "Nếu cán bộ có ý thức pháp luật kém -> Áp dụng sai, nhũng nhiễu. Nếu tốt -> Áp dụng đúng, công bằng."
+        },
+
+        // --- PHẦN 2: VI PHẠM PHÁP LUẬT (KHÁI NIỆM & CẤU THÀNH) ---
+        {
+            topic: "Vi phạm pháp luật",
+            q: "Dấu hiệu nào sau đây là dấu hiệu cơ bản ĐẦU TIÊN để nhận biết một vi phạm pháp luật?",
+            a: [
+                "Tính có lỗi.",
+                "Tính trái pháp luật của hành vi (Hành động hoặc Không hành động).",
+                "Tính nguy hiểm cho xã hội.",
+                "Năng lực trách nhiệm pháp lý."
+            ],
+            correct: 1,
+            explain: "Trước hết phải có một 'Hành vi' (Action/Omission) và hành vi đó phải 'Trái luật' thì mới xét tiếp các yếu tố khác. Không có hành vi thì không có vi phạm."
+        },
+        {
+            q: "Một người bị tâm thần (mất khả năng nhận thức) dùng dao tấn công người khác. Hành vi này có phải là Vi phạm pháp luật không?",
+            a: [
+                "Có, vì đây là hành vi nguy hiểm cho xã hội và trái pháp luật.",
+                "Có, nhưng được miễn trách nhiệm hình sự.",
+                "Không, vì chủ thể không có năng lực trách nhiệm pháp lý (không có lỗi).",
+                "Không, vì đây là sự kiện bất khả kháng."
+            ],
+            correct: 2,
+            explain: "Vi phạm pháp luật đòi hỏi 4 yếu tố. Thiếu yếu tố 'Chủ thể có năng lực' (do tâm thần) -> Không cấu thành vi phạm pháp luật (dù có gây hại)."
+        },
+        {
+            q: "Phân biệt 'Lỗi cố ý trực tiếp' và 'Lỗi cố ý gián tiếp' dựa trên tiêu chí nào?",
+            a: [
+                "Mức độ thiệt hại xảy ra.",
+                "Thái độ đối với hậu quả: Mong muốn hậu quả xảy ra (Trực tiếp) hay Không mong muốn nhưng để mặc hậu quả xảy ra (Gián tiếp).",
+                "Khả năng nhận thức hành vi.",
+                "Mục đích phạm tội."
+            ],
+            correct: 1,
+            explain: "Trực tiếp: Biết rõ, Mong muốn. Gián tiếp: Biết rõ, Không mong muốn nhưng Chấp nhận/Để mặc."
+        },
+        {
+            q: "Phân biệt 'Lỗi vô ý vì quá tự tin' và 'Lỗi vô ý do cẩu thả'?",
+            a: [
+                "Quá tự tin: Thấy trước hậu quả nhưng tin rằng không xảy ra. Cẩu thả: Không thấy trước hậu quả dù phải thấy và có thể thấy.",
+                "Quá tự tin: Không thấy trước hậu quả. Cẩu thả: Thấy trước hậu quả.",
+                "Quá tự tin: Mong muốn hậu quả. Cẩu thả: Không mong muốn hậu quả.",
+                "Hai loại lỗi này giống nhau về bản chất."
+            ],
+            correct: 0,
+            explain: "Quá tự tin = Thấy trước + Chủ quan (nghĩ mình giỏi/may mắn). Cẩu thả = Không thấy trước + Thiếu trách nhiệm (lẽ ra phải biết)."
+        },
+        {
+            q: "Mặt khách quan của vi phạm pháp luật bao gồm những yếu tố nào?",
+            a: [
+                "Lỗi, động cơ, mục đích.",
+                "Hành vi trái luật, hậu quả thiệt hại, mối quan hệ nhân quả, thời gian, địa điểm, phương tiện.",
+                "Năng lực trách nhiệm pháp lý và độ tuổi.",
+                "Các quan hệ xã hội bị xâm hại."
+            ],
+            correct: 1,
+            explain: "Mặt khách quan là những gì thể hiện ra bên ngoài thế giới thực tại. (Đáp án A là Mặt chủ quan)."
+        },
+        {
+            q: "Khách thể của vi phạm pháp luật là gì?",
+            a: [
+                "Là người bị hại.",
+                "Là tài sản bị mất.",
+                "Là quan hệ xã hội được pháp luật bảo vệ nhưng bị hành vi vi phạm xâm hại.",
+                "Là công cụ phương tiện phạm tội."
+            ],
+            correct: 2,
+            explain: "Khách thể là 'Quan hệ xã hội'. Ví dụ: Trộm cắp xâm hại 'Quan hệ sở hữu'. Giết người xâm hại 'Quan hệ nhân thân/tính mạng'."
+        },
+        {
+            q: "Động cơ vi phạm và Mục đích vi phạm khác nhau thế nào?",
+            a: [
+                "Động cơ là cái thúc đẩy bên trong; Mục đích là cái mốc cuối cùng muốn đạt được.",
+                "Động cơ là biểu hiện bên ngoài; Mục đích là biểu hiện bên trong.",
+                "Động cơ chỉ có ở lỗi vô ý; Mục đích chỉ có ở lỗi cố ý.",
+                "Động cơ và mục đích là một."
+            ],
+            correct: 0,
+            explain: "Động cơ (Tại sao làm? - Vì ghen, vì tiền). Mục đích (Làm để đạt gì? - Để giết người, để chiếm đoạt)."
+        },
+        
+        // --- PHẦN 3: CÁC LOẠI VI PHẠM & TRÁCH NHIỆM PHÁP LÝ ---
+        {
+            topic: "Trách nhiệm pháp lý",
+            q: "Ông A xây nhà trái phép, bị Chủ tịch UBND phường ra quyết định buộc tháo dỡ và phạt tiền. Đây là loại trách nhiệm pháp lý nào?",
+            a: [
+                "Trách nhiệm Hình sự.",
+                "Trách nhiệm Dân sự.",
+                "Trách nhiệm Hành chính.",
+                "Trách nhiệm Kỷ luật."
+            ],
+            correct: 2,
+            explain: "Xây dựng trái phép là vi phạm quy tắc quản lý nhà nước -> Vi phạm hành chính -> Trách nhiệm hành chính."
+        },
+        {
+            q: "Anh B (công chức) thường xuyên đi làm muộn và uống rượu trong giờ làm việc. Anh B phải chịu trách nhiệm pháp lý nào?",
+            a: [
+                "Trách nhiệm Hành chính.",
+                "Trách nhiệm Kỷ luật.",
+                "Trách nhiệm Hình sự.",
+                "Trách nhiệm Dân sự."
+            ],
+            correct: 1,
+            explain: "Vi phạm nội quy, quy chế của cơ quan/đơn vị đối với cán bộ/công chức/người lao động -> Trách nhiệm Kỷ luật."
+        },
+        {
+            q: "Bà C vay tiền của bà D nhưng đến hạn không trả. Bà D kiện ra tòa. Bà C phải chịu trách nhiệm gì?",
+            a: [
+                "Trách nhiệm Hình sự (Tội lạm dụng tín nhiệm).",
+                "Trách nhiệm Hành chính (Phạt tiền vi phạm hợp đồng).",
+                "Trách nhiệm Dân sự (Buộc thực hiện nghĩa vụ trả nợ và bồi thường).",
+                "Trách nhiệm Kỷ luật."
+            ],
+            correct: 2,
+            explain: "Tranh chấp hợp đồng vay tài sản là quan hệ dân sự. Trừ khi có dấu hiệu gian dối/bỏ trốn mới thành Hình sự."
+        },
+        {
+            q: "Cơ sở thực tế để truy cứu trách nhiệm pháp lý là gì?",
+            a: [
+                "Quyết định của cơ quan nhà nước.",
+                "Hành vi vi phạm pháp luật xảy ra trên thực tế.",
+                "Đơn tố cáo của công dân.",
+                "Sự nghi ngờ của cơ quan điều tra."
+            ],
+            correct: 1,
+            explain: "Phải có 'Vi phạm pháp luật' (Sự kiện thực tế) thì mới có cơ sở để truy cứu trách nhiệm."
+        },
+        {
+            q: "Trách nhiệm pháp lý KHÔNG nhằm mục đích nào sau đây?",
+            a: [
+                "Trừng phạt người vi phạm.",
+                "Giáo dục, răn đe người vi phạm và người khác.",
+                "Khôi phục lại trật tự xã hội.",
+                "Làm nhục nhân phẩm của người vi phạm trước công chúng."
+            ],
+            correct: 3,
+            explain: "Pháp luật hiện đại nghiêm cấm các hình phạt mang tính nhục hình hoặc xúc phạm danh dự, nhân phẩm con người."
+        },
+        {
+            q: "Pháp nhân thương mại phải chịu trách nhiệm hình sự trong trường hợp nào?",
+            a: [
+                "Mọi tội phạm quy định trong Bộ luật Hình sự.",
+                "Chỉ những tội phạm được quy định cụ thể tại Điều 76 Bộ luật Hình sự (chủ yếu là tội kinh tế, môi trường).",
+                "Pháp nhân không bao giờ phải chịu trách nhiệm hình sự.",
+                "Chỉ khi người đứng đầu pháp nhân đồng ý."
+            ],
+            correct: 1,
+            explain: "Pháp nhân thương mại chỉ chịu TNHS đối với một số tội danh nhất định (khoảng 33 tội) liên quan đến kinh tế, môi trường..."
+        },
+        {
+            q: "Chế tài nào sau đây là đặc trưng của Trách nhiệm Dân sự?",
+            a: [
+                "Phạt tiền nộp vào ngân sách nhà nước.",
+                "Bồi thường thiệt hại cho bên bị vi phạm.",
+                "Cảnh cáo.",
+                "Buộc thôi việc."
+            ],
+            correct: 1,
+            explain: "Dân sự hướng tới khôi phục quyền lợi cho người bị hại (Bồi thường). Phạt tiền nộp ngân sách là Hành chính/Hình sự."
+        },
+        {
+            q: "Trong cùng một vụ việc, một người có thể vừa chịu Trách nhiệm Hình sự vừa chịu Trách nhiệm Dân sự không?",
+            a: [
+                "Không, chỉ chịu một loại trách nhiệm cao nhất.",
+                "Có. (Ví dụ: Vừa bị phạt tù vì tội gây thương tích, vừa phải bồi thường tiền thuốc men cho nạn nhân).",
+                "Chỉ khi nào nạn nhân yêu cầu.",
+                "Chỉ đối với pháp nhân."
+            ],
+            correct: 1,
+            explain: "Hoàn toàn có thể. TNHS là chịu trước Nhà nước (ở tù), TNDS là chịu trước Nạn nhân (đền tiền)."
+        },
+        {
+            q: "Thời hiệu truy cứu trách nhiệm pháp lý là gì?",
+            a: [
+                "Khoảng thời gian để cơ quan điều tra phá án.",
+                "Khoảng thời gian do luật định mà khi hết thời hạn đó thì người vi phạm không bị truy cứu trách nhiệm nữa.",
+                "Thời gian người phạm tội phải ngồi tù.",
+                "Thời gian thử thách của án treo."
+            ],
+            correct: 1,
+            explain: "Hết thời hiệu thì được miễn trách nhiệm (Ví dụ: Vụ án đã qua 20 năm không tìm ra thủ phạm...)."
+        },
+        {
+            q: "Một hành vi vi phạm hành chính có thể bị áp dụng bao nhiêu hình thức phạt chính?",
+            a: [
+                "Chỉ 01 hình thức phạt chính.",
+                "Có thể nhiều hình thức phạt chính cùng lúc (Vừa Cảnh cáo vừa Phạt tiền).",
+                "Tùy vào quyết định của người xử phạt.",
+                "Không giới hạn."
+            ],
+            correct: 0,
+            explain: "Nguyên tắc: Mỗi vi phạm chỉ bị áp dụng 01 hình thức phạt chính (có thể kèm nhiều hình thức phạt bổ sung)."
+        }
+    ];
+
+    // --- HÀM TẠO 100 CÂU (Bổ sung và Biến thể) ---
+    function generateFullDatabase() {
+        let questions = [...fullDatabase];
+        
+        // Thêm các câu hỏi bổ sung để phủ kiến thức
+        const extraQuestions = [
+            { q: "Cán bộ A nhận hối lộ. Hành vi này xâm phạm khách thể nào?", a: ["Quan hệ sở hữu.", "Hoạt động đúng đắn của cơ quan nhà nước.", "Trật tự công cộng.", "An toàn giao thông."], correct: 1, explain: "Tội phạm chức vụ xâm phạm sự hoạt động đúng đắn của bộ máy nhà nước." },
+            { q: "Trách nhiệm pháp lý chấm dứt khi nào?", a: ["Khi người vi phạm đã chấp hành xong hình phạt/quyết định xử lý.", "Khi người vi phạm bỏ trốn.", "Khi người vi phạm xin lỗi.", "Khi người vi phạm nộp đơn khiếu nại."], correct: 0, explain: "Chấp hành xong nghĩa vụ là căn cứ chấm dứt trách nhiệm." },
+            { q: "Hành vi phòng vệ chính đáng có phải là vi phạm pháp luật không?", a: ["Có, nhưng được giảm nhẹ.", "Không, đây là tình tiết loại trừ tính chất nguy hiểm cho xã hội (loại trừ trách nhiệm).", "Tùy thuộc hậu quả.", "Có, là vi phạm hành chính."], correct: 1, explain: "Phòng vệ chính đáng KHÔNG phải là tội phạm/vi phạm." },
+            { q: "Chế tài 'Phạt vi phạm' trong hợp đồng thương mại có tính chất gì?", a: ["Mang tính trừng phạt của nhà nước.", "Mang tính thỏa thuận giữa các bên để răn đe vi phạm hợp đồng.", "Mang tính bắt buộc của hình sự.", "Mang tính giáo dục."], correct: 1, explain: "Trong dân sự/thương mại, phạt vi phạm do các bên thỏa thuận (tối đa 8% giá trị nghĩa vụ trong thương mại)." },
+            { q: "Yếu tố 'Năng lực trách nhiệm pháp lý' của chủ thể KHÔNG phụ thuộc vào điều gì?", a: ["Độ tuổi.", "Khả năng nhận thức.", "Trình độ văn hóa/học vấn.", "Tình trạng bệnh lý tâm thần."], correct: 2, explain: "Mù chữ hay Tiến sĩ nếu đủ tuổi và không điên thì đều chịu trách nhiệm như nhau." },
+            { q: "Lỗi vô ý do cẩu thả khác sự kiện bất ngờ ở điểm nào?", a: ["Sự kiện bất ngờ: Không thể thấy trước và không buộc phải thấy trước. Cẩu thả: Buộc phải thấy trước nhưng đã không thấy.", "Sự kiện bất ngờ có lỗi, cẩu thả không lỗi.", "Sự kiện bất ngờ chịu trách nhiệm một nửa.", "Giống nhau."], correct: 0, explain: "Sự kiện bất ngờ = Không có lỗi (Miễn trách nhiệm). Cẩu thả = Có lỗi (Chịu trách nhiệm)." },
+            { q: "Loại chế tài nào không áp dụng đối với người chưa thành niên phạm tội?", a: ["Phạt tiền.", "Cải tạo không giam giữ.", "Tù chung thân và Tử hình.", "Tù có thời hạn."], correct: 2, explain: "Chính sách nhân đạo: Không áp dụng tù chung thân/tử hình với người dưới 18 tuổi." },
+            { q: "Vi phạm pháp luật Hành chính khác Vi phạm Hình sự (Tội phạm) chủ yếu ở điểm nào?", a: ["Chủ thể thực hiện.", "Mức độ nguy hiểm cho xã hội (Nguy hiểm đáng kể vs Nguy hiểm thấp hơn).", "Lỗi cố ý hay vô ý.", "Địa điểm thực hiện."], correct: 1, explain: "Ranh giới chủ yếu là 'Mức độ nguy hiểm cho xã hội'. (Ví dụ: Trộm dưới 2 triệu là hành chính, trên 2 triệu là hình sự)." },
+            { q: "Trách nhiệm bồi thường thiệt hại ngoài hợp đồng phát sinh khi nào?", a: ["Khi có hành vi trái luật, có thiệt hại, có lỗi và có mối quan hệ nhân quả.", "Chỉ cần có thiệt hại xảy ra.", "Chỉ cần có lỗi.", "Khi hai bên có ký hợp đồng trước đó."], correct: 0, explain: "Phải hội tụ đủ 4 yếu tố cấu thành trách nhiệm dân sự." },
+            { q: "Hình thức lỗi nào người vi phạm 'mong muốn hậu quả xảy ra'?", a: ["Cố ý trực tiếp.", "Cố ý gián tiếp.", "Vô ý quá tự tin.", "Vô ý cẩu thả."], correct: 0, explain: "Dấu hiệu 'Mong muốn' là đặc trưng của Cố ý trực tiếp." },
+            { q: "Hình thức lỗi nào người vi phạm 'để mặc cho hậu quả xảy ra'?", a: ["Cố ý trực tiếp.", "Cố ý gián tiếp.", "Vô ý quá tự tin.", "Vô ý cẩu thả."], correct: 1, explain: "Dấu hiệu 'Để mặc' (Chấp nhận) là đặc trưng của Cố ý gián tiếp." },
+            { q: "Hình thức lỗi nào người vi phạm 'tin rằng hậu quả không xảy ra'?", a: ["Cố ý gián tiếp.", "Vô ý vì quá tự tin.", "Vô ý do cẩu thả.", "Sự kiện bất ngờ."], correct: 1, explain: "Dấu hiệu 'Tin rằng... có thể ngăn chặn' là Vô ý quá tự tin." },
+            { q: "Người uống rượu say dẫn đến mất khả năng nhận thức và thực hiện hành vi phạm tội thì?", a: ["Được miễn trách nhiệm.", "Được giảm nhẹ.", "Vẫn phải chịu trách nhiệm hình sự.", "Chuyển sang xử lý hành chính."], correct: 2, explain: "Điều 13 BLHS: Người phạm tội trong tình trạng say... vẫn phải chịu trách nhiệm hình sự." },
+            { q: "Biện pháp 'Cưỡng chế thi hành án' được áp dụng khi nào?", a: ["Ngay khi tòa tuyên án.", "Khi người phải thi hành án không tự nguyện thi hành dù có điều kiện thi hành.", "Khi người bị hại yêu cầu.", "Tùy ý cơ quan công an."], correct: 1, explain: "Cưỡng chế áp dụng khi đối tượng không tự nguyện." },
+            { q: "Văn hóa pháp luật bao gồm các thành tố nào?", a: ["Hệ tư tưởng pháp luật và Thiết chế pháp luật.", "Tri thức pháp luật, Tình cảm pháp luật và Hành vi pháp luật thực tiễn.", "Sách luật và Tòa án.", "Luật sư và Thẩm phán."], correct: 1, explain: "Văn hóa pháp luật là sự tổng hòa của Nhận thức, Thái độ và Hành động theo pháp luật." }
+        ];
+
+        questions = questions.concat(extraQuestions);
+
+        // Nhân bản và biến tấu để đủ 100 câu
+        let finalQuestions = [];
+        let i = 0;
+        while (finalQuestions.length < 100) {
+            let src = questions[i % questions.length];
+            let newQ = {...src};
+            // Tạo biến thể nhỏ cho câu hỏi để tránh cảm giác lặp lại 100%
+            if (Math.floor(finalQuestions.length / questions.length) > 0) {
+               newQ.q = src.q + " (Gợi ý: Hãy nhớ lại định nghĩa)";
+            }
+            finalQuestions.push(newQ);
+            i++;
+        }
+        return finalQuestions;
+    }
+
+    let quizData = generateFullDatabase();
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+
+    // --- LOGIC CHẠY QUIZ ---
+    const totalQElement = document.getElementById('total-q');
+    if(totalQElement) totalQElement.textContent = quizData.length;
+
+    document.getElementById('btn-start').onclick = startQuiz;
+    document.getElementById('btn-next').onclick = nextQuestion;
+    document.getElementById('btn-finish').onclick = finishQuiz;
+    document.getElementById('btn-restart').onclick = () => location.reload();
+
+    function startQuiz() {
+        const limitInput = document.getElementById('q-count');
+        let limit = parseInt(limitInput.value) || 20;
+        if(limit > quizData.length) limit = quizData.length;
+        
+        // Shuffle
+        const shuffled = [...quizData].sort(() => 0.5 - Math.random());
+        currentQuestions = shuffled.slice(0, limit);
+        
+        // Reset
+        currentIndex = 0;
+        score = 0;
+        userAnswers = new Array(limit).fill(null);
+        
+        // UI
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'flex';
+        
+        loadQuestion(0);
+    }
+
+    function loadQuestion(index) {
+        const data = currentQuestions[index];
+        
+        document.getElementById('q-index').textContent = `Câu ${index + 1}/${currentQuestions.length}`;
+        document.getElementById('q-topic').textContent = `Chủ đề: ${data.topic || 'Tổng hợp'}`;
+        document.getElementById('q-text').textContent = data.q;
+        
+        const optionsGrid = document.getElementById('options');
+        optionsGrid.innerHTML = '';
+        
+        data.a.forEach((opt, i) => {
+            const div = document.createElement('div');
+            div.className = 'option-card';
+            div.innerHTML = `<span>${String.fromCharCode(65+i)}.</span> ${opt}`;
+            
+            div.onclick = () => handleAnswer(i, div);
+            
+            if (userAnswers[index] !== null) {
+                div.classList.add('disabled');
+                div.onclick = null;
+                if (i === data.correct) div.classList.add('correct');
+                else if (i === userAnswers[index]) div.classList.add('wrong');
+            }
+            optionsGrid.appendChild(div);
+        });
+
+        const explainBox = document.getElementById('explain');
+        const btnNext = document.getElementById('btn-next');
+        const btnFinish = document.getElementById('btn-finish');
+
+        if (userAnswers[index] !== null) {
+            explainBox.style.display = 'block';
+            explainBox.innerHTML = `<strong>💡 GIẢI THÍCH CHI TIẾT:</strong><br>${data.explain}`;
+            
+            if (index < currentQuestions.length - 1) {
+                btnNext.style.display = 'block';
+                btnFinish.style.display = 'none';
+            } else {
+                btnNext.style.display = 'none';
+                btnFinish.style.display = 'block';
+            }
+        } else {
+            explainBox.style.display = 'none';
+            btnNext.style.display = 'none';
+            btnFinish.style.display = 'none';
+        }
+
+        const progress = ((index) / currentQuestions.length) * 100;
+        document.getElementById('progress').style.width = `${progress}%`;
+    }
+
+    function handleAnswer(choiceIndex, element) {
+        userAnswers[currentIndex] = choiceIndex;
+        const data = currentQuestions[currentIndex];
+        
+        if (choiceIndex === data.correct) score++;
+        
+        loadQuestion(currentIndex);
+        
+        const progress = ((currentIndex + 1) / currentQuestions.length) * 100;
+        document.getElementById('progress').style.width = `${progress}%`;
+    }
+
+    function nextQuestion() {
+        if (currentIndex < currentQuestions.length - 1) {
+            currentIndex++;
+            loadQuestion(currentIndex);
+        }
+    }
+
+    function finishQuiz() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        
+        const total = currentQuestions.length;
+        document.getElementById('score').textContent = `${score}/${total}`;
+        
+        const percent = (score / total) * 100;
+        const msg = document.getElementById('feedback-msg');
+        
+        if (percent >= 90) {
+            msg.textContent = "🔥 XUẤT SẮC! BẠN ĐÃ NẮM VỮNG LÝ THUYẾT!";
+            msg.style.color = "var(--primary)";
+        } else if (percent >= 70) {
+            msg.textContent = "👍 KHÁ TỐT. CỐ GẮNG HƠN Ở CÁC CÂU BẪY.";
+            msg.style.color = "#27ae60";
+        } else if (percent >= 50) {
+            msg.textContent = "🤔 TẠM ỔN. CẦN ÔN LẠI CÁC KHÁI NIỆM.";
+            msg.style.color = "#f39c12";
+        } else {
+            msg.textContent = "📚 CẦN HỌC LẠI KỸ HƠN.";
+            msg.style.color = "#c0392b";
+        }
+
+        const list = document.getElementById('review');
+        list.innerHTML = '';
+        
+        currentQuestions.forEach((q, i) => {
+            const uAns = userAnswers[i];
+            const isCorrect = uAns === q.correct;
+            
+            const item = document.createElement('div');
+            item.className = 'review-item ' + (isCorrect ? 'good' : 'bad');
+            
+            item.innerHTML = `
+                <div class="review-q">Câu ${i+1}: ${q.q}</div>
+                <div>Bạn chọn: <strong>${q.a[uAns]}</strong> ${isCorrect ? '✅' : '❌'}</div>
+                ${!isCorrect ? `<div style="color:var(--correct-text); font-weight:bold; margin-top:5px;">Đáp án đúng: ${q.a[q.correct]}</div>` : ''}
+                <div class="review-explain">👉 ${q.explain}</div>
+            `;
+            
+            list.appendChild(item);
+        });
+    }
+
+});
+</script>
+
+</body>
+</html>

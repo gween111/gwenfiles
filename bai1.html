@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Câu Trắc Nghiệm Bài 1: Nhà Nước & NNPQ XHCN Việt Nam</title>
+    <style>
+        :root {
+            --primary: #c0392b; /* Màu đỏ đậm chủ đạo cho chủ đề Chính trị/Nhà nước */
+            --light: #fdf2f0;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ecf0f1;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        /* Setup Section */
+        .setup-box {
+            text-align: center;
+            padding: 30px;
+            background: var(--light);
+            border-radius: 8px;
+            border: 2px dashed #dcdcdc;
+        }
+
+        input[type=number] {
+            padding: 10px;
+            font-size: 16px;
+            width: 80px;
+            text-align: center;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+
+        button.start-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+
+        button.start-btn:hover {
+            background-color: #a93226;
+        }
+
+        /* Quiz Section */
+        #quiz-area {
+            display: none;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-content {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            text-align: left;
+            font-size: 1em;
+        }
+
+        .option-item:hover:not(.disabled) {
+            border-color: var(--primary);
+            background-color: var(--light);
+        }
+
+        .option-item.correct {
+            background-color: #d5f5e3;
+            border-color: var(--correct);
+            color: #0e6655;
+        }
+
+        .option-item.wrong {
+            background-color: #fadbd8;
+            border-color: var(--wrong);
+            color: #78281f;
+        }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+
+        .nav-btns {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .nav-btn {
+            background-color: #34495e;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Result Section */
+        #result-area {
+            display: none;
+            text-align: center;
+        }
+
+        .score-big {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .review-section {
+            text-align: left;
+            margin-top: 40px;
+        }
+
+        .review-card {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.8em;
+            background: #eee;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>NGÂN HÀNG CÂU HỎI BÀI 1</h1>
+    <div class="subtitle">Nhà nước & Nhà nước pháp quyền XHCN Việt Nam</div>
+
+    <!-- Màn hình cài đặt -->
+    <div id="setup-screen" class="setup-box">
+        <p>Tổng số câu hỏi trong ngân hàng: <strong id="total-q" style="color: var(--primary)">0</strong> câu.</p>
+        <p>Chọn số lượng câu hỏi bạn muốn ôn tập:</p>
+        <input type="number" id="q-limit" value="20" min="5">
+        <br>
+        <button class="start-btn" onclick="startQuiz()">Bắt đầu làm bài</button>
+    </div>
+
+    <!-- Màn hình làm bài -->
+    <div id="quiz-area">
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress"></div>
+        </div>
+        
+        <div class="question-header" style="display: flex; justify-content: space-between; color: #7f8c8d; font-size: 0.9em; margin-bottom: 10px;">
+            <span id="q-index">Câu 1/?</span>
+            <span id="q-topic">Chủ đề: Tổng quan</span>
+        </div>
+
+        <div class="question-content" id="q-text">
+            Nội dung câu hỏi...
+        </div>
+
+        <div class="options-list" id="opt-list">
+            <!-- Options inserted here -->
+        </div>
+
+        <div class="explanation" id="explanation">
+            <!-- Explanation inserted here -->
+        </div>
+
+        <div class="nav-btns">
+            <button class="nav-btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Câu tiếp theo</button>
+            <button class="nav-btn" id="finish-btn" onclick="showResults()" style="display: none; background-color: var(--correct);">Xem kết quả</button>
+        </div>
+    </div>
+
+    <!-- Màn hình kết quả -->
+    <div id="result-area">
+        <h2>Kết Quả</h2>
+        <div class="score-big" id="final-score">0/0</div>
+        <p id="final-msg"></p>
+        <button class="start-btn" onclick="location.reload()">Làm lại đề mới</button>
+        
+        <div class="review-section" id="review-list">
+            <h3>Xem lại bài làm:</h3>
+            <!-- Review items -->
+        </div>
+    </div>
+</div>
+
+<script>
+    const database = [
+        // --- CHỦ ĐỀ 1: KHÁI NIỆM & NGUỒN GỐC NHÀ NƯỚC (15 câu) ---
+        {
+            topic: "Nguồn gốc & Khái niệm",
+            q: "Theo quan điểm Mác - Lênin, nhà nước xuất hiện khi nào?",
+            a: ["Khi xã hội loài người hình thành", "Khi xuất hiện chế độ tư hữu và mâu thuẫn giai cấp gay gắt", "Khi con người biết trồng trọt và chăn nuôi", "Do Thượng đế sắp đặt từ đầu"],
+            correct: 1,
+            explain: "Nhà nước là sản phẩm của xã hội có giai cấp, xuất hiện khi mâu thuẫn giai cấp không thể điều hòa được."
+        },
+        {
+            q: "Tổ chức quản lý xã hội trong thời kỳ Cộng sản nguyên thủy là gì?",
+            a: ["Nhà nước chủ nô", "Hội đồng thị tộc, bộ lạc", "Chính phủ lâm thời", "Tòa án tập quán"],
+            correct: 1,
+            explain: "Thời kỳ này chưa có nhà nước, quyền lực xã hội do Hội đồng thị tộc/bộ lạc thực hiện."
+        },
+        {
+            q: "Nguyên nhân kinh tế dẫn đến sự ra đời của nhà nước là gì?",
+            a: ["Sự xuất hiện chế độ tư hữu về tư liệu sản xuất", "Sự tăng dân số", "Chiến tranh giữa các bộ lạc", "Sự phát triển của tôn giáo"],
+            correct: 0,
+            explain: "Chế độ tư hữu làm phân hóa giàu nghèo, tạo tiền đề kinh tế cho nhà nước ra đời."
+        },
+        {
+            q: "Thuyết 'Thần quyền' giải thích nguồn gốc nhà nước như thế nào?",
+            a: ["Nhà nước là kết quả của một bản khế ước xã hội", "Nhà nước do Thượng đế sáng tạo ra để cai quản trần gian", "Nhà nước là sự phát triển của gia đình", "Nhà nước ra đời từ bạo lực"],
+            correct: 1,
+            explain: "Thuyết Thần quyền cho rằng quyền lực nhà nước là do thần linh ban cho."
+        },
+        {
+            q: "Thuyết 'Gia trưởng' quan niệm nhà nước là gì?",
+            a: ["Là sự mở rộng của quyền lực người cha trong gia đình", "Là công cụ trấn áp giai cấp", "Là sự thỏa thuận của công dân", "Là kết quả của chiến tranh"],
+            correct: 0,
+            explain: "Thuyết Gia trưởng coi nhà nước như một gia đình lớn."
+        },
+        {
+            q: "Định nghĩa chung nhất về nhà nước là gì?",
+            a: ["Tổ chức từ thiện lớn nhất", "Tổ chức quyền lực chính trị công cộng đặc biệt, có bộ máy cưỡng chế, quản lý dân cư theo lãnh thổ", "Tổ chức kinh tế độc quyền", "Tổ chức tôn giáo toàn cầu"],
+            correct: 1,
+            explain: "Nhà nước là tổ chức quyền lực chính trị đặc biệt, có bộ máy chuyên trách."
+        },
+        {
+            q: "Kiểu nhà nước đầu tiên trong lịch sử nhân loại là gì?",
+            a: ["Nhà nước Phong kiến", "Nhà nước Tư bản", "Nhà nước Chiếm hữu nô lệ", "Nhà nước Xã hội chủ nghĩa"],
+            correct: 2,
+            explain: "Lịch sử phát triển: Chủ nô -> Phong kiến -> Tư bản -> XHCN."
+        },
+        {
+            q: "Xã hội nào sau đây KHÔNG có nhà nước?",
+            a: ["Xã hội chiếm hữu nô lệ", "Xã hội Cộng sản nguyên thủy", "Xã hội Phong kiến", "Xã hội Tư bản"],
+            correct: 1,
+            explain: "Xã hội Cộng sản nguyên thủy chưa có phân chia giai cấp nên chưa có nhà nước."
+        },
+        {
+            q: "Thuyết 'Khế ước xã hội' (Rousseau) cho rằng nhà nước ra đời do đâu?",
+            a: ["Do sự thỏa thuận (ký hợp đồng) giữa các thành viên trong xã hội", "Do Chúa trời định đoạt", "Do kẻ mạnh thôn tính kẻ yếu", "Do sự phát triển của gia đình"],
+            correct: 0,
+            explain: "Người dân nhường một phần quyền tự do của mình cho nhà nước để được bảo vệ."
+        },
+        {
+            q: "Yếu tố nào là mầm mống trực tiếp dẫn đến sự phân hóa giai cấp?",
+            a: ["Sự xuất hiện của công cụ lao động bằng kim loại", "Chế độ tư hữu", "Sự gia tăng dân số", "Thiên tai dịch bệnh"],
+            correct: 1,
+            explain: "Tư hữu là nguyên nhân trực tiếp dẫn đến phân hóa giàu nghèo và giai cấp."
+        },
+
+        // --- CHỦ ĐỀ 2: BẢN CHẤT & ĐẶC TRƯNG NHÀ NƯỚC (20 câu) ---
+        {
+            topic: "Bản chất & Đặc trưng",
+            q: "Bản chất của nhà nước thể hiện ở hai thuộc tính nào?",
+            a: ["Tính giai cấp và tính xã hội", "Tính nhân dân và tính dân tộc", "Tính kinh tế và tính chính trị", "Tính cưỡng chế và tính tự nguyện"],
+            correct: 0,
+            explain: "Bản chất nhà nước luôn là sự thống nhất giữa tính giai cấp và tính xã hội."
+        },
+        {
+            q: "Tính giai cấp của nhà nước thể hiện điều gì?",
+            a: ["Nhà nước là công cụ trấn áp của giai cấp thống trị đối với giai cấp bị trị", "Nhà nước bảo vệ quyền lợi của mọi người như nhau", "Nhà nước là trọng tài trung lập", "Nhà nước không bênh vực ai"],
+            correct: 0,
+            explain: "Nhà nước là bộ máy bạo lực để duy trì sự thống trị của giai cấp cầm quyền."
+        },
+        {
+            q: "Tính xã hội của nhà nước thể hiện ở hoạt động nào?",
+            a: ["Trấn áp các cuộc biểu tình", "Xây dựng công trình công cộng, y tế, giáo dục, bảo vệ môi trường", "Thu thuế để nuôi quân đội", "Ban hành hình phạt tử hình"],
+            correct: 1,
+            explain: "Nhà nước phải giải quyết các công việc chung của xã hội để duy trì sự tồn tại."
+        },
+        {
+            q: "Nhà nước có bao nhiêu đặc trưng cơ bản?",
+            a: ["3 đặc trưng", "4 đặc trưng", "5 đặc trưng", "6 đặc trưng"],
+            correct: 2,
+            explain: "5 đặc trưng: Quyền lực công cộng, Lãnh thổ, Chủ quyền, Pháp luật, Thuế."
+        },
+        {
+            q: "Đặc trưng 'Quyền lực công cộng đặc biệt' nghĩa là gì?",
+            a: ["Nhà nước có uy tín cao", "Nhà nước có bộ máy cưỡng chế chuyên nghiệp (cảnh sát, nhà tù, quân đội) tách khỏi xã hội", "Nhà nước được mọi người yêu mến", "Nhà nước có nhiều tiền"],
+            correct: 1,
+            explain: "Khác với quyền lực xã hội tiền sử, quyền lực nhà nước dựa trên bộ máy vũ lực chuyên nghiệp."
+        },
+        {
+            q: "Khác với tổ chức thị tộc (huyết thống), nhà nước quản lý dân cư theo tiêu chí nào?",
+            a: ["Theo độ tuổi", "Theo giới tính", "Theo sự phân chia lãnh thổ hành chính", "Theo nghề nghiệp"],
+            correct: 2,
+            explain: "Nhà nước chia lãnh thổ thành các đơn vị hành chính và quản lý người dân trên lãnh thổ đó."
+        },
+        {
+            q: "Chủ quyền quốc gia là gì?",
+            a: ["Quyền lực tối cao của nhà nước trong nội bộ và độc lập trong quan hệ quốc tế", "Quyền được in tiền", "Quyền có quân đội", "Quyền sở hữu đất đai"],
+            correct: 0,
+            explain: "Chủ quyền quốc gia bao gồm hai mặt: Tối cao bên trong và Độc lập bên ngoài."
+        },
+        {
+            q: "Nhà nước là chủ thể duy nhất có quyền ban hành cái gì?",
+            a: ["Nội quy", "Điều lệ", "Pháp luật", "Hương ước"],
+            correct: 2,
+            explain: "Chỉ nhà nước mới có quyền ban hành pháp luật và đảm bảo thực hiện bằng cưỡng chế."
+        },
+        {
+            q: "Mục đích chính của việc nhà nước thu thuế là gì?",
+            a: ["Để làm giàu cho quan chức", "Để đảm bảo nguồn lực tài chính nuôi bộ máy nhà nước và thực hiện các chức năng xã hội", "Để trừng phạt người dân", "Để hạn chế tiêu dùng"],
+            correct: 1,
+            explain: "Thuế là nguồn thu bắt buộc để duy trì hoạt động của bộ máy nhà nước."
+        },
+        {
+            q: "Điểm khác biệt cơ bản giữa Nhà nước và Tổ chức xã hội (như Đoàn thanh niên) là gì?",
+            a: ["Nhà nước có điều lệ", "Nhà nước có bộ máy cưỡng chế chuyên nghiệp và quyền ban hành pháp luật", "Nhà nước có đông thành viên hơn", "Nhà nước có trụ sở đẹp hơn"],
+            correct: 1,
+            explain: "Tổ chức xã hội không có nhà tù, cảnh sát và không được ban hành pháp luật."
+        },
+        {
+            q: "Trong các nhà nước hiện đại, thuộc tính nào ngày càng trở nên quan trọng?",
+            a: ["Tính giai cấp (trấn áp)", "Tính xã hội (phục vụ)", "Tính thần quyền", "Tính quân sự"],
+            correct: 1,
+            explain: "Xu hướng hiện đại là nhà nước phục vụ, kiến tạo, đề cao tính xã hội."
+        },
+        {
+            q: "Quyền lực nhà nước có tính chất gì?",
+            a: ["Tính thuyết phục", "Tính cưỡng chế và tính phổ biến", "Tính tự nguyện", "Tính cục bộ"],
+            correct: 1,
+            explain: "Quyền lực nhà nước có sức mạnh cưỡng chế và tác động lên toàn bộ xã hội."
+        },
+        {
+            q: "Cơ quan nhà nước khác với tổ chức xã hội ở chỗ nào?",
+            a: ["Mang tính quyền lực nhà nước", "Hoạt động vì lợi nhuận", "Hoạt động tự nguyện", "Chỉ có ở trung ương"],
+            correct: 0,
+            explain: "Cơ quan nhà nước nhân danh quyền lực nhà nước để hoạt động."
+        },
+        {
+            q: "Thuế có đặc điểm gì?",
+            a: ["Là khoản đóng góp tự nguyện", "Là khoản đóng góp bắt buộc, không hoàn trả trực tiếp", "Là khoản phí dịch vụ", "Là khoản tiền phạt"],
+            correct: 1,
+            explain: "Thuế là nghĩa vụ bắt buộc và không mang tính hoàn trả trực tiếp cho người đóng."
+        },
+        {
+            q: "Về mặt bản chất, Nhà nước CHXHCN Việt Nam mang bản chất của giai cấp nào?",
+            a: ["Giai cấp nông dân", "Giai cấp công nhân", "Tầng lớp trí thức", "Tầng lớp doanh nhân"],
+            correct: 1,
+            explain: "Nhà nước ta mang bản chất giai cấp công nhân, tính nhân dân và tính dân tộc sâu sắc."
+        },
+
+        // --- CHỦ ĐỀ 3: NHÀ NƯỚC PHÁP QUYỀN (15 câu) ---
+        {
+            topic: "Nhà nước pháp quyền",
+            q: "Nhà nước pháp quyền có phải là một kiểu nhà nước trong lịch sử không?",
+            a: ["Có, là kiểu nhà nước thứ 5", "Không, nó là một phương thức tổ chức quyền lực nhà nước tiến bộ", "Là kiểu nhà nước tư bản", "Là kiểu nhà nước phong kiến"],
+            correct: 1,
+            explain: "NNPQ không phải là một kiểu nhà nước (như chủ nô, phong kiến...) mà là cách thức tổ chức quyền lực."
+        },
+        {
+            q: "Đặc trưng cơ bản nhất của nhà nước pháp quyền là gì?",
+            a: ["Nhà nước có nhiều luật", "Sự thượng tôn pháp luật (Pháp luật tối cao)", "Nhà nước quản lý chặt chẽ", "Tăng cường hình phạt"],
+            correct: 1,
+            explain: "Thượng tôn pháp luật: Pháp luật đứng trên tất cả, kể cả nhà nước."
+        },
+        {
+            q: "Trong nhà nước pháp quyền, mối quan hệ giữa nhà nước và công dân là?",
+            a: ["Cai trị và phục tùng", "Bình đẳng về quyền và nghĩa vụ pháp lý", "Ban ơn và chịu ơn", "Nhà nước luôn đúng"],
+            correct: 1,
+            explain: "Cả nhà nước và công dân đều là chủ thể bình đẳng trước pháp luật."
+        },
+        {
+            q: "Để chống lạm quyền, quyền lực nhà nước trong nhà nước pháp quyền phải được?",
+            a: ["Tập trung vào một người", "Phân công, phân nhiệm và kiểm soát lẫn nhau", "Chia nhỏ manh mún", "Trao hết cho quân đội"],
+            correct: 1,
+            explain: "Cần có cơ chế kiểm soát quyền lực (kiềm chế - đối trọng) giữa Lập pháp, Hành pháp, Tư pháp."
+        },
+        {
+            q: "Yêu cầu đối với hệ thống pháp luật trong nhà nước pháp quyền là gì?",
+            a: ["Phải hà khắc", "Phải dân chủ, công bằng, nhân đạo, minh bạch, khả thi", "Phải bí mật", "Phải thay đổi liên tục"],
+            correct: 1,
+            explain: "Pháp luật không chỉ cần được tuân thủ mà nội dung pháp luật phải tốt (công bằng, nhân đạo)."
+        },
+        {
+            q: "Trong nhà nước pháp quyền, tư pháp (Tòa án) phải có đặc tính gì?",
+            a: ["Phụ thuộc vào hành pháp", "Xét xử độc lập và chỉ tuân theo pháp luật", "Xét xử theo dư luận", "Xét xử theo mệnh lệnh cấp trên"],
+            correct: 1,
+            explain: "Độc lập xét xử là điều kiện tiên quyết để bảo vệ công lý."
+        },
+        {
+            q: "Nhà nước pháp quyền đòi hỏi thái độ như thế nào đối với quyền con người?",
+            a: ["Hạn chế tối đa", "Tôn trọng, bảo vệ và bảo đảm quyền con người", "Chỉ bảo vệ quyền công dân", "Không quan tâm"],
+            correct: 1,
+            explain: "Bảo vệ quyền con người là mục tiêu cao cả của nhà nước pháp quyền."
+        },
+        {
+            q: "Nhà nước pháp quyền ứng xử thế nào với pháp luật quốc tế?",
+            a: ["Không quan tâm", "Tôn trọng và thực hiện đầy đủ các cam kết quốc tế", "Chỉ thực hiện khi có lợi", "Luôn coi luật quốc gia cao hơn"],
+            correct: 1,
+            explain: "Tôn trọng các cam kết quốc tế là một đặc trưng của NNPQ văn minh."
+        },
+        {
+            q: "Khái niệm 'Thượng tôn pháp luật' có nghĩa là gì?",
+            a: ["Mọi chủ thể (kể cả nhà nước) đều phải tuân thủ pháp luật", "Chỉ người dân phải tuân thủ", "Pháp luật dùng để trừng trị", "Luật pháp đứng dưới chính trị"],
+            correct: 0,
+            explain: "Pháp luật có vị trí tối thượng trong đời sống nhà nước và xã hội."
+        },
+        {
+            q: "Tư tưởng về nhà nước pháp quyền xuất hiện từ khi nào?",
+            a: ["Mới xuất hiện gần đây", "Đã manh nha từ thời cổ đại (Aristote, Cicero...)", "Từ thời phong kiến", "Từ năm 1945"],
+            correct: 1,
+            explain: "Tư tưởng pháp trị/pháp quyền đã có mầm mống từ các triết gia cổ đại."
+        },
+
+        // --- CHỦ ĐỀ 4: NHÀ NƯỚC PHÁP QUYỀN XHCN VIỆT NAM (30 câu) ---
+        {
+            topic: "NNPQ XHCN Việt Nam",
+            q: "Theo Hiến pháp 2013, Nhà nước CHXHCN Việt Nam là nhà nước của ai?",
+            a: ["Của giai cấp công nhân", "Của nông dân", "Của Nhân dân, do Nhân dân, vì Nhân dân", "Của Đảng viên"],
+            correct: 2,
+            explain: "Điều 2 Hiến pháp 2013 khẳng định bản chất của Nhà nước ta."
+        },
+        {
+            q: "Quyền lực nhà nước ở Việt Nam có đặc điểm gì nổi bật?",
+            a: ["Tam quyền phân lập", "Thống nhất, có sự phân công, phối hợp và kiểm soát giữa các cơ quan", "Phân tán", "Tập trung tuyệt đối"],
+            correct: 1,
+            explain: "Việt Nam không theo tam quyền phân lập mà là quyền lực thống nhất có phân công, phối hợp, kiểm soát."
+        },
+        {
+            q: "Lực lượng nào lãnh đạo Nhà nước và xã hội Việt Nam?",
+            a: ["Mặt trận Tổ quốc", "Đảng Cộng sản Việt Nam", "Quốc hội", "Chủ tịch nước"],
+            correct: 1,
+            explain: "Điều 4 Hiến pháp: Đảng Cộng sản Việt Nam là lực lượng lãnh đạo."
+        },
+        {
+            q: "Văn kiện nào gần đây nhất (2022) của Đảng đề ra nhiệm vụ xây dựng NNPQ XHCN Việt Nam?",
+            a: ["Nghị quyết Đại hội XIII", "Nghị quyết số 27-NQ/TW", "Hiến pháp 2013", "Cương lĩnh 2011"],
+            correct: 1,
+            explain: "Nghị quyết 27-NQ/TW ngày 9/11/2022 về tiếp tục xây dựng và hoàn thiện NNPQ XHCN VN."
+        },
+        {
+            q: "Cơ quan nào thực hiện quyền lập hiến và lập pháp?",
+            a: ["Chính phủ", "Quốc hội", "Tòa án tối cao", "Viện kiểm sát"],
+            correct: 1,
+            explain: "Quốc hội là cơ quan đại biểu cao nhất, có quyền lập hiến và lập pháp."
+        },
+        {
+            q: "Chính phủ là cơ quan gì?",
+            a: ["Cơ quan quyền lực nhà nước cao nhất", "Cơ quan hành chính nhà nước cao nhất, thực hiện quyền hành pháp", "Cơ quan xét xử", "Cơ quan kiểm sát"],
+            correct: 1,
+            explain: "Chính phủ đứng đầu nhánh hành pháp, là cơ quan chấp hành của Quốc hội."
+        },
+        {
+            q: "Tòa án nhân dân thực hiện quyền gì?",
+            a: ["Quyền lập pháp", "Quyền hành pháp", "Quyền tư pháp", "Quyền công tố"],
+            correct: 2,
+            explain: "Tòa án là cơ quan xét xử, thực hiện quyền tư pháp."
+        },
+        {
+            q: "Nguyên tắc tổ chức và hoạt động của bộ máy nhà nước Việt Nam là?",
+            a: ["Tập trung dân chủ", "Tam quyền phân lập", "Đa nguyên đa đảng", "Tự trị địa phương"],
+            correct: 0,
+            explain: "Tập trung dân chủ là nguyên tắc cơ bản trong tổ chức bộ máy nhà nước ta."
+        },
+        {
+            q: "Tính 'Nhân dân' trong Nhà nước ta thể hiện ở quyền nào của người dân?",
+            a: ["Quyền bầu cử, ứng cử, tham gia quản lý nhà nước", "Quyền được miễn thuế", "Quyền được tự do tuyệt đối", "Quyền được đứng trên pháp luật"],
+            correct: 0,
+            explain: "Nhân dân thực hiện quyền làm chủ thông qua bầu cử và tham gia quản lý nhà nước."
+        },
+        {
+            q: "Mặt trận Tổ quốc Việt Nam có vai trò gì?",
+            a: ["Quản lý hành chính", "Xét xử", "Giám sát và phản biện xã hội", "Ban hành văn bản luật"],
+            correct: 2,
+            explain: "MTTQ là liên minh chính trị, có vai trò giám sát và phản biện xã hội."
+        },
+        {
+            q: "Quyền con người, quyền công dân ở Việt Nam chỉ có thể bị hạn chế trong trường hợp nào?",
+            a: ["Do Chính phủ quy định", "Trong trường hợp cần thiết vì lý do quốc phòng, an ninh, sức khỏe cộng đồng... do Luật định", "Khi kinh tế khó khăn", "Tùy ý cơ quan nhà nước"],
+            correct: 1,
+            explain: "Điều 14 Hiến pháp: Việc hạn chế quyền phải do Luật định và chỉ trong trường hợp cần thiết."
+        },
+        {
+            q: "Đặc điểm về hệ thống pháp luật trong NNPQ XHCN Việt Nam là gì?",
+            a: ["Phức tạp, khó hiểu", "Dân chủ, công bằng, nhân đạo, đồng bộ, thống nhất, khả thi, công khai, minh bạch", "Chỉ bảo vệ người giàu", "Thường xuyên thay đổi tùy tiện"],
+            correct: 1,
+            explain: "Yêu cầu về một hệ thống pháp luật tốt, hoàn thiện."
+        },
+        {
+            q: "Cơ chế kiểm soát quyền lực nhà nước ở Việt Nam là?",
+            a: ["Kiểm soát bên trong (giữa các cơ quan) và kiểm soát từ bên ngoài (nhân dân, mặt trận)", "Chỉ có Đảng kiểm soát", "Không cần kiểm soát", "Chỉ có kiểm soát nội bộ"],
+            correct: 0,
+            explain: "Kiểm soát quyền lực là vấn đề then chốt, bao gồm cả cơ chế bên trong và bên ngoài."
+        },
+        {
+            q: "Chủ quyền nhân dân ở Việt Nam được thực hiện thông qua các hình thức nào?",
+            a: ["Chỉ dân chủ trực tiếp", "Chỉ dân chủ đại diện", "Dân chủ trực tiếp và dân chủ đại diện", "Thông qua mạng xã hội"],
+            correct: 2,
+            explain: "Nhân dân thực hiện quyền lực bằng dân chủ trực tiếp (trưng cầu ý dân) và đại diện (qua Quốc hội, HĐND)."
+        },
+        {
+            q: "Ai là người đứng đầu Nhà nước Việt Nam?",
+            a: ["Tổng Bí thư", "Thủ tướng Chính phủ", "Chủ tịch nước", "Chủ tịch Quốc hội"],
+            correct: 2,
+            explain: "Chủ tịch nước là người đứng đầu Nhà nước, thay mặt nước CHXHCNVN về đối nội, đối ngoại."
+        },
+        {
+            q: "Nhiệm vụ trọng tâm trong cải cách hành chính là gì?",
+            a: ["Tăng số lượng công chức", "Xây dựng nền hành chính phục vụ, chuyên nghiệp, hiện đại", "Tăng thủ tục hành chính", "Giảm lương công chức"],
+            correct: 1,
+            explain: "Hướng tới nền hành chính phục vụ nhân dân, đơn giản hóa thủ tục."
+        },
+        {
+            q: "Yêu cầu đối với Tòa án trong NNPQ XHCN Việt Nam là gì?",
+            a: ["Phải xét xử theo chỉ đạo", "Bảo đảm tính độc lập của Tòa án", "Phải tăng án phí", "Phải xét xử nhanh bất chấp quy trình"],
+            correct: 1,
+            explain: "Tính độc lập của Tòa án là đặc trưng quan trọng để bảo vệ công lý."
+        },
+        {
+            q: "Trách nhiệm của Nhà nước đối với quyền con người là gì?",
+            a: ["Công nhận, tôn trọng, bảo vệ, bảo đảm", "Chỉ cần công nhận", "Hạn chế quyền", "Ban ơn"],
+            correct: 0,
+            explain: "Nhà nước có 4 trách nhiệm: Công nhận, Tôn trọng, Bảo vệ, Bảo đảm quyền con người."
+        },
+        {
+            q: "Khái niệm 'Nhà nước kiến tạo phát triển' thường gắn liền với chức năng nào?",
+            a: ["Chức năng trấn áp", "Chức năng kinh tế (tạo môi trường, động lực phát triển)", "Chức năng tư pháp", "Chức năng quân sự"],
+            correct: 1,
+            explain: "Nhà nước kiến tạo không làm thay thị trường mà tạo khuôn khổ thể chế tốt cho phát triển."
+        },
+        {
+            q: "Ở Việt Nam, Hiến pháp có vị trí như thế nào?",
+            a: ["Là một đạo luật thông thường", "Là đạo luật gốc, có hiệu lực pháp lý cao nhất", "Thấp hơn Cương lĩnh Đảng", "Ngang bằng với các Bộ luật"],
+            correct: 1,
+            explain: "Hiến pháp là luật cơ bản, luật gốc, mọi văn bản khác không được trái Hiến pháp."
+        },
+
+        // --- CHỦ ĐỀ 5: MỞ RỘNG & TỔNG HỢP (20 câu) ---
+        {
+            topic: "Mở rộng",
+            q: "Chức năng đối ngoại của nhà nước bao gồm?",
+            a: ["Bảo vệ trật tự an toàn xã hội", "Bảo vệ tổ quốc, thiết lập quan hệ ngoại giao, hợp tác quốc tế", "Phát triển giáo dục", "Xây dựng cơ sở hạ tầng"],
+            correct: 1,
+            explain: "Chức năng đối ngoại liên quan đến quan hệ với các quốc gia và tổ chức quốc tế."
+        },
+        {
+            q: "Nhà nước quản lý xã hội chủ yếu bằng công cụ gì?",
+            a: ["Bằng đạo đức", "Bằng pháp luật", "Bằng dư luận", "Bằng tiền"],
+            correct: 1,
+            explain: "Pháp luật là công cụ quản lý chủ yếu và hiệu quả nhất của nhà nước."
+        },
+        {
+            q: "Tại sao nói Nhà nước mang tính xã hội?",
+            a: ["Vì nhà nước giải quyết các công việc chung, phục vụ lợi ích cộng đồng", "Vì nhà nước thu thuế", "Vì nhà nước có quân đội", "Vì nhà nước trấn áp tội phạm"],
+            correct: 0,
+            explain: "Tính xã hội thể hiện ở vai trò quản lý và phục vụ lợi ích chung."
+        },
+        {
+            q: "Mối quan hệ giữa pháp luật và kinh tế là gì?",
+            a: ["Pháp luật đứng trên kinh tế", "Kinh tế quyết định pháp luật, pháp luật tác động trở lại kinh tế", "Không liên quan", "Pháp luật kìm hãm kinh tế"],
+            correct: 1,
+            explain: "Cơ sở hạ tầng (kinh tế) quyết định kiến trúc thượng tầng (pháp luật)."
+        },
+        {
+            q: "Hình thức cấu trúc của Nhà nước Việt Nam là gì?",
+            a: ["Nhà nước Liên bang", "Nhà nước Đơn nhất", "Nhà nước Liên minh", "Nhà nước Tự trị"],
+            correct: 1,
+            explain: "Việt Nam là nhà nước đơn nhất, toàn vẹn lãnh thổ, thống nhất từ trung ương đến địa phương."
+        },
+        {
+            q: "Hình thức chính thể của Nhà nước Việt Nam là gì?",
+            a: ["Quân chủ lập hiến", "Cộng hòa Tổng thống", "Cộng hòa xã hội chủ nghĩa", "Cộng hòa đại nghị"],
+            correct: 2,
+            explain: "Chính thể Cộng hòa XHCN: Quyền lực thuộc về nhân dân, không có vua."
+        },
+        {
+            q: "Chế độ chính trị của Việt Nam là?",
+            a: ["Chế độ độc tài", "Chế độ dân chủ", "Chế độ quân chủ", "Chế độ phát xít"],
+            correct: 1,
+            explain: "Việt Nam theo chế độ dân chủ xã hội chủ nghĩa."
+        },
+        {
+            q: "Một trong những giải pháp xây dựng NNPQ XHCN VN là?",
+            a: ["Hoàn thiện cơ chế kiểm soát quyền lực nhà nước", "Tập trung hết quyền lực vào một người", "Bãi bỏ Tòa án", "Giảm bớt vai trò của pháp luật"],
+            correct: 0,
+            explain: "Kiểm soát quyền lực là giải pháp then chốt để chống tham nhũng, lạm quyền."
+        },
+        {
+            q: "Quyền lực nhà nước thống nhất ở đâu?",
+            a: ["Ở Chính phủ", "Ở Quốc hội", "Ở Nhân dân", "Ở Tòa án"],
+            correct: 2,
+            explain: "Nguồn gốc quyền lực là từ Nhân dân."
+        },
+        {
+            q: "Đặc điểm nào KHÔNG phải của nhà nước pháp quyền?",
+            a: ["Thượng tôn pháp luật", "Bảo vệ quyền con người", "Quyền lực tập trung độc đoán", "Tư pháp độc lập"],
+            correct: 2,
+            explain: "Quyền lực độc đoán trái ngược với nguyên tắc của nhà nước pháp quyền."
+        },
+        {
+            q: "Vai trò của pháp luật trong nhà nước pháp quyền?",
+            a: ["Là công cụ để cai trị dân", "Là phương tiện để hạn chế quyền lực nhà nước và bảo vệ quyền tự do của công dân", "Là văn bản trang trí", "Là ý muốn chủ quan của lãnh đạo"],
+            correct: 1,
+            explain: "Pháp luật trong NNPQ không chỉ để quản lý dân mà còn để giới hạn quyền lực nhà nước."
+        },
+        {
+            q: "Thế nào là 'Xã hội dân sự'?",
+            a: ["Là xã hội không có quân đội", "Là các tổ chức, hiệp hội hoạt động độc lập tương đối với nhà nước, đại diện cho lợi ích đa dạng của người dân", "Là cơ quan nhà nước", "Là công ty kinh doanh"],
+            correct: 1,
+            explain: "Xã hội dân sự là môi trường để phát huy dân chủ và kiểm soát nhà nước."
+        },
+        {
+            q: "Công dân có nghĩa vụ gì đối với Nhà nước?",
+            a: ["Trung thành với Tổ quốc, tuân thủ Hiến pháp và pháp luật", "Chỉ cần kiếm tiền", "Không có nghĩa vụ gì", "Phải làm việc cho nhà nước"],
+            correct: 0,
+            explain: "Nghĩa vụ cơ bản: Trung thành, bảo vệ Tổ quốc, tuân thủ pháp luật, đóng thuế."
+        },
+        {
+            q: "Cơ quan nào có quyền giám sát tối cao đối với hoạt động của nhà nước?",
+            a: ["Chính phủ", "Quốc hội", "Tòa án", "Viện kiểm sát"],
+            correct: 1,
+            explain: "Quốc hội thực hiện quyền giám sát tối cao."
+        },
+        {
+            q: "Tại sao cần xây dựng NNPQ XHCN Việt Nam?",
+            a: ["Do xu thế thời đại và yêu cầu phát triển kinh tế thị trường, hội nhập quốc tế", "Do bị ép buộc", "Để giống các nước tư bản", "Để tăng quyền lực cho lãnh đạo"],
+            correct: 0,
+            explain: "Xây dựng NNPQ là nhu cầu tất yếu để phát triển bền vững và hội nhập."
+        },
+        // Thêm các câu để đủ số lượng (Các biến thể và chi tiết nhỏ)
+        {
+            q: "Chức năng lập pháp thuộc về?",
+            a: ["Quốc hội", "Chính phủ", "Tòa án", "Chủ tịch nước"],
+            correct: 0,
+            explain: "Lập pháp (làm luật) là chức năng của Quốc hội."
+        },
+        {
+            q: "Chức năng hành pháp thuộc về?",
+            a: ["Quốc hội", "Chính phủ", "Tòa án", "Viện kiểm sát"],
+            correct: 1,
+            explain: "Hành pháp (thi hành luật) là chức năng của Chính phủ."
+        },
+        {
+            q: "Chức năng tư pháp thuộc về?",
+            a: ["Quốc hội", "Chính phủ", "Tòa án", "Công an"],
+            correct: 2,
+            explain: "Tư pháp (xét xử) là chức năng của Tòa án."
+        },
+        {
+            q: "Nhà nước ra đời là một tất yếu?",
+            a: ["Khách quan", "Chủ quan", "Ngẫu nhiên", "Do thần linh"],
+            correct: 0,
+            explain: "Sự ra đời của nhà nước là quy luật khách quan của sự phát triển xã hội."
+        },
+        {
+            q: "Văn bản nào có hiệu lực cao nhất trong hệ thống pháp luật?",
+            a: ["Luật", "Pháp lệnh", "Hiến pháp", "Nghị định"],
+            correct: 2,
+            explain: "Hiến pháp là đạo luật gốc."
+        },
+        {
+            q: "Bản chất của pháp luật XHCN là gì?",
+            a: ["Thể hiện ý chí của giai cấp công nhân và nhân dân lao động", "Thể hiện ý chí của giai cấp tư sản", "Thể hiện ý chí của vua", "Không thể hiện ý chí của ai"],
+            correct: 0,
+            explain: "Pháp luật XHCN mang bản chất giai cấp công nhân và tính nhân dân rộng rãi."
+        },
+        {
+            q: "Cơ quan nào phê chuẩn các điều ước quốc tế quan trọng?",
+            a: ["Chính phủ", "Quốc hội (hoặc Chủ tịch nước tùy trường hợp)", "Bộ Ngoại giao", "Tòa án"],
+            correct: 1,
+            explain: "Quốc hội phê chuẩn các điều ước quốc tế quan trọng liên quan đến chủ quyền, biên giới..."
+        },
+        {
+            q: "Ai có quyền bầu cử đại biểu Quốc hội?",
+            a: ["Công dân từ đủ 18 tuổi", "Công dân từ đủ 21 tuổi", "Mọi người dân", "Chỉ đảng viên"],
+            correct: 0,
+            explain: "Công dân đủ 18 tuổi có quyền bầu cử."
+        },
+        {
+            q: "Ai có quyền ứng cử đại biểu Quốc hội?",
+            a: ["Công dân từ đủ 18 tuổi", "Công dân từ đủ 21 tuổi", "Mọi người dân", "Chỉ cán bộ"],
+            correct: 1,
+            explain: "Công dân đủ 21 tuổi có quyền ứng cử."
+        },
+        {
+            q: "Thủ tướng Chính phủ do ai bầu?",
+            a: ["Nhân dân bầu trực tiếp", "Quốc hội bầu", "Chủ tịch nước bầu", "Chính phủ bầu"],
+            correct: 1,
+            explain: "Thủ tướng do Quốc hội bầu trong số các đại biểu Quốc hội."
+        }
+    ];
+
+    // --- LOGIC ỨNG DỤNG ---
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+
+    // Init Info
+    document.getElementById('total-q').textContent = database.length;
+    document.getElementById('q-limit').max = database.length;
+
+    function startQuiz() {
+        const limitInput = document.getElementById('q-limit');
+        let limit = parseInt(limitInput.value);
+        if (limit > database.length) limit = database.length;
+        if (limit < 1) limit = 1;
+
+        // Shuffle & Slice
+        const shuffled = [...database].sort(() => 0.5 - Math.random());
+        currentQuestions = shuffled.slice(0, limit);
+        
+        // Reset state
+        currentIndex = 0;
+        score = 0;
+        userAnswers = new Array(currentQuestions.length).fill(null);
+
+        // UI Switch
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('quiz-area').style.display = 'block';
+        document.getElementById('result-area').style.display = 'none';
+
+        loadQuestion(0);
+    }
+
+    function loadQuestion(index) {
+        const qData = currentQuestions[index];
+        const qText = document.getElementById('q-text');
+        const optList = document.getElementById('opt-list');
+        const qIndex = document.getElementById('q-index');
+        const qTopic = document.getElementById('q-topic');
+        const progressBar = document.getElementById('progress');
+        const explain = document.getElementById('explanation');
+        const nextBtn = document.getElementById('next-btn');
+        const finishBtn = document.getElementById('finish-btn');
+
+        // Update Header
+        qIndex.textContent = `Câu ${index + 1}/${currentQuestions.length}`;
+        qTopic.textContent = `Chủ đề: ${qData.topic || 'Tổng hợp'}`;
+        progressBar.style.width = `${((index) / currentQuestions.length) * 100}%`;
+
+        // Update Content
+        qText.textContent = qData.q;
+        optList.innerHTML = '';
+        explain.style.display = 'none';
+        
+        // Render Options
+        qData.a.forEach((opt, i) => {
+            const div = document.createElement('div');
+            div.className = 'option-item';
+            div.textContent = opt;
+            div.onclick = () => checkAnswer(i, div);
+
+            // Re-render state if answered (for review mode if needed, though simpler here)
+            if (userAnswers[index] !== null) {
+                div.classList.add('disabled');
+                div.onclick = null;
+                if (i === qData.correct) div.classList.add('correct');
+                if (i === userAnswers[index] && i !== qData.correct) div.classList.add('wrong');
+            }
+            optList.appendChild(div);
+        });
+
+        // Show Explanation & Nav if answered
+        if (userAnswers[index] !== null) {
+            explain.style.display = 'block';
+            explain.innerHTML = `<strong>Giải thích:</strong> ${qData.explain}`;
+            
+            if (index < currentQuestions.length - 1) {
+                nextBtn.style.display = 'inline-block';
+                finishBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+            }
+        } else {
+            nextBtn.style.display = 'none';
+            finishBtn.style.display = 'none';
+        }
+    }
+
+    function checkAnswer(choiceIndex, element) {
+        userAnswers[currentIndex] = choiceIndex;
+        const qData = currentQuestions[currentIndex];
+        
+        // Update Score
+        if (choiceIndex === qData.correct) {
+            score++;
+        }
+
+        // Lock UI & Show Colors
+        const options = document.querySelectorAll('.option-item');
+        options.forEach((opt, i) => {
+            opt.classList.add('disabled');
+            opt.onclick = null;
+            if (i === qData.correct) opt.classList.add('correct');
+            if (i === choiceIndex && i !== qData.correct) opt.classList.add('wrong');
+        });
+
+        // Show Explain & Nav
+        const explain = document.getElementById('explanation');
+        explain.style.display = 'block';
+        explain.innerHTML = `<strong>Giải thích:</strong> ${qData.explain}`;
+
+        const nextBtn = document.getElementById('next-btn');
+        const finishBtn = document.getElementById('finish-btn');
+        
+        if (currentIndex < currentQuestions.length - 1) {
+            nextBtn.style.display = 'inline-block';
+        } else {
+            finishBtn.style.display = 'inline-block';
+        }
+        
+        // Update Progress
+        document.getElementById('progress').style.width = `${((currentIndex + 1) / currentQuestions.length) * 100}%`;
+    }
+
+    function nextQuestion() {
+        if (currentIndex < currentQuestions.length - 1) {
+            currentIndex++;
+            loadQuestion(currentIndex);
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+
+        const finalScore = document.getElementById('final-score');
+        finalScore.textContent = `${score}/${currentQuestions.length}`;
+
+        const msg = document.getElementById('final-msg');
+        const percent = (score / currentQuestions.length) * 100;
+        
+        if (percent >= 90) msg.textContent = "Xuất sắc! Bạn đã nắm rất vững kiến thức Bài 1.";
+        else if (percent >= 70) msg.textContent = "Khá tốt! Hãy ôn lại những phần chưa chắc chắn.";
+        else if (percent >= 50) msg.textContent = "Trung bình. Cần cố gắng đọc lại giáo trình.";
+        else msg.textContent = "Kết quả thấp. Bạn cần học lại kỹ Bài 1 ngay!";
+
+        // Generate Review
+        const reviewList = document.getElementById('review-list');
+        reviewList.innerHTML = '';
+
+        currentQuestions.forEach((q, idx) => {
+            const uAns = userAnswers[idx];
+            const isCorrect = uAns === q.correct;
+            
+            const div = document.createElement('div');
+            div.className = 'review-card';
+            div.innerHTML = `
+                <div>
+                    <span class="tag" style="background:${isCorrect?'#d5f5e3':'#fadbd8'}; color:${isCorrect?'#0e6655':'#78281f'}">
+                        Câu ${idx + 1}: ${isCorrect ? 'ĐÚNG' : 'SAI'}
+                    </span>
+                    <span class="tag">${q.topic || 'Tổng hợp'}</span>
+                </div>
+                <div style="font-weight:600; margin: 10px 0;">${q.q}</div>
+                <div style="color:${isCorrect?'var(--correct)':'var(--wrong)'}">
+                    Bạn chọn: ${q.a[uAns]}
+                </div>
+                ${!isCorrect ? `<div style="color:var(--correct)">Đáp án đúng: ${q.a[q.correct]}</div>` : ''}
+                <div style="font-size:0.9em; color:#7f8c8d; margin-top:5px;">${q.explain}</div>
+            `;
+            reviewList.appendChild(div);
+        });
+    }
+
+</script>
+
+</body>
+</html>

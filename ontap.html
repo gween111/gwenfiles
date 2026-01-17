@@ -1,0 +1,2752 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Nhà Nước & Pháp Luật Đại Cương</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --bg-color: #f5f6fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        /* Setup Screen */
+        #setup-screen {
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100px;
+            text-align: center;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Quiz Screen */
+        #quiz-screen {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background-color: white;
+            border: 2px solid #ddd;
+            color: #333;
+            text-align: left;
+            padding: 15px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent-color);
+            background-color: #f0f8ff;
+        }
+
+        .option-btn.selected {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .option-btn.correct {
+            background-color: var(--success-color) !important;
+            color: white !important;
+            border-color: var(--success-color) !important;
+        }
+
+        .option-btn.incorrect {
+            background-color: var(--error-color) !important;
+            color: white !important;
+            border-color: var(--error-color) !important;
+        }
+
+        /* Result Screen */
+        #result-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px auto;
+        }
+
+        .review-list {
+            text-align: left;
+            margin-top: 30px;
+        }
+
+        .review-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+
+        .review-item.wrong {
+            color: var(--error-color);
+        }
+        
+        .explanation {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        #notification {
+            color: var(--error-color);
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
+        .footer-note {
+            margin-top: auto;
+            text-align: center;
+            font-size: 0.8em;
+            color: #7f8c8d;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Ôn Tập Pháp Luật Đại Cương</h1>
+
+    <!-- Màn hình cài đặt -->
+    <div id="setup-screen">
+        <p>Tổng số câu hỏi trong ngân hàng: <strong id="total-questions">0</strong></p>
+        <div class="input-group">
+            <label>Bạn muốn làm bao nhiêu câu?</label><br><br>
+            <input type="number" id="question-count" min="1" value="20">
+        </div>
+        <button onclick="startQuiz()">Bắt đầu làm bài</button>
+        <div id="notification"></div>
+    </div>
+
+    <!-- Màn hình làm bài -->
+    <div id="quiz-screen">
+        <div class="header-info" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span id="question-counter">Câu 1/20</span>
+            <span id="timer">00:00</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        <div class="question-text" id="question-text">
+            Nội dung câu hỏi sẽ hiện ở đây?
+        </div>
+        <div class="options-grid" id="options-container">
+            <!-- Options will be generated here -->
+        </div>
+        <div style="margin-top: 20px; text-align: right;">
+            <button id="next-btn" onclick="nextQuestion()" style="display: none;">Câu tiếp theo</button>
+            <button id="finish-btn" onclick="finishQuiz()" style="display: none; background-color: var(--success-color);">Nộp bài</button>
+        </div>
+        <div id="feedback" style="margin-top: 15px; font-weight: bold;"></div>
+    </div>
+
+    <!-- Màn hình kết quả -->
+    <div id="result-screen">
+        <h2>Kết Quả</h2>
+        <div class="score-circle" id="final-score">
+            0/0
+        </div>
+        <p id="score-message"></p>
+        <button onclick="location.reload()">Làm lại</button>
+        <div class="review-list" id="review-container">
+            <!-- Review items -->
+        </div>
+    </div>
+
+    <div class="footer-note">
+        Dữ liệu được tổng hợp từ các bài giảng: Nhà nước pháp quyền, Bộ máy nhà nước, Nguồn pháp luật, Quy phạm pháp luật, Vi phạm pháp luật và Các ngành luật.
+    </div>
+</div>
+
+<script>
+    // NGÂN HÀNG CÂU HỎI (Bạn có thể thêm câu hỏi vào đây theo mẫu)
+    // Cấu trúc: { q: "Câu hỏi", a: ["Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4"], correct: chỉ số đáp án đúng (0-3), explain: "Giải thích" }
+    const database = [
+        // --- BÀI 1: NHÀ NƯỚC PHÁP QUYỀN ---
+        {
+            q: "Theo quan điểm Mác - Lênin, nhà nước xuất hiện khi nào?",
+            a: ["Khi xã hội loài người xuất hiện", "Khi xã hội phân chia giai cấp và có đấu tranh giai cấp", "Khi con người biết lao động", "Khi xuất hiện chế độ tư hữu"],
+            correct: 1,
+            explain: "Nhà nước chỉ ra đời trong xã hội có giai cấp và đấu tranh giai cấp (Bài 1)."
+        },
+        {
+            q: "Đâu là đặc trưng cơ bản giúp phân biệt nhà nước với các tổ chức xã hội khác?",
+            a: ["Có điều lệ hoạt động", "Có bộ máy cưỡng chế chuyên trách và phân chia dân cư theo lãnh thổ", "Có đông đảo thành viên tham gia", "Có mục đích hoạt động phi lợi nhuận"],
+            correct: 1,
+            explain: "5 đặc trưng của nhà nước: quyền lực công cộng đặc biệt (cưỡng chế), quản lý dân cư theo lãnh thổ, chủ quyền quốc gia, ban hành pháp luật, thu thuế."
+        },
+        {
+            q: "Bản chất của nhà nước thể hiện ở hai thuộc tính nào?",
+            a: ["Tính nhân dân và tính dân tộc", "Tính giai cấp và tính xã hội", "Tính quyền lực và tính phục vụ", "Tính cưỡng chế và tính tự nguyện"],
+            correct: 1,
+            explain: "Bản chất nhà nước luôn có 2 mặt: Tính giai cấp (bảo vệ lợi ích giai cấp thống trị) và Tính xã hội (giải quyết công việc chung)."
+        },
+        {
+            q: "Nhà nước pháp quyền xã hội chủ nghĩa Việt Nam có đặc trưng nào sau đây?",
+            a: ["Quyền lực nhà nước là phân lập, đối trọng tuyệt đối", "Quyền lực nhà nước là thống nhất, có sự phân công, phối hợp và kiểm soát", "Tập trung toàn bộ quyền lực vào Quốc hội", "Tam quyền phân lập cứng nhắc"],
+            correct: 1,
+            explain: "Ở VN, quyền lực nhà nước là thống nhất, nhưng có sự phân công, phối hợp, kiểm soát giữa 3 nhánh (Lập pháp, Hành pháp, Tư pháp)."
+        },
+
+        // --- BÀI 2: BỘ MÁY NHÀ NƯỚC ---
+        {
+            q: "Cơ quan nào là cơ quan quyền lực nhà nước cao nhất của nước CHXHCN Việt Nam?",
+            a: ["Chính phủ", "Quốc hội", "Tòa án nhân dân tối cao", "Đảng Cộng sản Việt Nam"],
+            correct: 1,
+            explain: "Quốc hội là cơ quan đại biểu cao nhất của Nhân dân, cơ quan quyền lực nhà nước cao nhất (Hiến pháp 2013)."
+        },
+        {
+            q: "Chính phủ thực hiện quyền gì trong bộ máy nhà nước?",
+            a: ["Quyền lập hiến", "Quyền hành pháp", "Quyền tư pháp", "Quyền công tố"],
+            correct: 1,
+            explain: "Chính phủ là cơ quan hành chính nhà nước cao nhất, thực hiện quyền hành pháp."
+        },
+        {
+            q: "Hình thức cấu trúc của Nhà nước Việt Nam là gì?",
+            a: ["Nhà nước Liên bang", "Nhà nước Đơn nhất", "Nhà nước Liên minh", "Nhà nước Quân chủ"],
+            correct: 1,
+            explain: "Việt Nam là nhà nước đơn nhất: có chủ quyền chung toàn vẹn, 1 hệ thống pháp luật, 1 bộ máy thống nhất từ TW xuống địa phương."
+        },
+        {
+            q: "Nguyên thủ quốc gia trong chính thể Cộng hòa Tổng thống có đặc điểm gì?",
+            a: ["Do Nghị viện bầu ra", "Do dân bầu, không chịu trách nhiệm trước Nghị viện", "Vừa là người đứng đầu nhà nước, vừa đứng đầu chính phủ", "Cả B và C đều đúng"],
+            correct: 3,
+            explain: "Trong chính thể Cộng hòa Tổng thống (như Mỹ), Tổng thống do dân bầu, nắm quyền hành pháp, đứng đầu nhà nước và chính phủ."
+        },
+        {
+            q: "Cơ quan nào thực hiện quyền tư pháp ở Việt Nam?",
+            a: ["Viện kiểm sát", "Công an", "Tòa án", "Bộ Tư pháp"],
+            correct: 2,
+            explain: "Tòa án nhân dân là cơ quan xét xử, thực hiện quyền tư pháp."
+        },
+
+        // --- BÀI 3: PHÁP LUẬT, NGUỒN VÀ CHỨC NĂNG ---
+        {
+            q: "Pháp luật khác với các quy phạm xã hội khác (đạo đức, tập quán) ở đặc điểm nào nổi bật nhất?",
+            a: ["Tính nhân văn", "Tính cưỡng chế nhà nước và tính quy phạm phổ biến", "Tính truyền miệng", "Tính tự nguyện"],
+            correct: 1,
+            explain: "Pháp luật được bảo đảm thực hiện bằng quyền lực nhà nước (tính cưỡng chế) và áp dụng chung cho toàn xã hội."
+        },
+        {
+            q: "Nguồn cơ bản và quan trọng nhất của pháp luật Việt Nam là gì?",
+            a: ["Tập quán pháp", "Án lệ", "Văn bản quy phạm pháp luật", "Lẽ công bằng"],
+            correct: 2,
+            explain: "Việt Nam theo truyền thống Civil Law (chịu ảnh hưởng Xô Viết cũ), văn bản quy phạm pháp luật là nguồn chính thống quan trọng nhất."
+        },
+        {
+            q: "Chức năng nào sau đây KHÔNG phải là chức năng của pháp luật?",
+            a: ["Chức năng điều chỉnh các quan hệ xã hội", "Chức năng giáo dục", "Chức năng bảo vệ", "Chức năng thay thế tôn giáo"],
+            correct: 3,
+            explain: "Pháp luật có chức năng điều chỉnh, giáo dục, bảo vệ, nhưng không thay thế chức năng của tôn giáo."
+        },
+        {
+            q: "Văn bản nào sau đây KHÔNG phải là văn bản quy phạm pháp luật?",
+            a: ["Luật Giáo dục", "Nghị định của Chính phủ", "Quyết định bổ nhiệm Giám đốc Sở", "Thông tư của Bộ trưởng"],
+            correct: 2,
+            explain: "Quyết định bổ nhiệm là văn bản áp dụng pháp luật (cá biệt), không chứa quy tắc xử sự chung nên không phải VBQPPL."
+        },
+
+        // --- BÀI 4: QUY PHẠM, QUAN HỆ & THỰC HIỆN PL ---
+        {
+            q: "Cấu trúc của một quy phạm pháp luật đầy đủ gồm các bộ phận nào?",
+            a: ["Giả định, Quy định, Chế tài", "Giả thuyết, Quy tắc, Hình phạt", "Mở bài, Thân bài, Kết luận", "Nguyên nhân, Diễn biến, Kết quả"],
+            correct: 0,
+            explain: "3 bộ phận: Giả định (hoàn cảnh), Quy định (được làm gì/phải làm gì), Chế tài (hậu quả nếu vi phạm)."
+        },
+        {
+            q: "Bộ phận nào của quy phạm pháp luật nêu lên biện pháp tác động (trừng phạt) của nhà nước?",
+            a: ["Giả định", "Quy định", "Chế tài", "Cả 3 đáp án trên"],
+            correct: 2,
+            explain: "Chế tài quy định hậu quả bất lợi (phạt tiền, tù...) mà chủ thể phải gánh chịu khi vi phạm."
+        },
+        {
+            q: "Hình thức thực hiện pháp luật nào mà chủ thể pháp luật 'không làm những điều pháp luật cấm'?",
+            a: ["Sử dụng pháp luật", "Thi hành pháp luật", "Tuân thủ pháp luật", "Áp dụng pháp luật"],
+            correct: 2,
+            explain: "Tuân thủ pháp luật là kiềm chế không thực hiện hành vi mà pháp luật cấm (dạng thụ động)."
+        },
+        {
+            q: "Độ tuổi nào bắt đầu có năng lực hành vi dân sự đầy đủ (nếu không bị bệnh tâm thần)?",
+            a: ["Đủ 15 tuổi", "Đủ 16 tuổi", "Đủ 18 tuổi", "Đủ 21 tuổi"],
+            correct: 2,
+            explain: "Người từ đủ 18 tuổi trở lên có năng lực hành vi dân sự đầy đủ."
+        },
+        {
+            q: "Sự kiện pháp lý là gì?",
+            a: ["Mọi sự kiện xảy ra trong đời sống", "Sự kiện làm phát sinh, thay đổi hoặc chấm dứt quan hệ pháp luật", "Chỉ là các hành vi của con người", "Chỉ là các biến cố thiên nhiên"],
+            correct: 1,
+            explain: "Sự kiện pháp lý là những tình huống thực tế được luật dự liệu, gắn với sự phát sinh/thay đổi/chấm dứt QHPL."
+        },
+
+        // --- BÀI 5: VI PHẠM PHÁP LUẬT & TRÁCH NHIỆM PHÁP LÝ ---
+        {
+            q: "Dấu hiệu nào là BẮT BUỘC trong mặt chủ quan của vi phạm pháp luật?",
+            a: ["Động cơ", "Mục đích", "Lỗi", "Hoàn cảnh"],
+            correct: 2,
+            explain: "Lỗi (cố ý hoặc vô ý) là dấu hiệu bắt buộc. Không có lỗi thì không thành vi phạm pháp luật."
+        },
+        {
+            q: "Anh A lái xe quá tốc độ nhưng tin rằng mình lái giỏi nên sẽ không gây tai nạn. Đây là lỗi gì?",
+            a: ["Cố ý trực tiếp", "Cố ý gián tiếp", "Vô ý vì quá tự tin", "Vô ý do cẩu thả"],
+            correct: 2,
+            explain: "Vô ý quá tự tin: thấy trước hậu quả nhưng tin rằng sẽ không xảy ra hoặc ngăn chặn được."
+        },
+        {
+            q: "Trách nhiệm pháp lý nghiêm khắc nhất là gì?",
+            a: ["Trách nhiệm dân sự", "Trách nhiệm hành chính", "Trách nhiệm hình sự", "Trách nhiệm kỷ luật"],
+            correct: 2,
+            explain: "Trách nhiệm hình sự (Hình phạt) là nghiêm khắc nhất, có thể tước bỏ quyền tự do, tính mạng."
+        },
+        {
+            q: "Hành vi trộm cắp tài sản (dưới mức truy cứu hình sự) bị công an phường phạt tiền là loại trách nhiệm nào?",
+            a: ["Trách nhiệm hình sự", "Trách nhiệm hành chính", "Trách nhiệm dân sự", "Trách nhiệm kỷ luật"],
+            correct: 1,
+            explain: "Xử phạt vi phạm hành chính do cơ quan quản lý nhà nước thực hiện."
+        },
+        {
+            q: "Khách thể của vi phạm pháp luật là gì?",
+            a: ["Người thực hiện hành vi vi phạm", "Công cụ, phương tiện phạm tội", "Quan hệ xã hội được pháp luật bảo vệ bị xâm hại", "Hậu quả của hành vi"],
+            correct: 2,
+            explain: "Khách thể là các quan hệ xã hội (tài sản, tính mạng, trật tự công cộng...) được luật bảo vệ."
+        },
+
+        // --- BÀI 6: CÁC NGÀNH LUẬT ---
+        {
+            q: "Luật Dân sự điều chỉnh nhóm quan hệ nào?",
+            a: ["Quan hệ giữa nhà nước và công dân", "Quan hệ tài sản và quan hệ nhân thân", "Quan hệ về tội phạm và hình phạt", "Quan hệ lao động trong cơ quan nhà nước"],
+            correct: 1,
+            explain: "Luật Dân sự điều chỉnh các quan hệ tài sản và nhân thân trên cơ sở bình đẳng, tự nguyện (Bài 6)."
+        },
+        {
+            q: "Phương pháp điều chỉnh đặc trưng của Luật Dân sự là gì?",
+            a: ["Mệnh lệnh - phục tùng", "Bình đẳng, thỏa thuận", "Cưỡng chế đơn phương", "Giáo dục thuyết phục"],
+            correct: 1,
+            explain: "Vì các chủ thể dân sự bình đẳng về địa vị pháp lý nên phương pháp là bình đẳng, thỏa thuận."
+        },
+        {
+            q: "Trong Luật Hình sự, 'Tội phạm' là hành vi nguy hiểm cho xã hội được quy định ở đâu?",
+            a: ["Trong Luật Xử lý vi phạm hành chính", "Chỉ trong Bộ luật Hình sự", "Trong các văn bản dưới luật", "Trong hương ước làng xã"],
+            correct: 1,
+            explain: "Chỉ có Bộ luật Hình sự mới có quyền quy định về tội phạm và hình phạt (nguyên tắc pháp chế)."
+        },
+        {
+            q: "Phương pháp điều chỉnh đặc trưng của Luật Hành chính là gì?",
+            a: ["Bình đẳng, thỏa thuận", "Mệnh lệnh - phục tùng", "Hiệp thương", "Hòa giải"],
+            correct: 1,
+            explain: "Luật Hành chính điều chỉnh quan hệ quản lý nhà nước, dựa trên quyền uy (cấp trên - cấp dưới, nhà nước - công dân) -> Mệnh lệnh - phục tùng."
+        },
+        {
+            q: "Cơ quan nào có thẩm quyền xét xử các vụ án hành chính?",
+            a: ["Ủy ban nhân dân", "Cơ quan thanh tra", "Tòa án nhân dân", "Viện kiểm sát"],
+            correct: 2,
+            explain: "Tòa án nhân dân có thẩm quyền xét xử vụ án hành chính (kiện quyết định/hành vi hành chính)."
+        },
+        {
+            q: "Thời hiệu khởi kiện vụ án hành chính thông thường là bao lâu?",
+            a: ["1 năm kể từ ngày nhận được quyết định", "6 tháng", "2 năm", "5 năm"],
+            correct: 0,
+            explain: "Thời hiệu khởi kiện là 01 năm kể từ ngày nhận được hoặc biết được quyết định/hành vi hành chính (Bài 6)."
+        },
+        {
+            q: "Hình phạt chính đối với pháp nhân thương mại phạm tội gồm những gì?",
+            a: ["Tù có thời hạn", "Phạt tiền, đình chỉ hoạt động (có thời hạn/vĩnh viễn)", "Cảnh cáo", "Tử hình"],
+            correct: 1,
+            explain: "Pháp nhân thương mại không thể bị đi tù, hình phạt chính là phạt tiền hoặc đình chỉ hoạt động."
+        },
+        {
+            q: "Quy trình giải quyết vụ án hình sự gồm các giai đoạn cơ bản nào (theo thứ tự)?",
+            a: ["Xét xử -> Điều tra -> Khởi tố", "Khởi tố -> Truy tố -> Xét xử -> Thi hành án", "Khởi tố -> Điều tra -> Truy tố -> Xét xử -> Thi hành án", "Điều tra -> Hòa giải -> Xét xử"],
+            correct: 2,
+            explain: "Quy trình chuẩn: Khởi tố (Công an) -> Điều tra (Công an) -> Truy tố (Viện kiểm sát) -> Xét xử (Tòa án) -> Thi hành án."
+        },
+        {
+            q: "Chế định 'Thừa kế' thuộc ngành luật nào?",
+            a: ["Luật Hôn nhân gia đình", "Luật Dân sự", "Luật Đất đai", "Luật Thương mại"],
+            correct: 1,
+            explain: "Thừa kế là một chế định cơ bản của Luật Dân sự."
+        },
+        {
+            q: "Ai là người có quyền công tố (buộc tội) tại phiên tòa hình sự?",
+            a: ["Thẩm phán", "Luật sư", "Kiểm sát viên", "Điều tra viên"],
+            correct: 2,
+            explain: "Viện kiểm sát thực hành quyền công tố, Kiểm sát viên là người đại diện buộc tội tại tòa."
+        },
+        
+        // --- CÁC CÂU HỎI BỔ SUNG ĐỂ TĂNG SỐ LƯỢNG MẪU ---
+        {
+            q: "Văn bản nào có giá trị pháp lý cao nhất trong hệ thống pháp luật Việt Nam?",
+            a: ["Bộ luật Dân sự", "Hiến pháp", "Luật Tổ chức Quốc hội", "Điều lệ Đảng"],
+            correct: 1,
+            explain: "Hiến pháp là đạo luật gốc, có giá trị pháp lý cao nhất."
+        },
+        {
+            q: "Hội đồng nhân dân là cơ quan gì?",
+            a: ["Cơ quan hành chính nhà nước ở địa phương", "Cơ quan quyền lực nhà nước ở địa phương", "Cơ quan xét xử ở địa phương", "Cơ quan kiểm sát ở địa phương"],
+            correct: 1,
+            explain: "HĐND là cơ quan quyền lực nhà nước ở địa phương, do nhân dân địa phương bầu ra."
+        },
+        {
+            q: "Ủy ban nhân dân các cấp chịu trách nhiệm trước cơ quan nào?",
+            a: ["Chỉ chịu trách nhiệm trước cơ quan nhà nước cấp trên", "Chịu trách nhiệm trước HĐND cùng cấp và cơ quan nhà nước cấp trên", "Chỉ chịu trách nhiệm trước nhân dân", "Chỉ chịu trách nhiệm trước Chính phủ"],
+            correct: 1,
+            explain: "UBND chấp hành nghị quyết của HĐND cùng cấp và mệnh lệnh của cơ quan cấp trên."
+        },
+        {
+            q: "Tuổi chịu trách nhiệm hình sự về mọi tội phạm là bao nhiêu?",
+            a: ["Đủ 14 tuổi", "Đủ 16 tuổi", "Đủ 18 tuổi", "Đủ 15 tuổi"],
+            correct: 1,
+            explain: "Người từ đủ 16 tuổi trở lên phải chịu TNHS về mọi tội phạm (Điều 12 BLHS)."
+        },
+        {
+            q: "Phòng vệ chính đáng có bị coi là tội phạm không?",
+            a: ["Có, nhưng được giảm nhẹ", "Không phải là tội phạm", "Có, nhưng được miễn hình phạt", "Tùy trường hợp"],
+            correct: 1,
+            explain: "Phòng vệ chính đáng không phải là tội phạm và không phải chịu TNHS."
+        },
+        {
+            q: "Tình thế cấp thiết là gì?",
+            a: ["Gây thiệt hại nhỏ hơn để bảo vệ lợi ích lớn hơn", "Gây thiệt hại lớn hơn để bảo vệ lợi ích nhỏ hơn", "Hành vi trả thù", "Hành vi vi phạm do bị ép buộc"],
+            correct: 0,
+            explain: "Tình thế cấp thiết là hy sinh lợi ích nhỏ để bảo vệ lợi ích lớn hơn khi không còn cách nào khác."
+        },
+        {
+            q: "Quyền sở hữu bao gồm các quyền năng nào?",
+            a: ["Quyền chiếm hữu, quyền sử dụng, quyền định đoạt", "Quyền mua, quyền bán, quyền tặng cho", "Quyền cầm cố, thế chấp, bảo lãnh", "Quyền chiếm dụng, quyền khai thác"],
+            correct: 0,
+            explain: "3 quyền năng của chủ sở hữu: Chiếm hữu, Sử dụng, Định đoạt (Bộ luật Dân sự)."
+        },
+        {
+            q: "Hợp đồng dân sự là sự thỏa thuận về việc?",
+            a: ["Xác lập, thay đổi hoặc chấm dứt quyền, nghĩa vụ dân sự", "Mua bán hàng hóa", "Vay mượn tài sản", "Tất cả các ý trên"],
+            correct: 0,
+            explain: "Khái niệm chung nhất: Hợp đồng là sự thỏa thuận nhằm xác lập, thay đổi, chấm dứt quyền và nghĩa vụ dân sự."
+        },
+        {
+            q: "Người nào sau đây KHÔNG có năng lực hành vi dân sự?",
+            a: ["Người nghiện ma túy", "Người chưa thành niên", "Người bị bệnh tâm thần không nhận thức được hành vi", "Người bị khuyết tật"],
+            correct: 2,
+            explain: "Người mất năng lực hành vi dân sự là người bị bệnh tâm thần hoặc bệnh khác không làm chủ được hành vi (được Tòa tuyên)."
+        },
+        {
+            q: "Cơ quan nào có quyền ban hành Luật?",
+            a: ["Chính phủ", "Quốc hội", "Chủ tịch nước", "Bộ Chính trị"],
+            correct: 1,
+            explain: "Chỉ có Quốc hội mới có quyền lập pháp (ban hành Hiến pháp và Luật)."
+        },
+        {
+            q: "Nghị quyết của Đảng có phải là văn bản quy phạm pháp luật không?",
+            a: ["Có, vì Đảng lãnh đạo nhà nước", "Không, đó là văn bản của tổ chức chính trị", "Có, đối với Đảng viên", "Tùy trường hợp"],
+            correct: 1,
+            explain: "Văn bản của Đảng mang tính chỉ đạo đường lối, không phải là văn bản quy phạm pháp luật của Nhà nước."
+        },
+        {
+            q: "Thời hiệu xử phạt vi phạm hành chính thông thường là bao lâu?",
+            a: ["06 tháng", "01 năm", "02 năm", "05 năm"],
+            correct: 1,
+            explain: "Thời hiệu xử phạt VPHC thông thường là 01 năm (trừ một số lĩnh vực đặc thù như thuế, môi trường...)."
+        },
+        {
+            q: "Biện pháp nào KHÔNG phải là hình phạt bổ sung trong Luật Hình sự?",
+            a: ["Cấm đảm nhiệm chức vụ", "Quản chế", "Tước danh hiệu quân nhân", "Tù chung thân"],
+            correct: 3,
+            explain: "Tù chung thân là hình phạt chính, không bao giờ là hình phạt bổ sung."
+        },
+        {
+            q: "Việc kết hôn giữa những người cùng dòng máu về trực hệ bị cấm thuộc chế tài của ngành luật nào?",
+            a: ["Luật Hình sự", "Luật Hôn nhân và Gia đình", "Luật Dân sự", "Luật Hành chính"],
+            correct: 1,
+            explain: "Đây là điều cấm trong Luật Hôn nhân và Gia đình."
+        },
+        {
+            q: "Thuế là nguồn thu chủ yếu của?",
+            a: ["Các doanh nghiệp", "Ngân sách nhà nước", "Các tổ chức xã hội", "Quỹ từ thiện"],
+            correct: 1,
+            explain: "Thuế là khoản thu bắt buộc nộp vào Ngân sách nhà nước."
+        },
+        {
+            q: "Ai là người đứng đầu Chính phủ Việt Nam?",
+            a: ["Chủ tịch nước", "Tổng Bí thư", "Thủ tướng Chính phủ", "Chủ tịch Quốc hội"],
+            correct: 2,
+            explain: "Thủ tướng Chính phủ đứng đầu Chính phủ."
+        },
+        {
+            q: "Viện kiểm sát nhân dân có chức năng gì?",
+            a: ["Xét xử và kiểm sát hoạt động tư pháp", "Thực hành quyền công tố và kiểm sát hoạt động tư pháp", "Điều tra tội phạm và xét xử", "Bắt giữ tội phạm"],
+            correct: 1,
+            explain: "Chức năng hiến định của VKS: Thực hành quyền công tố và Kiểm sát các hoạt động tư pháp."
+        },
+        {
+            q: "Văn bản quy phạm pháp luật hết hiệu lực khi nào?",
+            a: ["Khi hết thời hạn có hiệu lực quy định trong văn bản", "Khi bị sửa đổi, bổ sung hoặc thay thế bằng văn bản mới", "Khi bị cơ quan có thẩm quyền bãi bỏ", "Cả 3 trường hợp trên"],
+            correct: 3,
+            explain: "Cả 3 trường hợp đều làm văn bản hết hiệu lực."
+        },
+        {
+            q: "Án lệ là gì?",
+            a: ["Lẽ công bằng", "Bản án, quyết định của Tòa án có nội dung chứa đựng lập luận, phán quyết mẫu mực được thừa nhận áp dụng cho vụ việc tương tự", "Phong tục tập quán", "Văn bản luật do Tòa án ban hành"],
+            correct: 1,
+            explain: "Định nghĩa về Án lệ tại Việt Nam."
+        },
+        {
+            q: "Năng lực pháp luật của cá nhân xuất hiện khi nào?",
+            a: ["Khi đủ 18 tuổi", "Khi sinh ra và còn sống", "Khi đi làm", "Khi kết hôn"],
+            correct: 1,
+            explain: "Năng lực pháp luật (khả năng có quyền/nghĩa vụ) có từ khi sinh ra và chấm dứt khi chết."
+        },
+    
+// --- BỔ SUNG: BÀI 1 & 2 (NHÀ NƯỚC, BỘ MÁY, HÌNH THỨC) ---
+    {
+        q: "Theo Hiến pháp 2013, Nhà nước CHXHCN Việt Nam là nhà nước của ai?",
+        a: ["Của giai cấp công nhân", "Của giai cấp nông dân", "Của Nhân dân, do Nhân dân, vì Nhân dân", "Của tầng lớp trí thức"],
+        correct: 2,
+        explain: "Hiến pháp 2013 khẳng định bản chất nhà nước là của Nhân dân, do Nhân dân, vì Nhân dân."
+    },
+    {
+        q: "Chức năng của nhà nước được phân chia thành những loại nào dựa trên phạm vi hoạt động?",
+        a: ["Chức năng lập pháp và hành pháp", "Chức năng kinh tế và xã hội", "Chức năng đối nội và chức năng đối ngoại", "Chức năng cai trị và phục vụ"],
+        correct: 2,
+        explain: "Dựa vào phạm vi hoạt động, chức năng nhà nước chia thành Đối nội (trong nước) và Đối ngoại (quốc tế)."
+    },
+    {
+        q: "Hình thức chính thể của Việt Nam hiện nay là gì?",
+        a: ["Cộng hòa Tổng thống", "Cộng hòa Đại nghị", "Cộng hòa xã hội chủ nghĩa", "Quân chủ lập hiến"],
+        correct: 2,
+        explain: "Việt Nam theo chính thể Cộng hòa xã hội chủ nghĩa (quyền lực thuộc về nhân dân, không có vua)."
+    },
+    {
+        q: "Trong hình thức cấu trúc 'Nhà nước đơn nhất', đặc điểm nào sau đây là ĐÚNG?",
+        a: ["Có nhiều hiến pháp và hệ thống pháp luật", "Các đơn vị hành chính lãnh thổ có chủ quyền riêng", "Chỉ có một chủ quyền quốc gia, một hiến pháp, một hệ thống pháp luật", "Công dân có thể có 2 quốc tịch"],
+        correct: 2,
+        explain: "Nhà nước đơn nhất (như VN) có chủ quyền thống nhất, toàn vẹn, 1 hiến pháp chung (Bài 2)."
+    },
+    {
+        q: "Cơ quan nào có quyền quyết định đại xá?",
+        a: ["Chủ tịch nước", "Quốc hội", "Thủ tướng Chính phủ", "Tòa án nhân dân tối cao"],
+        correct: 1,
+        explain: "Quốc hội có thẩm quyền quyết định đại xá (tha tội cho hàng loạt người nhân sự kiện lớn)."
+    },
+    {
+        q: "Đặc xá thuộc thẩm quyền của ai?",
+        a: ["Quốc hội", "Chủ tịch nước", "Bộ trưởng Bộ Công an", "Chính phủ"],
+        correct: 1,
+        explain: "Chủ tịch nước có quyền quyết định đặc xá (tha tù trước thời hạn cho cá nhân cụ thể)."
+    },
+    {
+        q: "Nhiệm kỳ của Quốc hội Việt Nam là bao nhiêu năm?",
+        a: ["4 năm", "5 năm", "6 năm", "3 năm"],
+        correct: 1,
+        explain: "Nhiệm kỳ của mỗi khóa Quốc hội là 05 năm (Hiến pháp 2013)."
+    },
+    {
+        q: "Hội đồng bầu cử quốc gia do cơ quan nào thành lập?",
+        a: ["Chính phủ", "Bộ Chính trị", "Quốc hội", "Ủy ban Trung ương Mặt trận Tổ quốc"],
+        correct: 2,
+        explain: "Hội đồng bầu cử quốc gia do Quốc hội thành lập để tổ chức bầu cử ĐBQH."
+    },
+    {
+        q: "Việc kiểm soát quyền lực nhà nước bên trong bộ máy nhà nước được thực hiện theo cơ chế nào?",
+        a: ["Tam quyền phân lập cứng nhắc", "Phân công, phối hợp và kiểm soát giữa các cơ quan lập pháp, hành pháp, tư pháp", "Tập trung dân chủ tuyệt đối", "Độc đoán chuyên quyền"],
+        correct: 1,
+        explain: "Quyền lực nhà nước là thống nhất, có sự phân công, phối hợp, kiểm soát giữa 3 nhánh quyền lực."
+    },
+
+    // --- BỔ SUNG: BÀI 3 & 4 (QUY PHẠM, VĂN BẢN, THỰC HIỆN PL) ---
+    {
+        q: "Bộ phận 'Giả định' trong quy phạm pháp luật trả lời cho câu hỏi nào?",
+        a: ["Chủ thể phải làm gì?", "Chủ thể chịu hậu quả gì?", "Ai? Khi nào? Trong hoàn cảnh nào?", "Nhà nước quản lý như thế nào?"],
+        correct: 2,
+        explain: "Giả định nêu lên tình huống, hoàn cảnh, chủ thể chịu sự tác động của quy phạm."
+    },
+    {
+        q: "Trong cấu trúc quy phạm pháp luật, bộ phận 'Quy định' nêu lên điều gì?",
+        a: ["Hoàn cảnh thực hiện", "Quy tắc xử sự (được làm, phải làm, không được làm)", "Biện pháp trừng phạt", "Lý do ban hành luật"],
+        correct: 1,
+        explain: "Quy định là bộ phận trung tâm, nêu lên cách xử sự mà nhà nước yêu cầu chủ thể thực hiện."
+    },
+    {
+        q: "Hình thức thực hiện pháp luật nào cần có sự tham gia của cơ quan nhà nước có thẩm quyền?",
+        a: ["Tuân thủ pháp luật", "Thi hành pháp luật", "Sử dụng pháp luật", "Áp dụng pháp luật"],
+        correct: 3,
+        explain: "Áp dụng pháp luật là hoạt động của cơ quan nhà nước (ra quyết định xử phạt, bản án, cấp phép...)."
+    },
+    {
+        q: "Văn bản nào sau đây là văn bản luật (do Quốc hội ban hành)?",
+        a: ["Nghị định", "Thông tư", "Bộ luật Lao động", "Quyết định của Thủ tướng"],
+        correct: 2,
+        explain: "Bộ luật, Luật, Hiến pháp là văn bản Luật do Quốc hội ban hành. Còn lại là văn bản dưới luật."
+    },
+    {
+        q: "Hiệu lực theo không gian của văn bản quy phạm pháp luật thường được xác định như thế nào?",
+        a: ["Chỉ có hiệu lực tại nơi người soạn thảo cư trú", "Có hiệu lực trên toàn bộ lãnh thổ hoặc một phần lãnh thổ tùy theo thẩm quyền", "Chỉ có hiệu lực ở thủ đô", "Không giới hạn không gian"],
+        correct: 1,
+        explain: "VB của cơ quan trung ương thường có hiệu lực toàn quốc; VB của địa phương có hiệu lực trong địa phương đó."
+    },
+    {
+        q: "Chế tài Hình sự áp dụng cho đối tượng nào?",
+        a: ["Người vi phạm hành chính", "Người phạm tội và pháp nhân thương mại phạm tội", "Người vi phạm kỷ luật lao động", "Người vi phạm hợp đồng dân sự"],
+        correct: 1,
+        explain: "Chế tài hình sự (Hình phạt) chỉ áp dụng cho Tội phạm (cá nhân/pháp nhân thương mại)."
+    },
+    {
+        q: "Hình thức 'Sử dụng pháp luật' có đặc điểm gì?",
+        a: ["Chủ thể buộc phải thực hiện nghĩa vụ", "Chủ thể thực hiện quyền của mình (có thể làm hoặc không làm)", "Cơ quan nhà nước ra quyết định", "Chủ thể kiềm chế không làm điều cấm"],
+        correct: 1,
+        explain: "Sử dụng pháp luật là thực hiện các quyền (ví dụ: quyền khiếu nại, quyền tự do kinh doanh...)."
+    },
+
+    // --- BỔ SUNG: BÀI 5 (VI PHẠM, TRÁCH NHIỆM PHÁP LÝ, Ý THỨC PL) ---
+    {
+        q: "Yếu tố nào KHÔNG thuộc mặt khách quan của vi phạm pháp luật?",
+        a: ["Hành vi trái pháp luật", "Hậu quả thiệt hại", "Động cơ và mục đích phạm tội", "Mối quan hệ nhân quả"],
+        correct: 2,
+        explain: "Động cơ và mục đích thuộc về 'Mặt chủ quan' (diễn biến tâm lý bên trong), không phải mặt khách quan."
+    },
+    {
+        q: "Lỗi cố ý gián tiếp là gì?",
+        a: ["Mong muốn hậu quả xảy ra", "Không thấy trước hậu quả", "Thấy trước hậu quả, không mong muốn nhưng để mặc cho nó xảy ra", "Tin rằng hậu quả không xảy ra"],
+        correct: 2,
+        explain: "Cố ý gián tiếp: Biết nguy hiểm, không mong muốn nhưng chấp nhận/để mặc hậu quả (Bài 5)."
+    },
+    {
+        q: "Người tâm thần thực hiện hành vi nguy hiểm cho xã hội thì:",
+        a: ["Vẫn bị truy cứu trách nhiệm hình sự", "Được giảm nhẹ hình phạt", "Không phải chịu trách nhiệm pháp lý do mất năng lực nhận thức", "Bị xử phạt hành chính"],
+        correct: 2,
+        explain: "Người mất năng lực trách nhiệm pháp lý (tâm thần) không có lỗi nên không bị truy cứu trách nhiệm."
+    },
+    {
+        q: "Ý thức pháp luật bao gồm hai bộ phận nào?",
+        a: ["Tâm lý pháp luật và Tư tưởng pháp luật", "Kiến thức pháp luật và Hành vi pháp luật", "Đạo đức và Lối sống", "Luật viết và Luật bất thành văn"],
+        correct: 0,
+        explain: "Cấu trúc ý thức pháp luật gồm: Tâm lý pháp luật (cảm xúc) và Tư tưởng pháp luật (lý luận)."
+    },
+    {
+        q: "Đâu là đặc điểm của Trách nhiệm hành chính?",
+        a: ["Áp dụng cho người phạm tội", "Áp dụng cho cán bộ công chức vi phạm nội quy", "Áp dụng cho cá nhân/tổ chức vi phạm quy tắc quản lý nhà nước", "Áp dụng cho người vi phạm hợp đồng"],
+        correct: 2,
+        explain: "TN hành chính áp dụng khi vi phạm quy tắc quản lý nhà nước mà chưa đến mức tội phạm."
+    },
+    {
+        q: "Độ tuổi nào bị xử phạt hành chính về MỌI vi phạm hành chính?",
+        a: ["Đủ 14 tuổi", "Đủ 16 tuổi", "Đủ 18 tuổi", "Đủ 15 tuổi"],
+        correct: 1,
+        explain: "Người từ đủ 16 tuổi trở lên bị xử phạt về mọi vi phạm hành chính (Luật XLVPHC)."
+    },
+
+    // --- BỔ SUNG: BÀI 6 (LUẬT DÂN SỰ, HÌNH SỰ, HÀNH CHÍNH) ---
+    {
+        q: "Trong Luật Dân sự, nguyên tắc nào là quan trọng nhất?",
+        a: ["Mệnh lệnh phục tùng", "Tự do, tự nguyện thỏa thuận và bình đẳng", "Tập trung dân chủ", "Cưỡng chế nhà nước"],
+        correct: 1,
+        explain: "Luật dân sự dựa trên nền tảng bình đẳng, tự do ý chí, tự nguyện thỏa thuận."
+    },
+    {
+        q: "Việc dân sự khác Vụ án dân sự ở điểm nào?",
+        a: ["Việc dân sự không có tranh chấp, Vụ án dân sự có tranh chấp", "Việc dân sự nghiêm trọng hơn", "Vụ án dân sự không cần ra Tòa", "Cả hai đều giống nhau"],
+        correct: 0,
+        explain: "Việc dân sự là yêu cầu Tòa công nhận một sự kiện (không tranh chấp). Vụ án là giải quyết tranh chấp."
+    },
+    {
+        q: "Tố quyền là gì?",
+        a: ["Quyền tố cáo tội phạm", "Quyền yêu cầu Tòa án bảo vệ quyền và lợi ích hợp pháp (quyền khởi kiện)", "Quyền khiếu nại hành chính", "Quyền im lặng"],
+        correct: 1,
+        explain: "Tố quyền (trong tố tụng dân sự) là quyền khởi kiện yêu cầu Tòa án giải quyết tranh chấp."
+    },
+    {
+        q: "Phương pháp điều chỉnh của Luật Hình sự là?",
+        a: ["Bình đẳng, thỏa thuận", "Mệnh lệnh - phục tùng (Quyền uy)", "Thương lượng", "Hòa giải"],
+        correct: 1,
+        explain: "Nhà nước dùng quyền uy để định tội danh và áp đặt hình phạt -> Mệnh lệnh phục tùng."
+    },
+    {
+        q: "Tội phạm hoàn thành là gì?",
+        a: ["Khi người phạm tội đã bị bắt", "Khi hành vi thỏa mãn hết các dấu hiệu cấu thành tội phạm", "Khi đã thực hiện xong hành vi và bỏ trốn", "Khi có bản án của Tòa"],
+        correct: 1,
+        explain: "Tội phạm hoàn thành là khi hành vi đã thỏa mãn đầy đủ các dấu hiệu mô tả trong cấu thành tội phạm."
+    },
+    {
+        q: "Đồng phạm trong Luật Hình sự đòi hỏi yếu tố nào?",
+        a: ["Hai người trở lên cùng vô ý thực hiện", "Hai người trở lên cố ý cùng thực hiện một tội phạm", "Một người thực hiện, một người cổ vũ", "Nhiều người tình cờ cùng thực hiện"],
+        correct: 1,
+        explain: "Đồng phạm: Có từ 2 người trở lên + Cố ý cùng thực hiện."
+    },
+    {
+        q: "Người giúp sức trong đồng phạm là ai?",
+        a: ["Người chủ mưu cầm đầu", "Người trực tiếp thực hiện tội phạm", "Người tạo điều kiện tinh thần hoặc vật chất cho việc phạm tội", "Người xúi giục kích động"],
+        correct: 2,
+        explain: "Người giúp sức tạo điều kiện (cung cấp dao, xe, chỉ đường...) cho người thực hành."
+    },
+    {
+        q: "Quyết định hành chính là đối tượng xét xử của Tòa án khi nào?",
+        a: ["Khi nó là quyết định cá biệt làm ảnh hưởng đến quyền lợi hợp pháp của người khởi kiện", "Khi nó là văn bản quy phạm pháp luật", "Khi nó là quyết định nội bộ của cơ quan", "Tất cả các trường hợp"],
+        correct: 0,
+        explain: "Tòa hành chính chỉ xét xử các Quyết định hành chính cá biệt (ví dụ: QĐ xử phạt, QĐ thu hồi đất...), không xử VBQPPL."
+    },
+    {
+        q: "Ai có thẩm quyền xử phạt vi phạm hành chính?",
+        a: ["Chỉ có Cảnh sát giao thông", "Chỉ có Chủ tịch UBND", "Rất nhiều chủ thể: Chủ tịch UBND các cấp, Công an, Thanh tra, Hải quan, Kiểm lâm...", "Chỉ có Tòa án"],
+        correct: 2,
+        explain: "Thẩm quyền xử phạt hành chính rất rộng, bao gồm nhiều cơ quan quản lý nhà nước."
+    },
+    {
+        q: "Biện pháp 'Buộc khắc phục hậu quả' trong xử phạt hành chính có thể là?",
+        a: ["Phạt tiền", "Cảnh cáo", "Buộc tháo dỡ công trình xây dựng trái phép", "Tước giấy phép lái xe"],
+        correct: 2,
+        explain: "Buộc tháo dỡ, buộc khôi phục tình trạng ban đầu... là các biện pháp khắc phục hậu quả."
+    },
+    {
+        q: "Luật Tố tụng Hình sự quy định về vấn đề gì?",
+        a: ["Quy định tội danh và hình phạt", "Quy định trình tự, thủ tục giải quyết vụ án hình sự", "Quy định về tranh chấp đất đai", "Quy định về ly hôn"],
+        correct: 1,
+        explain: "Luật Tố tụng quy định về quy trình (khởi tố, điều tra, truy tố, xét xử...), còn Luật Hình sự quy định nội dung (tội gì, phạt gì)."
+    },
+
+    // --- CÁC CÂU HỎI TÌNH HUỐNG & MỞ RỘNG ---
+    {
+        q: "Ông A xây nhà lấn chiếm vỉa hè. Chủ tịch phường ra quyết định xử phạt và buộc tháo dỡ. Đây là quan hệ pháp luật gì?",
+        a: ["Quan hệ pháp luật Dân sự", "Quan hệ pháp luật Hình sự", "Quan hệ pháp luật Hành chính", "Quan hệ pháp luật Lao động"],
+        correct: 2,
+        explain: "Đây là quan hệ giữa cơ quan nhà nước (Chủ tịch phường) và người dân về chấp hành quy tắc quản lý -> Hành chính."
+    },
+    {
+        q: "Anh B vay chị C 500 triệu đồng nhưng đến hạn không trả. Chị C kiện ra Tòa. Đây là vụ án gì?",
+        a: ["Vụ án Hình sự (lừa đảo)", "Vụ án Hành chính", "Vụ án Dân sự", "Vụ việc dân sự"],
+        correct: 2,
+        explain: "Tranh chấp về hợp đồng vay tài sản là tranh chấp dân sự -> Vụ án dân sự."
+    },
+    {
+        q: "A rủ B đi trộm chó. B đứng canh, A vào bắt. Cả hai đều bị bắt. Vai trò của B là gì?",
+        a: ["Người thực hành", "Người giúp sức", "Người tổ chức", "Người xúi giục"],
+        correct: 1,
+        explain: "B đứng canh gác, tạo điều kiện cho A thực hiện -> B là người giúp sức."
+    },
+    {
+        q: "Cảnh sát giao thông lập biên bản xử phạt người vượt đèn đỏ. Đây là hoạt động gì?",
+        a: ["Tuân thủ pháp luật", "Sử dụng pháp luật", "Thi hành pháp luật", "Áp dụng pháp luật"],
+        correct: 3,
+        explain: "Cảnh sát giao thông (cơ quan có thẩm quyền) ra quyết định xử lý -> Áp dụng pháp luật."
+    },
+    {
+        q: "Một người bị tòa án tuyên bố mất tích. Sau đó người này trở về. Sự kiện trở về này làm phát sinh hậu quả gì?",
+        a: ["Hủy bỏ quyết định tuyên bố mất tích", "Người đó bị coi là đã chết", "Người đó bị mất quyền công dân", "Không có hậu quả gì"],
+        correct: 0,
+        explain: "Khi người bị tuyên bố mất tích trở về, Tòa án sẽ ra quyết định hủy bỏ quyết định tuyên bố mất tích."
+    },
+    {
+        q: "Nguyên tắc 'Không ai bị coi là có tội khi chưa có bản án kết tội có hiệu lực của Tòa án' được gọi là gì?",
+        a: ["Nguyên tắc công bằng", "Nguyên tắc suy đoán vô tội", "Nguyên tắc tranh tụng", "Nguyên tắc pháp chế"],
+        correct: 1,
+        explain: "Đây là nguyên tắc Suy đoán vô tội (Hiến pháp & Bộ luật Tố tụng Hình sự)."
+    },
+    {
+        q: "Thẩm phán và Hội thẩm xét xử theo nguyên tắc nào?",
+        a: ["Tuân theo chỉ đạo của Chánh án", "Độc lập và chỉ tuân theo pháp luật", "Tuân theo ý kiến của Viện kiểm sát", "Tuân theo dư luận xã hội"],
+        correct: 1,
+        explain: "Nguyên tắc độc lập xét xử là nguyên tắc hiến định quan trọng nhất của Tòa án."
+    },
+    {
+        q: "Văn bản nào dưới đây có giá trị pháp lý thấp nhất?",
+        a: ["Luật", "Pháp lệnh", "Nghị định", "Thông tư"],
+        correct: 3,
+        explain: "Thứ tự: Luật (Quốc hội) > Pháp lệnh (UBTVQH) > Nghị định (Chính phủ) > Thông tư (Bộ trưởng)."
+    },
+    {
+        q: "Người bao nhiêu tuổi thì có năng lực hành vi dân sự?",
+        a: ["Từ khi sinh ra", "Từ đủ 6 tuổi", "Từ đủ 15 tuổi", "Từ đủ 18 tuổi"],
+        correct: 1,
+        explain: "Người dưới 6 tuổi không có năng lực hành vi dân sự (giao dịch do người đại diện làm). Từ 6-18 là năng lực một phần. Đủ 18 là đầy đủ."
+    },
+    {
+        q: "Quyền tác giả thuộc nhóm quyền nào trong luật dân sự?",
+        a: ["Quyền tài sản", "Quyền nhân thân", "Quyền nhân thân và quyền tài sản", "Quyền chính trị"],
+        correct: 2,
+        explain: "Quyền tác giả bao gồm quyền nhân thân (đặt tên, đứng tên...) và quyền tài sản (nhuận bút, bản quyền...)."
+    },
+    {
+        q: "Hình phạt tử hình KHÔNG áp dụng cho đối tượng nào?",
+        a: ["Phụ nữ có thai, phụ nữ đang nuôi con dưới 36 tháng tuổi, người dưới 18 tuổi, người trên 75 tuổi", "Người già yếu", "Người nước ngoài", "Người có công với cách mạng"],
+        correct: 0,
+        explain: "Chính sách nhân đạo: Không tử hình phụ nữ có thai/nuôi con nhỏ <36 tháng, người <18 tuổi, người >=75 tuổi."
+    },
+    {
+        q: "Cơ quan nào thực hành quyền công tố?",
+        a: ["Tòa án", "Cơ quan điều tra", "Viện kiểm sát", "Văn phòng luật sư"],
+        correct: 2,
+        explain: "Viện kiểm sát là cơ quan duy nhất thực hành quyền công tố (buộc tội)."
+    },
+    {
+        q: "Giai đoạn nào là giai đoạn mở đầu của tố tụng hình sự?",
+        a: ["Điều tra", "Khởi tố vụ án", "Xét xử", "Truy tố"],
+        correct: 1,
+        explain: "Khởi tố vụ án là bước đầu tiên để xác định có dấu hiệu tội phạm hay không."
+    },
+    {
+        q: "Chế định 'Ly hôn' thuộc ngành luật nào?",
+        a: ["Luật Dân sự", "Luật Hôn nhân và Gia đình", "Luật Hành chính", "Luật Tố tụng dân sự"],
+        correct: 1,
+        explain: "Ly hôn là chế định của Luật Hôn nhân và Gia đình."
+    },
+    {
+        q: "Độ tuổi kết hôn theo Luật Hôn nhân và Gia đình Việt Nam?",
+        a: ["Nam từ đủ 20, nữ từ đủ 18", "Nam từ đủ 18, nữ từ đủ 16", "Nam nữ đều từ đủ 18", "Nam từ đủ 22, nữ từ đủ 20"],
+        correct: 0,
+        explain: "Quy định hiện hành: Nam từ đủ 20 tuổi, nữ từ đủ 18 tuổi."
+    },
+    {
+        q: "Tài sản chung của vợ chồng là?",
+        a: ["Tài sản do vợ, chồng tạo ra, thu nhập do lao động, hoạt động sản xuất, kinh doanh trong thời kỳ hôn nhân", "Tài sản được thừa kế riêng", "Tài sản có trước khi kết hôn", "Đồ dùng tư trang cá nhân"],
+        correct: 0,
+        explain: "Tài sản hình thành trong thời kỳ hôn nhân là tài sản chung (trừ thừa kế/tặng cho riêng)."
+    },
+    {
+        q: "Hành vi nào sau đây là vi phạm kỷ luật?",
+        a: ["Đi xe vượt đèn đỏ", "Trộm cắp tài sản", "Công chức thường xuyên đi làm muộn không lý do", "Vay tiền không trả"],
+        correct: 2,
+        explain: "Vi phạm nội quy, quy chế cơ quan/đơn vị là vi phạm kỷ luật."
+    },
+    {
+        q: "Ai là người đại diện theo pháp luật của con chưa thành niên?",
+        a: ["Cha mẹ", "Ông bà", "Anh chị", "Thầy cô giáo"],
+        correct: 0,
+        explain: "Cha mẹ là người đại diện theo pháp luật đương nhiên của con chưa thành niên."
+    },
+    {
+        q: "Trong các loại văn bản sau, văn bản nào là văn bản dưới luật?",
+        a: ["Hiến pháp", "Bộ luật Hình sự", "Luật Giáo dục", "Nghị định 100/2019/NĐ-CP"],
+        correct: 3,
+        explain: "Nghị định do Chính phủ ban hành để hướng dẫn Luật, nên là văn bản dưới luật."
+    },
+    {
+        q: "Quyền lực nhà nước CHXHCN Việt Nam thuộc về ai?",
+        a: ["Quốc hội", "Đảng Cộng sản", "Nhân dân", "Chính phủ"],
+        correct: 2,
+        explain: "Điều 2 Hiến pháp 2013: Tất cả quyền lực nhà nước thuộc về Nhân dân."
+    },
+    {
+        q: "Cơ quan nào có quyền sửa đổi Hiến pháp?",
+        a: ["Chính phủ", "Chủ tịch nước", "Quốc hội", "Tòa án Hiến pháp"],
+        correct: 2,
+        explain: "Chỉ có Quốc hội mới có quyền lập hiến (làm và sửa đổi Hiến pháp)."
+    },
+
+// --- BỔ SUNG ĐỢT 2: 100 CÂU HỎI (PHẦN 1) ---
+    // --- LUẬT DÂN SỰ & THỪA KẾ ---
+    {
+        q: "Di chúc miệng được coi là hợp pháp khi nào?",
+        a: ["Được lập bất cứ lúc nào", "Người lập di chúc bị cái chết đe dọa và có ít nhất 2 người làm chứng", "Được UBND xã chứng thực ngay sau đó", "Chỉ cần người làm chứng ký tên"],
+        correct: 1,
+        explain: "Di chúc miệng chỉ hợp pháp khi tính mạng bị đe dọa và có 2 người làm chứng. Sau 3 tháng nếu người đó còn sống thì di chúc miệng hủy bỏ."
+    },
+    {
+        q: "Người thừa kế không phụ thuộc vào nội dung di chúc bao gồm những ai?",
+        a: ["Con chưa thành niên, cha, mẹ, vợ, chồng, con thành niên mất khả năng lao động", "Anh chị em ruột", "Cháu ruột", "Bạn bè thân thiết"],
+        correct: 0,
+        explain: "Đây là những người được hưởng ít nhất 2/3 suất thừa kế theo pháp luật dù di chúc không cho hưởng."
+    },
+    {
+        q: "Thời hiệu để người thừa kế yêu cầu chia di sản là bao lâu?",
+        a: ["10 năm đối với động sản, 30 năm đối với bất động sản", "05 năm", "20 năm", "15 năm"],
+        correct: 0,
+        explain: "Thời hiệu thừa kế: 30 năm (nhà đất), 10 năm (tiền, xe...)."
+    },
+    {
+        q: "Hàng thừa kế thứ nhất theo pháp luật gồm những ai?",
+        a: ["Vợ, chồng, cha mẹ đẻ, cha mẹ nuôi, con đẻ, con nuôi", "Ông bà nội, ông bà ngoại", "Anh chị em ruột", "Cô dì chú bác"],
+        correct: 0,
+        explain: "Hàng thứ nhất là những người quan hệ huyết thống/hôn nhân gần gũi nhất."
+    },
+    {
+        q: "Nếu người thừa kế chết cùng thời điểm với người để lại di sản thì sao?",
+        a: ["Con của người thừa kế đó được hưởng (thừa kế thế vị)", "Phần di sản đó sung công quỹ", "Chia đều cho hàng thừa kế thứ hai", "Không ai được hưởng"],
+        correct: 0,
+        explain: "Nếu con chết cùng lúc hoặc trước cha mẹ, thì cháu được hưởng phần của con (thế vị)."
+    },
+    {
+        q: "Tài sản nào sau đây KHÔNG phải là bất động sản?",
+        a: ["Đất đai", "Nhà ở gắn liền với đất", "Cây lâu năm trồng trên đất", "Máy móc thiết bị có thể tháo rời"],
+        correct: 3,
+        explain: "Máy móc tháo rời được coi là động sản. Bất động sản là những thứ không di dời được."
+    },
+    {
+        q: "Hợp đồng tặng cho tài sản có hiệu lực khi nào?",
+        a: ["Khi hai bên thỏa thuận xong", "Khi bên được tặng cho nhận tài sản (đối với động sản không đăng ký)", "Khi công chứng", "Khi hứa tặng"],
+        correct: 1,
+        explain: "Hợp đồng tặng cho động sản có hiệu lực khi bên được tặng nhận tài sản."
+    },
+    {
+        q: "Bồi thường thiệt hại ngoài hợp đồng phát sinh khi nào?",
+        a: ["Khi có hành vi trái pháp luật gây thiệt hại, có lỗi và có mối quan hệ nhân quả", "Khi vi phạm hợp đồng", "Khi hai bên thỏa thuận trước", "Khi có sự kiện bất khả kháng"],
+        correct: 0,
+        explain: "4 yếu tố cấu thành TNBTTH ngoài hợp đồng: Hành vi trái luật, Thiệt hại, Lỗi, Quan hệ nhân quả."
+    },
+    {
+        q: "Người gây thiệt hại trong tình thế cấp thiết phải bồi thường không?",
+        a: ["Phải bồi thường toàn bộ", "Không phải bồi thường nếu thiệt hại nhỏ hơn thiệt hại cần ngăn chặn", "Chỉ bồi thường 50%", "Tùy thỏa thuận"],
+        correct: 1,
+        explain: "Người gây thiệt hại trong tình thế cấp thiết không phải bồi thường (người gây ra tình thế đó mới phải bồi thường)."
+    },
+    {
+        q: "Chủ sở hữu nguồn nguy hiểm cao độ (xe, thú dữ...) phải bồi thường khi nào?",
+        a: ["Chỉ khi có lỗi", "Kể cả khi không có lỗi, trừ trường hợp bất khả kháng hoặc lỗi cố ý của nạn nhân", "Khi Tòa án yêu cầu", "Chỉ khi vi phạm luật giao thông"],
+        correct: 1,
+        explain: "Đây là trách nhiệm bồi thường thiệt hại nghiêm ngặt (kể cả không lỗi)."
+    },
+
+    // --- LUẬT HÔN NHÂN & GIA ĐÌNH ---
+    {
+        q: "Chế độ tài sản của vợ chồng theo luật định là gì?",
+        a: ["Chế độ sở hữu chung hợp nhất", "Chế độ sở hữu riêng từng người", "Chế độ sở hữu theo phần", "Chế độ ủy quyền"],
+        correct: 0,
+        explain: "Tài sản chung vợ chồng là sở hữu chung hợp nhất (có thể phân chia)."
+    },
+    {
+        q: "Vợ chồng có quyền lựa chọn chế độ tài sản theo thỏa thuận không?",
+        a: ["Không, bắt buộc theo luật", "Có, phải lập văn bản thỏa thuận trước khi kết hôn và công chứng", "Có, thỏa thuận miệng là được", "Chỉ khi ly hôn mới thỏa thuận"],
+        correct: 1,
+        explain: "Luật 2014 cho phép chế độ tài sản theo thỏa thuận (Hợp đồng tiền hôn nhân) lập trước khi cưới."
+    },
+    {
+        q: "Khi ly hôn, nguyên tắc chia tài sản chung là gì?",
+        a: ["Chia đôi (50/50) nhưng có tính đến hoàn cảnh, công sức đóng góp", "Người chồng được 70%", "Người nuôi con được hưởng hết", "Ai làm ra người đó hưởng"],
+        correct: 0,
+        explain: "Nguyên tắc cơ bản là chia đôi, nhưng xem xét lỗi, công sức đóng góp và bảo vệ quyền lợi phụ nữ/trẻ em."
+    },
+    {
+        q: "Ai có quyền yêu cầu ly hôn?",
+        a: ["Chỉ có vợ", "Chỉ có chồng", "Vợ, chồng hoặc cả hai người; cha mẹ/người thân (nếu một bên bị tâm thần, bạo lực)", "Chỉ Tòa án"],
+        correct: 2,
+        explain: "Ngoài vợ chồng, cha mẹ/người thân có quyền yêu cầu nếu một bên bị tâm thần và là nạn nhân bạo lực gia đình."
+    },
+    {
+        q: "Chồng KHÔNG có quyền yêu cầu ly hôn trong trường hợp nào?",
+        a: ["Vợ đang mang thai, sinh con hoặc đang nuôi con dưới 12 tháng tuổi", "Vợ bị bệnh nặng", "Vợ thất nghiệp", "Vợ ngoại tình"],
+        correct: 0,
+        explain: "Quy định hạn chế quyền ly hôn của chồng để bảo vệ bà mẹ và trẻ em."
+    },
+    {
+        q: "Con sinh ra trong thời kỳ hôn nhân được xác định là?",
+        a: ["Con chung của vợ chồng", "Con riêng của vợ", "Con nuôi", "Con ngoài giá thú"],
+        correct: 0,
+        explain: "Nguyên tắc suy đoán pháp lý: Con sinh ra trong thời kỳ hôn nhân mặc nhiên là con chung."
+    },
+    {
+        q: "Nghĩa vụ cấp dưỡng đặt ra khi nào?",
+        a: ["Khi ly hôn và người trực tiếp nuôi con yêu cầu", "Giữa cha mẹ con, anh chị em, ông bà cháu khi một bên túng thiếu và bên kia có khả năng", "Chỉ khi con dưới 18 tuổi", "Chỉ khi cha mẹ già yếu"],
+        correct: 1,
+        explain: "Cấp dưỡng là nghĩa vụ san sẻ khó khăn giữa các thành viên gia đình (không chỉ khi ly hôn)."
+    },
+    {
+        q: "Tảo hôn là gì?",
+        a: ["Kết hôn khi chưa đủ tuổi theo quy định", "Kết hôn giả tạo", "Kết hôn cưỡng ép", "Kết hôn vì vụ lợi"],
+        correct: 0,
+        explain: "Tảo hôn là việc lấy vợ/chồng khi một hoặc cả hai chưa đủ tuổi (Nam <20, Nữ <18)."
+    },
+    {
+        q: "Việc mang thai hộ vì mục đích thương mại có bị cấm không?",
+        a: ["Không cấm", "Cấm tuyệt đối", "Cho phép nếu có hợp đồng", "Tùy từng tỉnh"],
+        correct: 1,
+        explain: "Luật chỉ cho phép mang thai hộ vì mục đích nhân đạo, cấm thương mại hóa."
+    },
+    {
+        q: "Người vợ có quyền giữ lại họ tên của mình sau khi kết hôn không?",
+        a: ["Bắt buộc đổi sang họ chồng", "Có quyền giữ nguyên họ tên", "Phải ghép họ chồng vào", "Tùy chồng quyết định"],
+        correct: 1,
+        explain: "Quyền nhân thân: Cá nhân có quyền đối với họ tên của mình."
+    },
+
+    // --- LUẬT LAO ĐỘNG (BỔ SUNG) ---
+    {
+        q: "Độ tuổi lao động tối thiểu ở Việt Nam là bao nhiêu?",
+        a: ["Đủ 18 tuổi", "Đủ 16 tuổi", "Đủ 15 tuổi", "Đủ 13 tuổi (làm việc nhẹ)"],
+        correct: 2,
+        explain: "Độ tuổi lao động chính thức là đủ 15 tuổi. Dưới 15 tuổi chỉ được làm một số việc nhẹ theo danh mục."
+    },
+    {
+        q: "Hợp đồng lao động có mấy loại theo Bộ luật Lao động 2019?",
+        a: ["3 loại: Không thời hạn, Có thời hạn, Thời vụ", "2 loại: Không xác định thời hạn và Xác định thời hạn", "1 loại duy nhất", "4 loại"],
+        correct: 1,
+        explain: "Luật mới (2019) đã bỏ loại HĐLĐ thời vụ, chỉ còn 2 loại."
+    },
+    {
+        q: "Thời gian thử việc tối đa đối với công việc cần trình độ Đại học là bao lâu?",
+        a: ["30 ngày", "60 ngày", "90 ngày", "180 ngày"],
+        correct: 1,
+        explain: "Tối đa 60 ngày đối với chức danh cần trình độ Cao đẳng trở lên (trừ quản lý doanh nghiệp là 180 ngày)."
+    },
+    {
+        q: "Lương thử việc ít nhất bằng bao nhiêu phần trăm lương chính thức?",
+        a: ["70%", "80%", "85%", "100%"],
+        correct: 2,
+        explain: "Mức lương thử việc do hai bên thỏa thuận nhưng ít nhất phải bằng 85% mức lương công việc đó."
+    },
+    {
+        q: "Người lao động có quyền đơn phương chấm dứt HĐLĐ không?",
+        a: ["Không, phải được chủ đồng ý", "Có, nhưng phải báo trước theo quy định", "Chỉ khi bị ngược đãi", "Chỉ khi ốm đau"],
+        correct: 1,
+        explain: "NLĐ có quyền đơn phương chấm dứt HĐLĐ nhưng phải tuân thủ thời hạn báo trước."
+    },
+    {
+        q: "Hình thức xử lý kỷ luật lao động nào bị CẤM?",
+        a: ["Khiển trách", "Sa thải", "Cắt lương, phạt tiền", "Kéo dài thời hạn nâng lương"],
+        correct: 2,
+        explain: "Cấm dùng hình thức phạt tiền, cắt lương thay cho xử lý kỷ luật lao động."
+    },
+    {
+        q: "Giờ làm việc bình thường không quá bao nhiêu giờ trong 01 ngày?",
+        a: ["8 giờ", "10 giờ", "12 giờ", "6 giờ"],
+        correct: 0,
+        explain: "Không quá 8 giờ/ngày và 48 giờ/tuần."
+    },
+    {
+        q: "Ngày nghỉ lễ Quốc khánh 2/9 người lao động được nghỉ mấy ngày?",
+        a: ["1 ngày", "2 ngày", "3 ngày", "4 ngày"],
+        correct: 1,
+        explain: "Theo luật mới, nghỉ Quốc khánh được 2 ngày (ngày 2/9 và 1 ngày liền kề)."
+    },
+    {
+        q: "Tiền lương làm thêm giờ vào ngày nghỉ lễ, tết ít nhất bằng bao nhiêu?",
+        a: ["150%", "200%", "300%", "400%"],
+        correct: 2,
+        explain: "Ít nhất 300% (chưa kể tiền lương ngày lễ, tết đối với lao động hưởng lương ngày)."
+    },
+    {
+        q: "Sa thải là hình thức kỷ luật áp dụng khi nào?",
+        a: ["Đi muộn 1 lần", "Làm hỏng dụng cụ nhỏ", "Trộm cắp, tham ô, tự ý bỏ việc 5 ngày cộng dồn/tháng", "Cãi lại sếp"],
+        correct: 2,
+        explain: "Sa thải là hình thức nặng nhất, chỉ áp dụng cho lỗi nghiêm trọng quy định tại Điều 125 BLLĐ."
+    },
+
+    // --- LUẬT HÌNH SỰ (NÂNG CAO) ---
+    {
+        q: "Một người chuẩn bị hung khí để giết người nhưng chưa kịp thực hiện thì bị bắt. Đây là giai đoạn nào?",
+        a: ["Chuẩn bị phạm tội", "Phạm tội chưa đạt", "Tội phạm hoàn thành", "Tự ý nửa chừng chấm dứt"],
+        correct: 0,
+        explain: "Chuẩn bị phạm tội là tìm kiếm, sửa soạn công cụ... (Điều 14 BLHS)."
+    },
+    {
+        q: "Người chuẩn bị phạm tội có phải chịu trách nhiệm hình sự không?",
+        a: ["Không bao giờ", "Luôn luôn phải chịu", "Chỉ chịu TNHS đối với một số tội rất nghiêm trọng hoặc đặc biệt nghiêm trọng", "Chỉ bị phạt hành chính"],
+        correct: 2,
+        explain: "Chỉ một số tội danh cụ thể (như Giết người, Cướp tài sản...) thì giai đoạn chuẩn bị mới bị truy cứu."
+    },
+    {
+        q: "Phạm tội chưa đạt là gì?",
+        a: ["Đã thực hiện hành vi nhưng không đạt được hậu quả mong muốn do nguyên nhân khách quan", "Tự nguyện dừng lại không làm nữa", "Chưa thực hiện hành vi", "Đã đạt hậu quả nhưng hậu quả nhỏ"],
+        correct: 0,
+        explain: "Đã ra tay nhưng không thành công vì lý do ngoài ý muốn (ví dụ: bắn trượt, nạn nhân được cứu sống)."
+    },
+    {
+        q: "Người tự ý nửa chừng chấm dứt việc phạm tội thì sao?",
+        a: ["Vẫn bị truy cứu tội định phạm", "Được miễn trách nhiệm hình sự về tội định phạm", "Bị xử phạt hành chính", "Được giảm nhẹ hình phạt"],
+        correct: 1,
+        explain: "Miễn TNHS về tội định phạm (nếu hành vi thực tế đã làm có đủ yếu tố cấu thành tội khác thì chịu TNHS tội đó)."
+    },
+    {
+        q: "Thời hiệu truy cứu trách nhiệm hình sự đối với tội đặc biệt nghiêm trọng là bao lâu?",
+        a: ["10 năm", "15 năm", "20 năm", "Không có thời hiệu"],
+        correct: 2,
+        explain: "5 năm (ít nghiêm trọng), 10 năm (nghiêm trọng), 15 năm (rất nghiêm trọng), 20 năm (đặc biệt nghiêm trọng)."
+    },
+    {
+        q: "Tội nào sau đây KHÔNG áp dụng thời hiệu truy cứu trách nhiệm hình sự (truy cứu vĩnh viễn)?",
+        a: ["Giết người", "Tham ô tài sản", "Xâm phạm an ninh quốc gia và phá hoại hòa bình", "Buôn bán ma túy"],
+        correct: 2,
+        explain: "Các tội xâm phạm ANQG và các tội phá hoại hòa bình, chống loài người không có thời hiệu."
+    },
+    {
+        q: "Án treo là gì?",
+        a: ["Là hình phạt nhẹ nhất", "Là hình thức miễn chấp hành hình phạt tù có điều kiện", "Là việc hoãn thi hành án", "Là việc tha tù trước thời hạn"],
+        correct: 1,
+        explain: "Án treo không phải là hình phạt, mà là biện pháp miễn chấp hành hình phạt tù có điều kiện."
+    },
+    {
+        q: "Điều kiện để được hưởng án treo?",
+        a: ["Bị phạt tù không quá 3 năm, nhân thân tốt, có tình tiết giảm nhẹ", "Bị phạt tù không quá 5 năm", "Bị phạt tù không quá 7 năm", "Bị phạt tiền"],
+        correct: 0,
+        explain: "Mức phạt tù phải từ 3 năm trở xuống và đáp ứng các điều kiện về nhân thân."
+    },
+    {
+        q: "Hình phạt cải tạo không giam giữ áp dụng khi nào?",
+        a: ["Tội ít nghiêm trọng/nghiêm trọng, có nơi làm việc/cư trú rõ ràng", "Tội rất nghiêm trọng", "Người nước ngoài phạm tội", "Pháp nhân phạm tội"],
+        correct: 0,
+        explain: "Áp dụng từ 6 tháng đến 3 năm cho tội ít nghiêm trọng/nghiêm trọng."
+    },
+    {
+        q: "Tội 'Cố ý gây thương tích' nếu tỷ lệ tổn thương cơ thể dưới 11% thì có bị khởi tố không?",
+        a: ["Không bao giờ", "Có, nếu dùng hung khí nguy hiểm hoặc có tình tiết định khung khác", "Chỉ phạt hành chính", "Tùy nạn nhân yêu cầu"],
+        correct: 1,
+        explain: "Dưới 11% vẫn bị khởi tố nếu dùng hung khí, axit, phạm tội với trẻ em, côn đồ..."
+    },
+
+    // --- LUẬT HÀNH CHÍNH & TỐ TỤNG HÀNH CHÍNH ---
+    {
+        q: "Chủ thể nào KHÔNG có quyền xử phạt vi phạm hành chính?",
+        a: ["Chủ tịch UBND xã", "Công an viên", "Bảo vệ cơ quan", "Thanh tra viên"],
+        correct: 2,
+        explain: "Bảo vệ không phải là người có thẩm quyền (chỉ có quyền bắt người phạm tội quả tang/lập biên bản)."
+    },
+    {
+        q: "Mức phạt tiền tối đa trong lĩnh vực an ninh trật tự đối với cá nhân là bao nhiêu?",
+        a: ["40 triệu", "50 triệu", "75 triệu", "100 triệu"],
+        correct: 0,
+        explain: "Tùy lĩnh vực, nhưng trần phạt tiền cá nhân thường thấp hơn tổ chức (gấp đôi)."
+    },
+    {
+        q: "Một hành vi vi phạm hành chính chỉ bị xử phạt mấy lần?",
+        a: ["Một lần", "Hai lần (cả phạt tiền và tịch thu)", "Nhiều lần nếu tái phạm", "Tùy mức độ"],
+        correct: 0,
+        explain: "Nguyên tắc: Một hành vi vi phạm hành chính chỉ bị xử phạt một lần."
+    },
+    {
+        q: "Người từ đủ 14 tuổi đến dưới 16 tuổi vi phạm hành chính thì bị xử phạt thế nào?",
+        a: ["Phạt tiền 50%", "Chỉ bị phạt Cảnh cáo", "Phạt lao động công ích", "Thông báo về gia đình"],
+        correct: 1,
+        explain: "Độ tuổi này vi phạm do cố ý chỉ bị áp dụng hình thức Cảnh cáo, không phạt tiền."
+    },
+    {
+        q: "Khiếu nại hành chính lần đầu gửi đến ai?",
+        a: ["Tòa án nhân dân", "Cơ quan cấp trên của người ra quyết định", "Chính người đã ra quyết định hành chính đó", "Viện kiểm sát"],
+        correct: 2,
+        explain: "Nguyên tắc khiếu nại lần 1 là gửi cho chính người/cơ quan đã ra quyết định để họ tự sửa sai."
+    },
+    {
+        q: "Nếu không đồng ý với quyết định giải quyết khiếu nại lần đầu, công dân có quyền gì?",
+        a: ["Khiếu nại lần 2 lên thủ trưởng cấp trên trực tiếp hoặc Khởi kiện ra Tòa án", "Chỉ được khiếu nại tiếp", "Chỉ được khởi kiện", "Phải chấp nhận"],
+        correct: 0,
+        explain: "Có 2 lựa chọn: Khiếu nại tiếp lên cấp trên hoặc Kiện ra Tòa hành chính."
+    },
+    {
+        q: "Tố cáo hành chính là việc công dân báo cho cơ quan chức năng về hành vi gì?",
+        a: ["Hành vi vi phạm pháp luật của bất kỳ ai", "Hành vi vi phạm pháp luật của cán bộ, công chức, cơ quan nhà nước", "Tranh chấp đất đai", "Mất trộm"],
+        correct: 1,
+        explain: "Tố cáo hành chính nhắm vào hành vi vi phạm công vụ của cán bộ/cơ quan nhà nước."
+    },
+    {
+        q: "Người tố cáo có được bảo vệ bí mật thông tin không?",
+        a: ["Không, phải công khai để đối chất", "Có, được quyền yêu cầu giữ bí mật họ tên, địa chỉ, bút tích", "Chỉ bí mật với báo chí", "Tùy trường hợp"],
+        correct: 1,
+        explain: "Luật Tố cáo quy định quyền được giữ bí mật thông tin cá nhân của người tố cáo."
+    },
+    {
+        q: "Cán bộ công chức nhận hối lộ có thể bị xử lý kỷ luật hình thức nào nặng nhất?",
+        a: ["Cảnh cáo", "Hạ bậc lương", "Buộc thôi việc", "Cách chức"],
+        correct: 2,
+        explain: "Kỷ luật hành chính nặng nhất đối với công chức là Buộc thôi việc (chưa nói đến Hình sự)."
+    },
+    {
+        q: "Tham nhũng là hành vi của ai?",
+        a: ["Của bất kỳ ai trong xã hội", "Của người có chức vụ, quyền hạn", "Của người kinh doanh", "Của người nước ngoài"],
+        correct: 1,
+        explain: "Chủ thể của tham nhũng bắt buộc phải là người có chức vụ, quyền hạn."
+    },
+
+    // --- HIẾN PHÁP & NHÀ NƯỚC (BỔ SUNG) ---
+    {
+        q: "Chủ tịch nước do cơ quan nào bầu ra?",
+        a: ["Do Nhân dân bầu trực tiếp", "Do Quốc hội bầu trong số các đại biểu Quốc hội", "Do Chính phủ bầu", "Do Ban chấp hành Trung ương Đảng bầu"],
+        correct: 1,
+        explain: "Chủ tịch nước do Quốc hội bầu, miễn nhiệm, bãi nhiệm."
+    },
+    {
+        q: "Thủ tướng Chính phủ chịu trách nhiệm trước ai?",
+        a: ["Trước Chính phủ", "Trước Quốc hội", "Trước Chủ tịch nước", "Trước nhân dân"],
+        correct: 1,
+        explain: "Thủ tướng do Quốc hội bầu nên chịu trách nhiệm báo cáo và giải trình trước Quốc hội."
+    },
+    {
+        q: "Quyền con người và Quyền công dân trong Hiến pháp 2013 có mối quan hệ thế nào?",
+        a: ["Là một", "Tách biệt hoàn toàn", "Quyền công dân nằm trong Quyền con người nhưng gắn với quốc tịch", "Quyền con người rộng hơn quyền công dân"],
+        correct: 2,
+        explain: "Hiến pháp 2013 phân biệt rõ: Quyền con người (mọi người) và Quyền công dân (chỉ công dân VN)."
+    },
+    {
+        q: "Ai có quyền biểu quyết thông qua Hiến pháp?",
+        a: ["Chỉ đại biểu Quốc hội", "Toàn thể nhân dân (thông qua trưng cầu ý dân) hoặc Quốc hội", "Chính phủ", "Chủ tịch nước"],
+        correct: 1,
+        explain: "Hiến pháp được Quốc hội thông qua. Trong trường hợp đặc biệt có thể Trưng cầu ý dân."
+    },
+    {
+        q: "Mặt trận Tổ quốc Việt Nam có vai trò gì?",
+        a: ["Quản lý nhà nước", "Xét xử", "Giám sát và phản biện xã hội", "Ban hành pháp luật"],
+        correct: 2,
+        explain: "MTTQ là liên minh chính trị, có vai trò giám sát và phản biện xã hội."
+    },
+    {
+        q: "Công đoàn Việt Nam đại diện cho ai?",
+        a: ["Cho người sử dụng lao động", "Cho người lao động", "Cho nhà nước", "Cho nông dân"],
+        correct: 1,
+        explain: "Công đoàn là tổ chức chính trị - xã hội đại diện và bảo vệ quyền lợi hợp pháp của người lao động."
+    },
+    {
+        q: "Đất đai thuộc sở hữu của ai?",
+        a: ["Sở hữu tư nhân", "Sở hữu nhà nước", "Sở hữu toàn dân do Nhà nước đại diện chủ sở hữu", "Sở hữu tập thể"],
+        correct: 2,
+        explain: "Việt Nam không có sở hữu tư nhân về đất đai, chỉ có quyền sử dụng đất."
+    },
+    {
+        q: "Kinh tế nhà nước giữ vai trò gì trong nền kinh tế?",
+        a: ["Vai trò bổ trợ", "Vai trò chủ đạo", "Vai trò thứ yếu", "Ngang bằng với tư nhân"],
+        correct: 1,
+        explain: "Hiến pháp 2013: Kinh tế nhà nước giữ vai trò chủ đạo."
+    },
+    {
+        q: "Công dân có nghĩa vụ gì đối với đất nước?",
+        a: ["Trung thành với Tổ quốc", "Bảo vệ Tổ quốc", "Tuân thủ Hiến pháp và pháp luật", "Tất cả các ý trên"],
+        correct: 3,
+        explain: "Đây là các nghĩa vụ cơ bản của công dân."
+    },
+    {
+        q: "Quyền bầu cử của công dân được thực hiện theo nguyên tắc nào?",
+        a: ["Phổ thông, bình đẳng, trực tiếp và bỏ phiếu kín", "Tự do, công khai, minh bạch", "Dân chủ, kỷ cương", "Tập trung, thống nhất"],
+        correct: 0,
+        explain: "4 nguyên tắc bầu cử: Phổ thông (ai đủ tuổi cũng được bầu), Bình đẳng (phiếu như nhau), Trực tiếp, Bỏ phiếu kín."
+    },
+
+    // --- CÁC LOẠI HÌNH DOANH NGHIỆP & KINH DOANH ---
+    {
+        q: "Doanh nghiệp nào KHÔNG có tư cách pháp nhân?",
+        a: ["Công ty TNHH", "Công ty Cổ phần", "Doanh nghiệp tư nhân", "Công ty Hợp danh"],
+        correct: 2,
+        explain: "Doanh nghiệp tư nhân do 1 cá nhân làm chủ, chịu trách nhiệm vô hạn nên không có tư cách pháp nhân."
+    },
+    {
+        q: "Loại hình doanh nghiệp nào được phát hành cổ phiếu?",
+        a: ["Công ty TNHH 1 thành viên", "Công ty TNHH 2 thành viên trở lên", "Công ty Cổ phần", "Công ty Hợp danh"],
+        correct: 2,
+        explain: "Chỉ Công ty Cổ phần mới được quyền phát hành cổ phần, cổ phiếu để huy động vốn."
+    },
+    {
+        q: "Thành viên hợp danh trong Công ty hợp danh chịu trách nhiệm thế nào?",
+        a: ["Hữu hạn trong phạm vi vốn góp", "Vô hạn bằng toàn bộ tài sản của mình", "Không chịu trách nhiệm", "Chịu một nửa"],
+        correct: 1,
+        explain: "Thành viên hợp danh chịu trách nhiệm vô hạn (đây là đặc trưng cốt lõi)."
+    },
+    {
+        q: "Hộ kinh doanh cá thể được sử dụng bao nhiêu lao động?",
+        a: ["Dưới 10 lao động", "Dưới 50 lao động", "Không giới hạn (theo luật mới)", "Dưới 5 lao động"],
+        correct: 2,
+        explain: "Hiện nay pháp luật không còn giới hạn cứng số lượng lao động của hộ kinh doanh (trước đây là 10)."
+    },
+    {
+        q: "Phá sản là tình trạng doanh nghiệp mất khả năng thanh toán và...?",
+        a: ["Bị thua lỗ 3 năm liên tiếp", "Bị Tòa án nhân dân ra quyết định tuyên bố phá sản", "Chủ doanh nghiệp bỏ trốn", "Không trả được lương"],
+        correct: 1,
+        explain: "Phá sản là thủ tục tư pháp, phải có quyết định của Tòa án mới gọi là phá sản."
+    },
+    {
+        q: "Cổ đông phổ thông có quyền gì?",
+        a: ["Biểu quyết tại cuộc họp Đại hội đồng cổ đông", "Nhận cổ tức (nếu có)", "Chuyển nhượng cổ phần", "Tất cả các quyền trên"],
+        correct: 3,
+        explain: "Cổ đông phổ thông là chủ sở hữu cơ bản của công ty cổ phần."
+    },
+    {
+        q: "Người đại diện theo pháp luật của doanh nghiệp là ai?",
+        a: ["Chỉ là Giám đốc", "Chỉ là Chủ tịch HĐQT", "Người được ghi danh trong Điều lệ công ty và Giấy đăng ký kinh doanh", "Kế toán trưởng"],
+        correct: 2,
+        explain: "Doanh nghiệp có thể có một hoặc nhiều người đại diện theo pháp luật tùy theo Điều lệ."
+    },
+
+    // --- QUAN HỆ DÂN SỰ CÓ YẾU TỐ NƯỚC NGOÀI ---
+    {
+        q: "Người nước ngoài có được sở hữu nhà ở tại Việt Nam không?",
+        a: ["Tuyệt đối không", "Có, nhưng bị hạn chế (ví dụ: mua căn hộ chung cư trong dự án thương mại)", "Được mua bao nhiêu tùy thích như người Việt", "Chỉ được thuê"],
+        correct: 1,
+        explain: "Người nước ngoài được sở hữu nhà ở tại VN nhưng có điều kiện hạn chế (tối đa 30% số căn trong 1 tòa chung cư, sở hữu 50 năm...)."
+    },
+    {
+        q: "Kết hôn với người nước ngoài tại Việt Nam đăng ký ở đâu?",
+        a: ["UBND xã/phường", "UBND cấp Quận/Huyện", "Sở Tư pháp", "Đại sứ quán"],
+        correct: 1,
+        explain: "Thẩm quyền đăng ký kết hôn có yếu tố nước ngoài thuộc về UBND cấp Huyện."
+    },
+    {
+        q: "Khi xung đột pháp luật xảy ra (ví dụ luật VN khác luật nước ngoài), áp dụng luật nào?",
+        a: ["Luôn áp dụng luật Việt Nam", "Luôn áp dụng luật Quốc tế", "Áp dụng quy phạm xung đột để chọn luật áp dụng", "Áp dụng luật nước nào có lợi hơn"],
+        correct: 2,
+        explain: "Tư pháp quốc tế sử dụng quy phạm xung đột để chỉ dẫn xem nên dùng luật nước nào."
+    },
+
+    // --- LÝ LUẬN VỀ NHÀ NƯỚC VÀ PHÁP LUẬT (CHI TIẾT) ---
+    {
+        q: "Kiểu nhà nước đầu tiên trong lịch sử là gì?",
+        a: ["Nhà nước Phong kiến", "Nhà nước Chiếm hữu nô lệ", "Nhà nước Tư bản", "Nhà nước Xã hội chủ nghĩa"],
+        correct: 1,
+        explain: "Lịch sử phát triển: Chủ nô -> Phong kiến -> Tư bản -> XHCN."
+    },
+    {
+        q: "Quy phạm pháp luật là 'tế bào' của cái gì?",
+        a: ["Của Hệ thống pháp luật", "Của Quan hệ pháp luật", "Của Bộ máy nhà nước", "Của Ý thức pháp luật"],
+        correct: 0,
+        explain: "Hệ thống pháp luật được cấu thành từ đơn vị nhỏ nhất là Quy phạm pháp luật."
+    },
+    {
+        q: "Chế định pháp luật là gì?",
+        a: ["Là một ngành luật", "Là tập hợp các quy phạm pháp luật điều chỉnh một nhóm quan hệ xã hội cùng loại", "Là một văn bản luật", "Là một điều luật"],
+        correct: 1,
+        explain: "Ví dụ: Chế định Thừa kế, Chế định Hợp đồng (nằm trong Ngành luật Dân sự)."
+    },
+    {
+        q: "Hệ thống pháp luật Việt Nam gồm bao nhiêu ngành luật chính?",
+        a: ["Khoảng 3 ngành", "Khoảng 12 ngành (Hiến pháp, Hành chính, Hình sự, Dân sự...)", "Hàng trăm ngành", "Chỉ có 1 ngành duy nhất"],
+        correct: 1,
+        explain: "Các ngành luật chính: Hiến pháp, Hành chính, Hình sự, Dân sự, HNGĐ, Lao động, Đất đai, Kinh tế..."
+    },
+    {
+        q: "Văn bản áp dụng pháp luật khác Văn bản quy phạm pháp luật ở chỗ nào?",
+        a: ["Áp dụng cho mọi người", "Áp dụng một lần cho một đối tượng cụ thể", "Do Quốc hội ban hành", "Có hiệu lực vĩnh viễn"],
+        correct: 1,
+        explain: "VB áp dụng (Quyết định xử phạt A, Quyết định bổ nhiệm B) chỉ dùng 1 lần cho người cụ thể. VBQPPL dùng nhiều lần cho mọi người."
+    },
+    {
+        q: "Thẩm quyền ban hành Pháp lệnh thuộc về cơ quan nào?",
+        a: ["Quốc hội", "Ủy ban Thường vụ Quốc hội", "Chính phủ", "Chủ tịch nước"],
+        correct: 1,
+        explain: "Pháp lệnh do Ủy ban Thường vụ Quốc hội ban hành."
+    },
+    {
+        q: "Hiệu lực hồi tố của văn bản pháp luật là gì?",
+        a: ["Văn bản có hiệu lực về trước (áp dụng cho hành vi xảy ra trước khi văn bản có hiệu lực)", "Văn bản có hiệu lực về sau", "Văn bản không có hiệu lực", "Văn bản áp dụng cho người chết"],
+        correct: 0,
+        explain: "Hồi tố rất hạn chế, chỉ áp dụng trong trường hợp có lợi cho đối tượng hoặc thật sự cần thiết."
+    },
+    {
+        q: "Nguyên tắc 'Luật bất vị thân' có nghĩa là gì?",
+        a: ["Pháp luật không bảo vệ người thân", "Pháp luật không thiên vị ai, kể cả người thân thích hay người có quyền chức", "Pháp luật chỉ bảo vệ người thân", "Pháp luật rất hà khắc"],
+        correct: 1,
+        explain: "Mọi người đều bình đẳng trước pháp luật."
+    },
+    {
+        q: "Tập quán pháp là gì?",
+        a: ["Những thói quen sinh hoạt", "Những phong tục tập quán được Nhà nước thừa nhận và nâng lên thành luật", "Những quy định của hương ước làng xã", "Luật của người dân tộc thiểu số"],
+        correct: 1,
+        explain: "Nguồn của pháp luật bao gồm Văn bản QPPL, Tiền lệ pháp và Tập quán pháp."
+    },
+    {
+        q: "Việt Nam có tham gia các Điều ước quốc tế không?",
+        a: ["Không", "Có, và Điều ước quốc tế là một nguồn của pháp luật Việt Nam", "Chỉ tham gia về kinh tế", "Có nhưng không phải thực hiện"],
+        correct: 1,
+        explain: "Điều ước quốc tế mà VN là thành viên là một nguồn quan trọng của pháp luật VN."
+    },
+
+    // --- TỔNG HỢP CÁC TÌNH HUỐNG THỰC TẾ ---
+    {
+        q: "Bạn nhặt được ví tiền có 10 triệu đồng. Bạn phải làm gì đúng luật?",
+        a: ["Được lấy dùng vì nhặt được của rơi", "Phải thông báo hoặc giao nộp cho UBND, Công an nơi gần nhất", "Chia đôi với người cùng nhìn thấy", "Giữ lại chờ người mất đến xin"],
+        correct: 1,
+        explain: "Điều 230 BLDS: Phải giao nộp/thông báo. Nếu sau 1 năm không ai nhận mới được xác lập sở hữu."
+    },
+    {
+        q: "Vay tiền qua App với lãi suất 500%/năm có hợp pháp không?",
+        a: ["Hợp pháp vì thuận mua vừa bán", "Bất hợp pháp vì vượt quá trần lãi suất quy định (20%/năm)", "Hợp pháp nếu có hợp đồng điện tử", "Tùy ứng dụng"],
+        correct: 1,
+        explain: "BLDS quy định lãi suất vay không được quá 20%/năm. Vượt quá mức này phần vượt vô hiệu, quá cao có thể bị xử lý hình sự (Cho vay lãi nặng)."
+    },
+    {
+        q: "Đốt pháo nổ trong ngày Tết bị xử lý thế nào?",
+        a: ["Không sao cả vì là phong tục", "Bị xử phạt hành chính hoặc truy cứu trách nhiệm hình sự", "Chỉ bị nhắc nhở", "Được phép nếu mua của Bộ Quốc phòng"],
+        correct: 1,
+        explain: "Pháo hoa (không nổ) của BQP thì được. Pháo nổ là hàng cấm, hành vi đốt pháo nổ là vi phạm pháp luật."
+    },
+    {
+        q: "Đăng tin sai sự thật lên Facebook bị phạt theo luật nào?",
+        a: ["Luật Dân sự", "Luật An ninh mạng và Nghị định về xử phạt hành chính", "Luật Báo chí", "Luật Hình sự (nếu nghiêm trọng) - Cả B và D"],
+        correct: 3,
+        explain: "Tùy mức độ, có thể bị phạt hành chính (Luật An ninh mạng) hoặc Hình sự (Vu khống, Lợi dụng quyền tự do dân chủ)."
+    },
+    {
+        q: "Hợp đồng mua bán nhà đất bằng giấy tay (không công chứng) có hiệu lực không?",
+        a: ["Có hiệu lực", "Vô hiệu về mặt hình thức (trừ một số ngoại lệ)", "Tùy thỏa thuận", "Có hiệu lực nếu đã trả tiền"],
+        correct: 1,
+        explain: "Luật Đất đai/Nhà ở yêu cầu phải công chứng/chứng thực. Nếu không có, HĐ vô hiệu (trừ khi đã thực hiện 2/3 nghĩa vụ và được Tòa công nhận)."
+    },
+    {
+        q: "Con cái có nghĩa vụ trả nợ thay cho cha mẹ không?",
+        a: ["Bắt buộc phải trả", "Không, trừ khi nhận thừa kế từ cha mẹ", "Chỉ con trai trưởng mới trả", "Phải trả nếu cha mẹ yêu cầu"],
+        correct: 1,
+        explain: "Nghĩa vụ tài sản là nghĩa vụ riêng. Con chỉ trả nợ trong phạm vi di sản thừa kế nếu cha mẹ chết."
+    },
+    {
+        q: "Cảnh sát giao thông có được rút chìa khóa xe của người vi phạm không?",
+        a: ["Được phép để ngăn chặn bỏ chạy", "Không có quy định nào cho phép rút chìa khóa", "Được phép nếu người vi phạm say rượu", "Tùy tình huống"],
+        correct: 1,
+        explain: "Luật không quy định quyền rút chìa khóa. CSGT chỉ được dừng xe, kiểm soát, tạm giữ phương tiện theo quy trình."
+    },
+    {
+        q: "Bao nhiêu tuổi thì được thi bằng lái xe máy (trên 50cc)?",
+        a: ["16 tuổi", "17 tuổi", "18 tuổi", "20 tuổi"],
+        correct: 2,
+        explain: "Đủ 18 tuổi mới được thi giấy phép lái xe hạng A1."
+    },
+    {
+        q: "Mua hàng online, hàng không đúng quảng cáo, người mua có quyền gì?",
+        a: ["Không có quyền gì", "Yêu cầu đổi trả, hoàn tiền hoặc bồi thường (Bảo vệ quyền lợi người tiêu dùng)", "Chỉ được đánh giá 1 sao", "Phải chấp nhận rủi ro"],
+        correct: 1,
+        explain: "Luật Bảo vệ quyền lợi NTD quy định quyền được cung cấp thông tin chính xác và bồi thường khi hàng sai lệch."
+    },
+    {
+        q: "Khi đi làm, công ty giữ bản gốc bằng đại học của nhân viên có đúng không?",
+        a: ["Đúng, để đảm bảo nhân viên không bỏ việc", "Sai, pháp luật cấm giữ bản chính giấy tờ tùy thân/văn bằng", "Đúng nếu có thỏa thuận", "Đúng nếu lương cao"],
+        correct: 1,
+        explain: "Điều 17 BLLĐ 2019 cấm người sử dụng lao động giữ bản chính giấy tờ tùy thân, văn bằng chứng chỉ của NLĐ."
+    },
+    {
+        q: "Thưởng Tết có bắt buộc không?",
+        a: ["Bắt buộc 100%", "Bắt buộc ít nhất 1 tháng lương thứ 13", "Không bắt buộc, tùy thuộc vào kết quả kinh doanh và quy chế công ty", "Nhà nước trả thưởng"],
+        correct: 2,
+        explain: "Thưởng là khoản không bắt buộc, dựa trên kết quả kinh doanh và mức độ hoàn thành công việc."
+    },
+    {
+        q: "Vợ chồng ly hôn, ai được quyền nuôi con dưới 36 tháng tuổi?",
+        a: ["Mặc định giao cho mẹ trực tiếp nuôi (trừ khi mẹ không đủ điều kiện)", "Giao cho cha", "Giao cho ông bà", "Chia đôi thời gian"],
+        correct: 0,
+        explain: "Nguyên tắc ưu tiên giao cho mẹ nuôi con dưới 36 tháng tuổi để đảm bảo sự phát triển tốt nhất."
+    },
+    {
+        q: "Đánh ghen (xúc phạm danh dự, gây thương tích) có vi phạm pháp luật không?",
+        a: ["Không, vì để bảo vệ hạnh phúc gia đình", "Có, vi phạm pháp luật (Hành chính hoặc Hình sự)", "Được phép nếu bắt quả tang", "Chỉ bị nhắc nhở"],
+        correct: 1,
+        explain: "Hành vi đánh ghen xâm phạm thân thể, danh dự người khác là trái pháp luật."
+    },
+    {
+        q: "Sinh viên đi làm thêm có phải đóng thuế thu nhập cá nhân không?",
+        a: ["Không bao giờ", "Có, nếu thu nhập đạt mức phải đóng thuế (khấu trừ 10% nếu >2 triệu/lần hoặc theo biểu lũy tiến)", "Chỉ đóng khi ra trường", "Sinh viên được miễn"],
+        correct: 1,
+        explain: "Sinh viên vẫn là công dân, nếu có thu nhập chịu thuế thì vẫn phải đóng thuế TNCN."
+    },
+    {
+        q: "Bị can, bị cáo có quyền im lặng không?",
+        a: ["Không, phải khai báo thành khẩn", "Có, không buộc phải đưa ra lời khai chống lại chính mình", "Chỉ được im lặng tại Tòa", "Tùy điều tra viên"],
+        correct: 1,
+        explain: "Luật Tố tụng hình sự mới quy định quyền không buộc phải đưa ra lời khai chống lại chính mình (Quyền im lặng)."
+    },
+    {
+        q: "Luật sư tham gia tố tụng từ giai đoạn nào?",
+        a: ["Chỉ khi ra Tòa", "Từ khi bị khởi tố", "Từ khi bị bắt, bị tạm giữ", "Khi thi hành án"],
+        correct: 2,
+        explain: "Luật sư có quyền tham gia bảo vệ ngay từ thời điểm bị bắt, tạm giữ."
+    },
+    {
+        q: "Tòa án xét xử tập thể hay cá nhân?",
+        a: ["Chỉ 1 Thẩm phán xét xử", "Hội đồng xét xử (gồm Thẩm phán và Hội thẩm nhân dân)", "Viện kiểm sát xét xử", "Công an xét xử"],
+        correct: 1,
+        explain: "Sơ thẩm thường là Hội đồng xét xử gồm 1 Thẩm phán và 2 Hội thẩm (xét xử tập thể)."
+    },
+    {
+        q: "Bản án sơ thẩm chưa có hiệu lực thì có được kháng cáo không?",
+        a: ["Được kháng cáo trong thời hạn 15 ngày", "Không được kháng cáo", "Chỉ Viện kiểm sát được kháng nghị", "Phải đợi thi hành xong mới kháng cáo"],
+        correct: 0,
+        explain: "Thời hạn kháng cáo bản án sơ thẩm là 15 ngày kể từ ngày tuyên án."
+    },
+    {
+        q: "Người làm chứng có được từ chối khai báo không?",
+        a: ["Được quyền từ chối nếu ngại", "Không được từ chối (nghĩa vụ công dân), trừ khi khai báo chống lại người thân thích", "Được từ chối nếu bận", "Tùy ý"],
+        correct: 1,
+        explain: "Làm chứng là nghĩa vụ, từ chối hoặc khai gian dối sẽ bị chịu trách nhiệm pháp lý (trừ trường hợp khai chống lại người thân)."
+    },
+
+// --- BỔ SUNG ĐỢT 3: 100 CÂU HỎI CUỐI CÙNG ---
+    // --- LUẬT GIAO THÔNG & TRẬT TỰ XÃ HỘI ---
+    {
+        q: "Nồng độ cồn trong máu bao nhiêu thì bị cấm lái xe ô tô?",
+        a: ["Trên 50mg/100ml máu", "Trên 80mg/100ml máu", "Cấm tuyệt đối (bằng 0)", "Được phép uống ít"],
+        correct: 2,
+        explain: "Luật Phòng chống tác hại rượu bia quy định cấm tuyệt đối lái xe khi trong máu/hơi thở có nồng độ cồn."
+    },
+    {
+        q: "Người đi bộ đi sai luật gây tai nạn nghiêm trọng có bị truy cứu trách nhiệm hình sự không?",
+        a: ["Không, chỉ người lái xe mới bị", "Có, nếu gây hậu quả nghiêm trọng", "Chỉ bị phạt tiền", "Chỉ bị nhắc nhở"],
+        correct: 1,
+        explain: "Người đi bộ vi phạm luật giao thông gây hậu quả nghiêm trọng vẫn bị xử lý hình sự (Điều 260 BLHS)."
+    },
+    {
+        q: "Khi xảy ra tai nạn giao thông, người chứng kiến có trách nhiệm gì?",
+        a: ["Bỏ đi ngay", "Bảo vệ hiện trường, giúp đỡ người bị nạn, báo cơ quan chức năng", "Chỉ đứng xem quay phim", "Lấy tài sản của người bị nạn đem cất giúp"],
+        correct: 1,
+        explain: "Cứu giúp người bị nạn và bảo vệ hiện trường là trách nhiệm của công dân."
+    },
+    {
+        q: "Đèn tín hiệu giao thông màu vàng có ý nghĩa gì?",
+        a: ["Đi chậm lại", "Dừng lại trước vạch dừng", "Được phép đi tiếp nếu đường vắng", "Tăng tốc để vượt qua"],
+        correct: 1,
+        explain: "Tín hiệu vàng là phải dừng lại trước vạch dừng. Nếu đã đi quá vạch thì được đi tiếp nhanh chóng."
+    },
+    {
+        q: "Xe máy được phép chở mấy người?",
+        a: ["Tối đa 2 người lớn", "1 người lái và 1 người ngồi sau (trừ chở trẻ em, người cấp cứu, áp giải tội phạm)", "Tùy loại xe", "Chở 3 người nếu đội mũ bảo hiểm"],
+        correct: 1,
+        explain: "Xe máy chỉ được chở 1 người ngồi sau. Được chở 2 người ngồi sau trong trường hợp đặc biệt (trẻ em <14t, cấp cứu, áp giải)."
+    },
+    {
+        q: "Hành vi đua xe trái phép bị xử lý thế nào?",
+        a: ["Chỉ phạt tiền", "Tịch thu phương tiện", "Phạt tiền, tịch thu phương tiện, có thể bị xử lý hình sự", "Chỉ giữ xe 7 ngày"],
+        correct: 2,
+        explain: "Đua xe trái phép là hành vi nguy hiểm, chế tài rất nặng (cả hành chính và hình sự)."
+    },
+
+    // --- LUẬT SỞ HỮU TRÍ TUỆ ---
+    {
+        q: "Quyền tác giả phát sinh khi nào?",
+        a: ["Khi tác phẩm được công bố", "Khi đăng ký với Cục Bản quyền", "Kể từ khi tác phẩm được sáng tạo và thể hiện dưới một hình thức vật chất nhất định", "Khi tác phẩm nổi tiếng"],
+        correct: 2,
+        explain: "Quyền tác giả phát sinh tự động ngay khi tác phẩm ra đời (viết ra giấy, lưu vào máy...), không cần đăng ký."
+    },
+    {
+        q: "Nhãn hiệu (Logo) được bảo hộ bao nhiêu năm?",
+        a: ["50 năm", "10 năm và có thể gia hạn nhiều lần", "20 năm", "Vĩnh viễn không cần gia hạn"],
+        correct: 1,
+        explain: "Giấy chứng nhận đăng ký nhãn hiệu có hiệu lực 10 năm, có thể gia hạn liên tiếp mỗi lần 10 năm."
+    },
+    {
+        q: "Bằng độc quyền sáng chế có thời hạn bảo hộ là?",
+        a: ["10 năm", "20 năm và không được gia hạn", "50 năm", "70 năm"],
+        correct: 1,
+        explain: "Sáng chế được bảo hộ độc quyền 20 năm kể từ ngày nộp đơn."
+    },
+    {
+        q: "Hành vi bán hàng giả, hàng nhái nhãn hiệu nổi tiếng là vi phạm gì?",
+        a: ["Vi phạm bản quyền", "Xâm phạm quyền sở hữu công nghiệp", "Cạnh tranh không lành mạnh", "Cả B và C"],
+        correct: 3,
+        explain: "Vừa xâm phạm nhãn hiệu (Sở hữu công nghiệp) vừa là hành vi cạnh tranh không lành mạnh."
+    },
+    {
+        q: "Phần mềm máy tính được bảo hộ dưới hình thức nào?",
+        a: ["Sáng chế", "Quyền tác giả", "Kiểu dáng công nghiệp", "Bí mật kinh doanh"],
+        correct: 1,
+        explain: "Phần mềm máy tính được bảo hộ như tác phẩm văn học (Quyền tác giả)."
+    },
+
+    // --- TỐ TỤNG DÂN SỰ (NÂNG CAO) ---
+    {
+        q: "Ai có nghĩa vụ chứng minh trong vụ án dân sự?",
+        a: ["Tòa án tự đi thu thập", "Đương sự có yêu cầu có nghĩa vụ cung cấp chứng cứ chứng minh", "Viện kiểm sát", "Công an"],
+        correct: 1,
+        explain: "Nguyên tắc 'Ai yêu cầu người đó chứng minh' (nguyên đơn kiện thì phải đưa bằng chứng)."
+    },
+    {
+        q: "Hòa giải trong tố tụng dân sự là thủ tục gì?",
+        a: ["Bắt buộc (trừ một số trường hợp không được hòa giải)", "Tùy nghi", "Không cần thiết", "Chỉ làm cho có"],
+        correct: 0,
+        explain: "Tòa án có trách nhiệm tiến hành hòa giải và tạo điều kiện cho các đương sự thỏa thuận."
+    },
+    {
+        q: "Tiền tạm ứng án phí ai phải nộp?",
+        a: ["Bị đơn", "Nguyên đơn (người đi kiện)", "Nhà nước hỗ trợ", "Luật sư nộp"],
+        correct: 1,
+        explain: "Người khởi kiện phải nộp tiền tạm ứng án phí thì Tòa mới thụ lý."
+    },
+    {
+        q: "Nếu nguyên đơn vắng mặt tại phiên tòa lần thứ nhất thì sao?",
+        a: ["Đình chỉ vụ án", "Hoãn phiên tòa", "Xét xử vắng mặt", "Bác đơn kiện"],
+        correct: 1,
+        explain: "Vắng mặt lần 1 thì hoãn phiên tòa. Vắng mặt lần 2 không có lý do chính đáng thì coi như từ bỏ việc kiện."
+    },
+    {
+        q: "Quyết định giám đốc thẩm có hiệu lực khi nào?",
+        a: ["Sau 15 ngày", "Sau 30 ngày", "Có hiệu lực pháp luật ngay", "Sau khi đương sự nhận được"],
+        correct: 2,
+        explain: "Quyết định của Hội đồng giám đốc thẩm có hiệu lực ngay lập tức."
+    },
+
+    // --- LUẬT ĐẤT ĐAI & NHÀ Ở ---
+    {
+        q: "Sổ đỏ và Sổ hồng khác nhau thế nào?",
+        a: ["Sổ đỏ cho đất nông nghiệp, sổ hồng cho đất ở", "Hiện nay thống nhất một mẫu là Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất", "Sổ hồng giá trị hơn sổ đỏ", "Sổ đỏ do Bộ Xây dựng cấp"],
+        correct: 1,
+        explain: "Trước đây phân biệt, hiện nay Luật Đất đai quy định thống nhất 1 mẫu chung (bìa màu hồng cánh sen)."
+    },
+    {
+        q: "Thời hạn sử dụng đất ở (đất thổ cư) là bao lâu?",
+        a: ["50 năm", "70 năm", "Ổn định lâu dài", "99 năm"],
+        correct: 2,
+        explain: "Đất ở là loại đất sử dụng ổn định lâu dài (không có thời hạn)."
+    },
+    {
+        q: "Tranh chấp đất đai bắt buộc phải qua thủ tục gì trước khi khởi kiện?",
+        a: ["Hòa giải tại UBND cấp xã", "Hòa giải tại tổ dân phố", "Thương lượng tại nhà", "Gửi đơn lên Huyện"],
+        correct: 0,
+        explain: "Hòa giải tại UBND xã là thủ tục tiền tố tụng bắt buộc đối với tranh chấp ai là người có quyền sử dụng đất."
+    },
+    {
+        q: "Điều kiện để chuyển nhượng quyền sử dụng đất?",
+        a: ["Có sổ đỏ, đất không tranh chấp, còn thời hạn sử dụng, không bị kê biên", "Chỉ cần có sổ đỏ", "Chỉ cần người mua đồng ý", "Đất chưa có sổ cũng bán được"],
+        correct: 0,
+        explain: "Phải hội tụ đủ 4 điều kiện (Điều 188 Luật Đất đai 2013)."
+    },
+    {
+        q: "Nhà nước thu hồi đất trong trường hợp nào?",
+        a: ["Vì mục đích quốc phòng, an ninh, phát triển kinh tế - xã hội vì lợi ích quốc gia, công cộng", "Do vi phạm pháp luật về đất đai", "Do chấm dứt việc sử dụng đất", "Tất cả các trường hợp trên"],
+        correct: 3,
+        explain: "Nhà nước có quyền thu hồi đất theo luật định và phải bồi thường (trừ trường hợp vi phạm)."
+    },
+
+    // --- QUYỀN TRẺ EM & BÌNH ĐẲNG GIỚI ---
+    {
+        q: "Trẻ em theo Luật Trẻ em Việt Nam là người dưới bao nhiêu tuổi?",
+        a: ["Dưới 18 tuổi", "Dưới 16 tuổi", "Dưới 14 tuổi", "Dưới 15 tuổi"],
+        correct: 1,
+        explain: "Luật Trẻ em 2016: Trẻ em là người dưới 16 tuổi."
+    },
+    {
+        q: "Hành vi nào bị nghiêm cấm đối với trẻ em?",
+        a: ["Bỏ rơi, bỏ mặc", "Xâm hại tình dục, bạo lực", "Bóc lột sức lao động", "Tất cả các hành vi trên"],
+        correct: 3,
+        explain: "Đây là các hành vi bị nghiêm cấm để bảo vệ trẻ em."
+    },
+    {
+        q: "Tổng đài quốc gia bảo vệ trẻ em là số nào?",
+        a: ["113", "115", "111", "1900"],
+        correct: 2,
+        explain: "Số 111 là tổng đài điện thoại quốc gia bảo vệ trẻ em."
+    },
+    {
+        q: "Bình đẳng giới là gì?",
+        a: ["Nam nữ như nhau về mọi mặt", "Nam nữ có vị trí, vai trò ngang nhau, được tạo điều kiện và cơ hội như nhau", "Ưu tiên phụ nữ hơn nam giới", "Nam giới phải nhường phụ nữ"],
+        correct: 1,
+        explain: "Bình đẳng giới là bình đẳng về cơ hội, điều kiện và thụ hưởng, không phải cào bằng."
+    },
+    {
+        q: "Định kiến giới là gì?",
+        a: ["Những suy nghĩ tốt đẹp về giới", "Nhận thức, thái độ và đánh giá thiên lệch, tiêu cực về đặc điểm, vị trí, vai trò của nam hoặc nữ", "Sự tôn trọng lẫn nhau", "Khoa học về giới"],
+        correct: 1,
+        explain: "Ví dụ: 'Đàn ông xây nhà, đàn bà xây tổ ấm' theo nghĩa áp đặt là định kiến giới."
+    },
+
+    // --- LUẬT PHÒNG CHỐNG THAM NHŨNG ---
+    {
+        q: "Tài sản tham nhũng phải xử lý thế nào?",
+        a: ["Sung công quỹ", "Trả lại cho chủ sở hữu, người quản lý hợp pháp hoặc sung quỹ nhà nước", "Chia cho người nghèo", "Người tham nhũng được giữ lại một nửa"],
+        correct: 1,
+        explain: "Phải thu hồi triệt để tài sản tham nhũng."
+    },
+    {
+        q: "Cán bộ công chức phải kê khai tài sản khi nào?",
+        a: ["Lần đầu khi nhận nhiệm vụ", "Hàng năm", "Kê khai bổ sung khi có biến động", "Tất cả các trường hợp trên"],
+        correct: 3,
+        explain: "Kê khai tài sản, thu nhập là biện pháp phòng ngừa tham nhũng quan trọng."
+    },
+    {
+        q: "Người đứng đầu cơ quan có chịu trách nhiệm khi để xảy ra tham nhũng không?",
+        a: ["Không, ai làm người nấy chịu", "Có, chịu trách nhiệm người đứng đầu (kỷ luật hoặc hình sự)", "Chỉ bị nhắc nhở", "Tùy cấp phó"],
+        correct: 1,
+        explain: "Người đứng đầu phải chịu trách nhiệm liên đới nếu để xảy ra tham nhũng trong cơ quan."
+    },
+    {
+        q: "Hành vi nhũng nhiễu của cán bộ công chức là gì?",
+        a: ["Gây khó khăn, phiền hà, đòi hỏi lợi ích", "Làm việc quá nhanh", "Thân thiện quá mức", "Lười biếng"],
+        correct: 0,
+        explain: "Nhũng nhiễu (tham nhũng vặt) là hành vi gây khó dễ để vòi vĩnh."
+    },
+
+    // --- CÁC TÌNH HUỐNG HỖN HỢP (CUỐI) ---
+    {
+        q: "A (17 tuổi) vay tiền của B để chơi game. Giao dịch này có hiệu lực không?",
+        a: ["Có, vì A đã lớn", "Vô hiệu, vì A chưa thành niên và giao dịch này không phục vụ nhu cầu thiết yếu, không có người đại diện đồng ý", "Có, nếu số tiền nhỏ", "Tùy B quyết định"],
+        correct: 1,
+        explain: "Giao dịch dân sự của người chưa thành niên (15-18t) phải được người đại diện đồng ý nếu không phục vụ nhu cầu sinh hoạt hàng ngày."
+    },
+    {
+        q: "Chó thả rông cắn người đi đường. Ai chịu trách nhiệm?",
+        a: ["Con chó chịu trách nhiệm", "Chủ sở hữu chó phải bồi thường thiệt hại", "Người bị cắn tự chịu vì không tránh", "UBND xã chịu"],
+        correct: 1,
+        explain: "Chủ sở hữu súc vật phải bồi thường thiệt hại do súc vật gây ra (Điều 603 BLDS)."
+    },
+    {
+        q: "Cây cối nhà A đổ sang nhà B làm vỡ mái ngói. A có phải bồi thường không?",
+        a: ["Có, A phải bồi thường (trừ trường hợp bất khả kháng)", "Không, do gió bão", "Chia đôi thiệt hại", "B tự sửa"],
+        correct: 0,
+        explain: "Chủ sở hữu cây cối phải bồi thường thiệt hại (Điều 604 BLDS), trừ khi bão quá lớn (bất khả kháng)."
+    },
+    {
+        q: "Đánh bài ăn tiền vui vẻ ngày Tết có phạm pháp không?",
+        a: ["Không, Tết được phép", "Có, là hành vi Đánh bạc trái phép (Hành chính hoặc Hình sự tùy số tiền)", "Được phép nếu đánh nhỏ dưới 10k", "Chỉ người tổ chức mới bị"],
+        correct: 1,
+        explain: "Đánh bạc trái phép dưới mọi hình thức đều bị cấm. Trên 5 triệu (hoặc ít hơn nhưng đã bị phạt) là Hình sự."
+    },
+    {
+        q: "Người lao động nữ nghỉ thai sản được hưởng chế độ gì?",
+        a: ["Nghỉ 6 tháng và hưởng trợ cấp thai sản từ BHXH", "Nghỉ 4 tháng hưởng nguyên lương công ty", "Nghỉ không lương", "Nghỉ 3 tháng"],
+        correct: 0,
+        explain: "Chế độ thai sản: Nghỉ 6 tháng, BHXH chi trả trợ cấp (100% bình quân tiền lương đóng BHXH)."
+    },
+    {
+        q: "Bảo hiểm thất nghiệp chi trả khi nào?",
+        a: ["Khi người lao động tự ý bỏ việc", "Khi chấm dứt HĐLĐ đúng luật, đã đóng BH thất nghiệp đủ 12 tháng trở lên", "Khi về hưu", "Khi bị ốm"],
+        correct: 1,
+        explain: "Điều kiện hưởng BHTN: Đã đóng đủ thời gian, chấm dứt HĐLĐ đúng luật, nộp hồ sơ đúng hạn."
+    },
+    {
+        q: "Ai là người có quyền thay đổi họ tên cho con?",
+        a: ["Cha hoặc mẹ tự quyết định", "Phải có sự thỏa thuận của cả cha và mẹ", "Ông bà nội ngoại", "Chính đứa con"],
+        correct: 1,
+        explain: "Việc thay đổi họ tên cho con dưới 18 tuổi phải có sự đồng ý của cả cha và mẹ."
+    },
+    {
+        q: "Di chúc viết tay không có người làm chứng có hợp pháp không?",
+        a: ["Không bao giờ hợp pháp", "Hợp pháp nếu chính người lập tự viết và ký tên (Di chúc tự viết)", "Chỉ hợp pháp nếu công chứng", "Tùy nội dung"],
+        correct: 1,
+        explain: "Điều 633 BLDS: Di chúc bằng văn bản không có người làm chứng vẫn hợp pháp nếu người lập tự viết tay và ký."
+    },
+    {
+        q: "Người thừa kế có được từ chối nhận di sản không?",
+        a: ["Bắt buộc phải nhận", "Được quyền từ chối (bằng văn bản)", "Chỉ được từ chối nếu di sản là nợ", "Phải nhận rồi mới cho người khác"],
+        correct: 1,
+        explain: "Người thừa kế có quyền từ chối nhận di sản (trừ khi từ chối để trốn tránh nghĩa vụ tài sản)."
+    },
+    {
+        q: "Công ty đơn phương sa thải nhân viên trái luật phải bồi thường gì?",
+        a: ["Tiền lương trong những ngày không được làm việc", "Ít nhất 2 tháng tiền lương", "Nhận lại làm việc", "Tất cả các khoản trên"],
+        correct: 3,
+        explain: "Hậu quả của sa thải trái luật rất nặng: Trả lương những ngày nghỉ + 2 tháng lương + Nhận lại + BHXH."
+    },
+    {
+        q: "Người lao động làm việc vào ban đêm được trả lương thế nào?",
+        a: ["Như ban ngày", "Được trả thêm ít nhất 30% tiền lương", "Được trả thêm 50%", "Được nghỉ bù"],
+        correct: 1,
+        explain: "Làm việc ban đêm (22h - 6h) được trả thêm ít nhất 30% lương."
+    },
+    {
+        q: "Có được kết hôn với người cùng giới tính không?",
+        a: ["Được phép và được pháp luật thừa nhận", "Nhà nước không thừa nhận hôn nhân giữa những người cùng giới tính", "Bị cấm và bị phạt", "Chỉ được kết hôn ở nước ngoài"],
+        correct: 1,
+        explain: "Luật HNGĐ 2014 bỏ quy định 'cấm', nhưng quy định 'Nhà nước không thừa nhận' (không cấp Đăng ký kết hôn)."
+    },
+    {
+        q: "Vợ chồng ly hôn, tài sản riêng của ai thuộc về người đó đúng không?",
+        a: ["Đúng", "Sai, phải chia đôi", "Sai, nhập vào tài sản chung", "Tùy Tòa"],
+        correct: 0,
+        explain: "Tài sản riêng (có trước hôn nhân, được tặng cho riêng, thừa kế riêng) thì thuộc về người đó, không phải chia."
+    },
+    {
+        q: "Con nuôi có được hưởng thừa kế của cha mẹ nuôi không?",
+        a: ["Không, chỉ con đẻ mới được", "Có, được hưởng như con đẻ", "Chỉ được hưởng một nửa", "Tùy họ hàng đồng ý"],
+        correct: 1,
+        explain: "Con nuôi hợp pháp có đầy đủ quyền lợi như con đẻ, thuộc hàng thừa kế thứ nhất."
+    },
+    {
+        q: "Người nghiện ma túy có bị coi là mất năng lực hành vi dân sự không?",
+        a: ["Có", "Không (trừ khi bị Tòa tuyên bố là người bị hạn chế năng lực hành vi dân sự)", "Tùy lúc tỉnh hay say", "Mất năng lực hoàn toàn"],
+        correct: 1,
+        explain: "Nghiện ma túy chưa đủ, phải có quyết định của Tòa án tuyên bố bị hạn chế năng lực hành vi thì mới tính."
+    },
+    {
+        q: "Hợp đồng lao động bằng lời nói có giá trị không?",
+        a: ["Không, phải bằng văn bản", "Có, đối với hợp đồng dưới 1 tháng", "Có, với mọi loại hợp đồng", "Chỉ có giá trị tin tưởng"],
+        correct: 1,
+        explain: "HĐLĐ dưới 01 tháng có thể giao kết bằng lời nói (trừ giúp việc gia đình, người <15 tuổi...)."
+    },
+    {
+        q: "Thời gian nghỉ thai sản có được tính là thời gian công tác để hưởng BHXH không?",
+        a: ["Không", "Có", "Chỉ tính 1 nửa", "Tùy công ty"],
+        correct: 1,
+        explain: "Thời gian nghỉ thai sản (6 tháng) vẫn được tính là thời gian tham gia BHXH."
+    },
+    {
+        q: "Người nước ngoài phạm tội tại Việt Nam xử lý thế nào?",
+        a: ["Trục xuất về nước ngay", "Xử lý theo pháp luật Việt Nam (trừ trường hợp miễn trừ ngoại giao)", "Giao cho Đại sứ quán xử lý", "Không xử lý được"],
+        correct: 1,
+        explain: "Nguyên tắc lãnh thổ: Phạm tội trên đất VN thì xử theo luật VN."
+    },
+    {
+        q: "Tội 'Làm nhục người khác' xâm phạm đến cái gì?",
+        a: ["Tính mạng", "Sức khỏe", "Danh dự, nhân phẩm", "Tài sản"],
+        correct: 2,
+        explain: "Khách thể của tội làm nhục là danh dự, nhân phẩm của con người."
+    },
+    {
+        q: "Người 80 tuổi phạm tội có phải đi tù không?",
+        a: ["Được miễn đi tù", "Vẫn phải chịu trách nhiệm hình sự, nhưng được xem xét giảm nhẹ", "Chỉ bị quản chế tại gia", "Không bị khởi tố"],
+        correct: 1,
+        explain: "Tuổi cao (người già yếu) là tình tiết giảm nhẹ, không phải là tình tiết loại trừ trách nhiệm hình sự."
+    },
+    {
+        q: "Hối lộ bao nhiêu tiền thì bị truy cứu trách nhiệm hình sự?",
+        a: ["Trên 500 nghìn đồng", "Trên 2 triệu đồng", "Bất kỳ giá trị nào (nếu đã bị phạt HC hoặc gây hậu quả nghiêm trọng), thông thường từ 2 triệu", "Trên 10 triệu"],
+        correct: 2,
+        explain: "Định lượng cơ bản là từ 2 triệu đồng trở lên, hoặc dưới 2 triệu nhưng gây hậu quả nghiêm trọng/tái phạm."
+    },
+    {
+        q: "Biển báo giao thông hình tròn, viền đỏ, nền trắng là biển gì?",
+        a: ["Biển nguy hiểm", "Biển cấm", "Biển hiệu lệnh", "Biển chỉ dẫn"],
+        correct: 1,
+        explain: "Đặc điểm nhận dạng của biển báo cấm."
+    },
+    {
+        q: "Biển báo hình tam giác đều, viền đỏ, nền vàng là biển gì?",
+        a: ["Biển cấm", "Biển nguy hiểm và cảnh báo", "Biển hiệu lệnh", "Biển phụ"],
+        correct: 1,
+        explain: "Đặc điểm nhận dạng của biển báo nguy hiểm."
+    },
+    {
+        q: "Khi đến ngã tư không có vòng xuyến, phải nhường đường cho xe nào?",
+        a: ["Xe đi từ bên trái", "Xe đi từ bên phải", "Xe đi thẳng", "Xe to hơn"],
+        correct: 1,
+        explain: "Quy tắc nhường đường: Tại nơi không có báo hiệu đi theo vòng xuyến, phải nhường đường cho xe đi đến từ bên phải."
+    },
+    {
+        q: "Quyền sở hữu trí tuệ bao gồm những nhóm quyền nào?",
+        a: ["Quyền tác giả và quyền liên quan", "Quyền sở hữu công nghiệp", "Quyền đối với giống cây trồng", "Cả 3 nhóm trên"],
+        correct: 3,
+        explain: "Luật SHTT chia làm 3 nhánh lớn: Tác giả, SHCN và Giống cây trồng."
+    },
+    {
+        q: "Tòa án Hiến pháp ở Việt Nam có hay không?",
+        a: ["Có", "Chưa có (Cơ chế Bảo hiến do Quốc hội thực hiện)", "Sắp thành lập", "Là Tòa tối cao"],
+        correct: 1,
+        explain: "Việt Nam hiện chưa có Tòa án Hiến pháp chuyên biệt. Chức năng giám sát hiến pháp thuộc về Quốc hội."
+    },
+    {
+        q: "Luật sư có được hứa trước kết quả vụ án với khách hàng không?",
+        a: ["Được, để khách yên tâm", "Không, quy tắc đạo đức nghề nghiệp cấm hứa hẹn kết quả", "Được nếu chắc chắn thắng", "Tùy thỏa thuận"],
+        correct: 1,
+        explain: "Luật sư chỉ được cam kết thực hiện hết khả năng, cấm hứa hẹn kết quả thắng kiện."
+    },
+    {
+        q: "Công chứng và Chứng thực khác nhau thế nào?",
+        a: ["Là một", "Công chứng xác nhận tính hợp pháp của nội dung hợp đồng; Chứng thực xác nhận sao y bản chính hoặc chữ ký", "Công chứng rẻ hơn", "Chứng thực cao cấp hơn"],
+        correct: 1,
+        explain: "Công chứng (Phòng công chứng) thẩm định nội dung. Chứng thực (UBND) chủ yếu xác thực về hình thức/chữ ký."
+    },
+    {
+        q: "Vi bằng là gì?",
+        a: ["Là văn bản do Thừa phát lại lập, ghi nhận sự kiện, hành vi được dùng làm chứng cứ", "Là bản án của Tòa", "Là giấy tờ nhà đất", "Là hợp đồng công chứng"],
+        correct: 0,
+        explain: "Vi bằng có giá trị chứng cứ trước Tòa, do Thừa phát lại lập."
+    },
+    {
+        q: "Mức lương cơ sở hiện nay dùng để làm gì?",
+        a: ["Tính lương công chức, viên chức, lực lượng vũ trang", "Tính mức đóng BHXH, BHYT", "Tính mức xử phạt hành chính", "Tất cả các ý trên"],
+        correct: 3,
+        explain: "Mức lương cơ sở là căn cứ để tính nhiều khoản tiền trong hệ thống nhà nước."
+    },
+    {
+        q: "Sổ hộ khẩu giấy còn hiệu lực không?",
+        a: ["Còn hiệu lực vĩnh viễn", "Đã hết hiệu lực (từ 1/1/2023), thay bằng quản lý cư trú điện tử (VNeID, Cơ sở dữ liệu quốc gia)", "Vẫn dùng song song", "Tùy tỉnh"],
+        correct: 1,
+        explain: "Sổ hộ khẩu giấy đã chính thức bãi bỏ, chuyển sang quản lý số hóa."
+    },
+    {
+        q: "Căn cước công dân gắn chip có tác dụng gì?",
+        a: ["Lưu trữ thông tin cá nhân, sinh trắc học, tích hợp giấy tờ", "Định vị người dân", "Nghe lén", "Chỉ để cho đẹp"],
+        correct: 0,
+        explain: "Tích hợp thông tin để thực hiện thủ tục hành chính, giao dịch điện tử thuận tiện."
+    },
+    {
+        q: "Vay tiền qua app không trả có bị nợ xấu CIC không?",
+        a: ["Không", "Có, nếu app đó là của Công ty tài chính/Ngân hàng có liên kết CIC", "Chỉ bị gọi điện đòi", "Không sao cả"],
+        correct: 1,
+        explain: "Các công ty tài chính chính thống đều báo cáo lên CIC. Nợ xấu sẽ không vay được ngân hàng."
+    },
+    {
+        q: "Sinh viên có được tham gia BHYT không?",
+        a: ["Không cần", "Bắt buộc (BHYT học sinh sinh viên)", "Tự nguyện", "Nhà nước cho không"],
+        correct: 1,
+        explain: "HSSV là đối tượng bắt buộc tham gia BHYT."
+    },
+    {
+        q: "Luật An ninh mạng cấm hành vi nào?",
+        a: ["Thông tin sai sự thật, xúc phạm danh dự nhân phẩm", "Kích động bạo loạn, phá hoại an ninh", "Tuyên truyền chống Nhà nước", "Tất cả các hành vi trên"],
+        correct: 3,
+        explain: "Luật An ninh mạng kiểm soát các nội dung độc hại trên không gian mạng."
+    },
+    {
+        q: "Livestream bán hàng có phải đóng thuế không?",
+        a: ["Không", "Có, nếu phát sinh doanh thu chịu thuế", "Chỉ người nổi tiếng mới đóng", "Tùy tâm"],
+        correct: 1,
+        explain: "Kinh doanh online, livestream có doanh thu đều phải kê khai và nộp thuế theo quy định."
+    },
+    {
+        q: "Đốt vàng mã tại chung cư có bị cấm không?",
+        a: ["Không cấm", "Cấm đốt không đúng nơi quy định (vi phạm PCCC)", "Được đốt ngoài ban công", "Được đốt ở hành lang"],
+        correct: 1,
+        explain: "Luật PCCC và nội quy chung cư cấm đốt vàng mã sai quy định gây nguy cơ cháy nổ."
+    },
+    {
+        q: "Quyền im lặng của bị can được hiểu là?",
+        a: ["Không được nói gì", "Không bị ép buộc phải khai báo những điều chống lại mình", "Im lặng đến khi ra tù", "Luật sư nói thay hoàn toàn"],
+        correct: 1,
+        explain: "Quyền không tự đưa ra lời khai chống lại chính mình (quyền im lặng)."
+    },
+    {
+        q: "Tòa án xét xử công khai hay kín?",
+        a: ["Luôn luôn công khai", "Về nguyên tắc là công khai, trường hợp đặc biệt (bí mật nhà nước, thuần phong mỹ tục, người dưới 18 tuổi...) có thể xử kín", "Luôn luôn xử kín", "Tùy Thẩm phán thích"],
+        correct: 1,
+        explain: "Nguyên tắc là công khai. Ngoại lệ xử kín để bảo vệ bí mật hoặc người chưa thành niên."
+    },
+    {
+        q: "Bản án có hiệu lực pháp luật thì phải làm gì?",
+        a: ["Cất đi", "Phải được tôn trọng và thi hành nghiêm chỉnh", "Có thể không làm theo nếu không thích", "Chờ xem xét lại"],
+        correct: 1,
+        explain: "Tính cưỡng chế của bản án: Cơ quan, tổ chức, cá nhân liên quan phải chấp hành."
+    },
+
+// --- PHẦN 3: 100 CÂU HỎI LÝ THUYẾT CHUYÊN SÂU TỪ BÀI GIẢNG ---
+    
+    // --- LÝ THUYẾT VỀ NHÀ NƯỚC (BÀI 1 & 2) ---
+    {
+        q: "Theo học thuyết Mác - Lênin, nhà nước là sản phẩm của?",
+        a: ["Ý muốn của Thượng đế", "Sự thỏa thuận xã hội", "Những mâu thuẫn giai cấp không thể điều hòa được", "Sự phát triển của gia đình"],
+        correct: 2,
+        explain: "Nhà nước ra đời khi mâu thuẫn giai cấp trong xã hội trở nên gay gắt không thể điều hòa."
+    },
+    {
+        q: "Bản chất giai cấp của nhà nước thể hiện ở chỗ?",
+        a: ["Nhà nước là công cụ để bảo vệ lợi ích của mọi người", "Nhà nước là công cụ trấn áp của giai cấp này đối với giai cấp khác", "Nhà nước là tổ chức trọng tài đứng giữa các giai cấp", "Nhà nước là tổ chức từ thiện"],
+        correct: 1,
+        explain: "Bản chất giai cấp thể hiện quyền lực nhà nước thuộc về giai cấp thống trị, dùng để duy trì trật tự có lợi cho họ."
+    },
+    {
+        q: "Chủ quyền quốc gia là gì?",
+        a: ["Quyền lực tối cao của nhà nước trong phạm vi lãnh thổ và độc lập trong quan hệ quốc tế", "Quyền được in tiền", "Quyền có quân đội riêng", "Quyền ban hành pháp luật"],
+        correct: 0,
+        explain: "Chủ quyền quốc gia bao gồm 2 mặt: Quyền lực tối cao bên trong và Sự độc lập bên ngoài."
+    },
+    {
+        q: "Nhà nước quản lý dân cư theo tiêu chí nào?",
+        a: ["Theo huyết thống", "Theo độ tuổi", "Theo sự phân chia lãnh thổ hành chính", "Theo nghề nghiệp"],
+        correct: 2,
+        explain: "Khác với tổ chức thị tộc (huyết thống), nhà nước quản lý dân cư theo lãnh thổ."
+    },
+    {
+        q: "Chức năng đối nội và đối ngoại của nhà nước có mối quan hệ thế nào?",
+        a: ["Tách biệt hoàn toàn", "Đối nội quyết định đối ngoại, đối ngoại tác động trở lại đối nội", "Đối ngoại quan trọng hơn đối nội", "Không liên quan gì nhau"],
+        correct: 1,
+        explain: "Hai chức năng này có quan hệ biện chứng, hỗ trợ và tác động qua lại lẫn nhau."
+    },
+    {
+        q: "Hình thức chính thể phản ánh điều gì?",
+        a: ["Cách thức tổ chức và trình tự thành lập các cơ quan cao nhất của quyền lực nhà nước", "Cách thức phân chia lãnh thổ", "Mối quan hệ giữa các đảng phái", "Chế độ bầu cử"],
+        correct: 0,
+        explain: "Chính thể trả lời câu hỏi: Ai nắm quyền tối cao? Vua (Quân chủ) hay Cơ quan dân bầu (Cộng hòa)?"
+    },
+    {
+        q: "Chế độ chính trị là gì?",
+        a: ["Là cách thức tổ chức quân đội", "Là tổng thể các phương pháp, thủ đoạn mà nhà nước sử dụng để thực hiện quyền lực", "Là hình thức cấu trúc nhà nước", "Là hệ thống pháp luật"],
+        correct: 1,
+        explain: "Chế độ chính trị thể hiện phương pháp cai trị (Dân chủ hay Phản dân chủ/Độc tài)."
+    },
+    {
+        q: "Đặc điểm của hình thức chính thể Quân chủ chuyên chế là?",
+        a: ["Quyền lực nhà nước tối cao thuộc về một tập thể", "Quyền lực nhà nước tối cao tập trung toàn bộ vào tay người đứng đầu (Vua) theo nguyên tắc thừa kế", "Vua chỉ là biểu tượng, không có thực quyền", "Có Hiến pháp hạn chế quyền lực Vua"],
+        correct: 1,
+        explain: "Quân chủ chuyên chế (tuyệt đối): Vua nắm trọn quyền lập pháp, hành pháp, tư pháp."
+    },
+    {
+        q: "Chính thể Cộng hòa dân chủ khác Quân chủ ở điểm nào cơ bản nhất?",
+        a: ["Người đứng đầu do dân bầu ra theo nhiệm kỳ", "Người đứng đầu là trọn đời", "Quyền lực cha truyền con nối", "Không có pháp luật"],
+        correct: 0,
+        explain: "Cộng hòa gắn liền với Bầu cử và Nhiệm kỳ. Quân chủ gắn liền với Thế tập (thừa kế) và Trọn đời."
+    },
+    {
+        q: "Trong bộ máy nhà nước CHXHCN Việt Nam, nguyên tắc tổ chức và hoạt động cơ bản nhất là?",
+        a: ["Tam quyền phân lập", "Tập trung dân chủ", "Đa nguyên đa đảng", "Thỏa hiệp chính trị"],
+        correct: 1,
+        explain: "Nguyên tắc Tập trung dân chủ là nguyên tắc hiến định bao trùm tổ chức bộ máy nhà nước VN."
+    },
+
+    // --- LÝ THUYẾT VỀ PHÁP LUẬT (BÀI 3) ---
+    {
+        q: "Thuộc tính 'Tính quy phạm phổ biến' của pháp luật nghĩa là gì?",
+        a: ["Pháp luật chỉ áp dụng cho người nghèo", "Pháp luật là những khuôn mẫu, chuẩn mực xử sự chung cho nhiều người, lặp đi lặp lại nhiều lần", "Pháp luật là mệnh lệnh cá biệt", "Pháp luật luôn thay đổi"],
+        correct: 1,
+        explain: "Tính quy phạm phổ biến: Là khuôn mẫu chung, áp dụng nhiều lần, cho phạm vi rộng."
+    },
+    {
+        q: "Tại sao pháp luật có tính xác định chặt chẽ về mặt hình thức?",
+        a: ["Để mọi người dễ hiểu, thực hiện thống nhất và tránh sự tùy tiện", "Để làm khó người dân", "Để văn bản dài hơn", "Để tốn giấy mực"],
+        correct: 0,
+        explain: "Ngôn ngữ pháp lý phải rõ ràng, chính xác, một nghĩa, chứa đựng trong các hình thức văn bản quy định."
+    },
+    {
+        q: "Pháp luật do ai ban hành?",
+        a: ["Do các tổ chức tôn giáo", "Do Nhà nước ban hành hoặc thừa nhận", "Do các hội đoàn tự đặt ra", "Do người giàu đặt ra"],
+        correct: 1,
+        explain: "Chỉ có Nhà nước mới có quyền ban hành pháp luật và đảm bảo thực hiện bằng cưỡng chế."
+    },
+    {
+        q: "Văn bản quy phạm pháp luật là hình thức thể hiện của?",
+        a: ["Tập quán pháp", "Tiền lệ pháp", "Thực tiễn pháp", "Pháp luật thành văn"],
+        correct: 3,
+        explain: "Văn bản QPPL là hình thức đặc trưng của Pháp luật thành văn (như ở Việt Nam)."
+    },
+    {
+        q: "Pháp luật có mối quan hệ thế nào với Kinh tế?",
+        a: ["Pháp luật đứng trên kinh tế", "Kinh tế quyết định pháp luật, pháp luật tác động trở lại kinh tế", "Pháp luật không liên quan đến kinh tế", "Pháp luật kìm hãm kinh tế"],
+        correct: 1,
+        explain: "Cơ sở hạ tầng (kinh tế) quyết định kiến trúc thượng tầng (pháp luật), nhưng pháp luật có tính độc lập tương đối."
+    },
+    {
+        q: "Pháp luật và Đạo đức có điểm chung là gì?",
+        a: ["Đều có tính cưỡng chế nhà nước", "Đều là các quy tắc xử sự để điều chỉnh hành vi con người", "Đều do nhà nước ban hành", "Đều chỉ tồn tại trong sách vở"],
+        correct: 1,
+        explain: "Cả hai đều là quy phạm xã hội nhằm điều chỉnh hành vi, hướng tới Chân - Thiện - Mỹ."
+    },
+    {
+        q: "Kiểu pháp luật nào không tồn tại trong lịch sử?",
+        a: ["Pháp luật Chủ nô", "Pháp luật Phong kiến", "Pháp luật Tư sản", "Pháp luật Cộng sản nguyên thủy"],
+        correct: 3,
+        explain: "Xã hội Cộng sản nguyên thủy chưa có nhà nước nên chưa có pháp luật (chỉ có tập quán, tín điều)."
+    },
+    {
+        q: "Hình thức pháp luật xuất hiện sớm nhất trong lịch sử là?",
+        a: ["Tập quán pháp", "Tiền lệ pháp", "Văn bản quy phạm pháp luật", "Điều ước quốc tế"],
+        correct: 0,
+        explain: "Tập quán pháp (nhà nước thừa nhận các phong tục có sẵn) là hình thức sơ khai nhất."
+    },
+    {
+        q: "Hệ thống pháp luật là gì?",
+        a: ["Là tổng thể các quy phạm pháp luật có mối liên hệ nội tại thống nhất", "Là một cuốn sách luật", "Là tập hợp các luật sư", "Là cơ quan công an"],
+        correct: 0,
+        explain: "Hệ thống pháp luật là cấu trúc bên trong gồm: Quy phạm PL -> Chế định PL -> Ngành luật."
+    },
+    {
+        q: "Đơn vị nhỏ nhất cấu thành nên hệ thống pháp luật là?",
+        a: ["Điều luật", "Quy phạm pháp luật", "Chế định pháp luật", "Ngành luật"],
+        correct: 1,
+        explain: "Quy phạm pháp luật là tế bào nhỏ nhất."
+    },
+
+    // --- LÝ THUYẾT VỀ QUY PHẠM & QUAN HỆ PHÁP LUẬT (BÀI 4) ---
+    {
+        q: "Cấu trúc của quy phạm pháp luật gồm 3 bộ phận là?",
+        a: ["Giả định, Quy định, Chế tài", "Tiêu đề, Nội dung, Kết luận", "Chương, Mục, Điều", "Nguyên nhân, Diễn biến, Kết quả"],
+        correct: 0,
+        explain: "Đây là cấu trúc logic kinh điển: Nếu (Giả định)... thì (Quy định)... nếu không (Chế tài)..."
+    },
+    {
+        q: "Bộ phận 'Giả định' thường bắt đầu bằng từ nào?",
+        a: ["Người nào, Công dân...", "Thì, Phải...", "Bị phạt, Bị xử lý...", "Cấm, Không được..."],
+        correct: 0,
+        explain: "Giả định xác định chủ thể và hoàn cảnh: 'Người nào...', 'Cơ quan nào...', 'Trong trường hợp...'."
+    },
+    {
+        q: "Quy phạm pháp luật cấm đoán là quy phạm như thế nào?",
+        a: ["Cho phép chủ thể lựa chọn hành vi", "Buộc chủ thể phải thực hiện hành vi nhất định", "Cấm chủ thể thực hiện hành vi nhất định", "Khuyên nhủ chủ thể"],
+        correct: 2,
+        explain: "Quy phạm cấm đoán: Yêu cầu không được làm (Ví dụ: Cấm vượt đèn đỏ)."
+    },
+    {
+        q: "Quy phạm pháp luật tùy nghi là gì?",
+        a: ["Cho phép chủ thể tự lựa chọn cách xử sự trong khuôn khổ pháp luật", "Bắt buộc làm", "Cấm làm", "Phạt nặng"],
+        correct: 0,
+        explain: "Ví dụ: Hai bên có quyền thỏa thuận về mức bồi thường..."
+    },
+    {
+        q: "Quan hệ pháp luật là quan hệ xã hội được?",
+        a: ["Đạo đức điều chỉnh", "Tôn giáo điều chỉnh", "Các quy phạm pháp luật điều chỉnh", "Phong tục điều chỉnh"],
+        correct: 2,
+        explain: "Khi quan hệ xã hội được pháp luật tác động, nó trở thành quan hệ pháp luật."
+    },
+    {
+        q: "Cấu thành của quan hệ pháp luật gồm?",
+        a: ["Chủ thể, Khách thể, Nội dung", "Nguyên đơn, Bị đơn, Tòa án", "Cảnh sát, Tội phạm, Nhà tù", "Người mua, Người bán, Hàng hóa"],
+        correct: 0,
+        explain: "3 yếu tố cấu thành QHPL: Chủ thể (người tham gia), Khách thể (lợi ích hướng tới), Nội dung (quyền & nghĩa vụ)."
+    },
+    {
+        q: "Năng lực chủ thể bao gồm?",
+        a: ["Năng lực pháp luật và Năng lực hành vi", "Sức khỏe và Trí tuệ", "Tiền bạc và Địa vị", "Quyền và Nghĩa vụ"],
+        correct: 0,
+        explain: "Năng lực chủ thể = Năng lực pháp luật (điều kiện cần) + Năng lực hành vi (điều kiện đủ)."
+    },
+    {
+        q: "Năng lực pháp luật của pháp nhân phát sinh khi nào?",
+        a: ["Khi có quyết định thành lập hoặc đăng ký hoạt động", "Khi kinh doanh có lãi", "Khi giải thể", "Khi nộp thuế"],
+        correct: 0,
+        explain: "Năng lực pháp luật của tổ chức/pháp nhân có từ khi thành lập hợp pháp."
+    },
+    {
+        q: "Khách thể của quan hệ pháp luật là gì?",
+        a: ["Là các bên tham gia", "Là quyền và nghĩa vụ", "Là những lợi ích vật chất hoặc tinh thần mà các chủ thể mong muốn đạt được", "Là văn bản luật"],
+        correct: 2,
+        explain: "Khách thể là cái cớ, là mục tiêu để các bên thiết lập quan hệ (ví dụ: căn nhà trong hợp đồng mua bán)."
+    },
+    {
+        q: "Sự kiện pháp lý được chia thành?",
+        a: ["Sự biến và Hành vi", "Sự việc và Con người", "Thiên tai và Địch họa", "Hợp đồng và Vi phạm"],
+        correct: 0,
+        explain: "Sự biến (khách quan, không phụ thuộc ý chí) và Hành vi (chủ quan, phụ thuộc ý chí con người)."
+    },
+    {
+        q: "Hành vi pháp lý bao gồm?",
+        a: ["Hành động và Không hành động", "Lời nói và Việc làm", "Suy nghĩ và Hành động", "Ý thức và Vô thức"],
+        correct: 0,
+        explain: "Hành vi có thể là 'Làm' (hành động) hoặc 'Không làm điều phải làm' (không hành động)."
+    },
+    {
+        q: "Thực hiện pháp luật là gì?",
+        a: ["Là hành vi hợp pháp của các chủ thể nhằm hiện thực hóa các quy định của pháp luật", "Là đọc văn bản luật", "Là ban hành luật", "Là nghiên cứu luật"],
+        correct: 0,
+        explain: "Thực hiện pháp luật là đưa luật vào đời sống thông qua hành vi thực tế."
+    },
+    {
+        q: "Có mấy hình thức thực hiện pháp luật?",
+        a: ["2 hình thức", "3 hình thức", "4 hình thức", "5 hình thức"],
+        correct: 2,
+        explain: "4 hình thức: Tuân thủ, Thi hành, Sử dụng và Áp dụng pháp luật."
+    },
+    {
+        q: "Hình thức thực hiện pháp luật nào chủ thể phải thực hiện 'nghĩa vụ pháp lý tích cực'?",
+        a: ["Tuân thủ pháp luật", "Thi hành pháp luật", "Sử dụng pháp luật", "Áp dụng pháp luật"],
+        correct: 1,
+        explain: "Thi hành pháp luật là chủ động làm những gì pháp luật quy định phải làm (Ví dụ: Đóng thuế, đi nghĩa vụ)."
+    },
+    {
+        q: "Áp dụng pháp luật là hoạt động mang tính?",
+        a: ["Tổ chức, quyền lực nhà nước", "Tự nguyện, thỏa thuận", "Cá nhân, riêng tư", "Thương mại, dịch vụ"],
+        correct: 0,
+        explain: "Chỉ cơ quan nhà nước có thẩm quyền mới được áp dụng pháp luật."
+    },
+
+    // --- LÝ THUYẾT VỀ VI PHẠM & TRÁCH NHIỆM PHÁP LÝ (BÀI 5) ---
+    {
+        q: "Vi phạm pháp luật là hành vi?",
+        a: ["Trái pháp luật, có lỗi, do chủ thể có năng lực trách nhiệm pháp lý thực hiện", "Trái đạo đức", "Trái phong tục", "Gây hậu quả xấu"],
+        correct: 0,
+        explain: "Định nghĩa đầy đủ: Hành vi trái luật + Có lỗi + Chủ thể có năng lực + Xâm hại quan hệ xã hội."
+    },
+    {
+        q: "Cấu thành của vi phạm pháp luật gồm mấy yếu tố?",
+        a: ["2 yếu tố", "3 yếu tố", "4 yếu tố", "5 yếu tố"],
+        correct: 2,
+        explain: "4 yếu tố: Mặt khách quan, Mặt chủ quan, Chủ thể, Khách thể."
+    },
+    {
+        q: "Mặt khách quan của vi phạm pháp luật bao gồm?",
+        a: ["Lỗi, động cơ, mục đích", "Hành vi trái luật, hậu quả, mối quan hệ nhân quả", "Năng lực trách nhiệm pháp lý", "Quan hệ xã hội bị xâm hại"],
+        correct: 1,
+        explain: "Mặt khách quan là những gì thể hiện ra bên ngoài thế giới khách quan."
+    },
+    {
+        q: "Mặt chủ quan của vi phạm pháp luật bao gồm?",
+        a: ["Hành vi và hậu quả", "Lỗi, động cơ, mục đích", "Chủ thể và khách thể", "Thời gian và địa điểm"],
+        correct: 1,
+        explain: "Mặt chủ quan là diễn biến tâm lý bên trong người vi phạm."
+    },
+    {
+        q: "Lỗi vô ý do cẩu thả là gì?",
+        a: ["Chủ thể không thấy trước hậu quả mặc dù phải thấy trước và có thể thấy trước", "Chủ thể thấy trước hậu quả nhưng tin rằng không xảy ra", "Chủ thể mong muốn hậu quả xảy ra", "Chủ thể buộc phải làm"],
+        correct: 0,
+        explain: "Vô ý cẩu thả: Do sơ suất mà không biết mình gây hại, dù lẽ ra phải biết."
+    },
+    {
+        q: "Trách nhiệm pháp lý là?",
+        a: ["Nghĩa vụ đạo đức", "Hậu quả bất lợi mà nhà nước áp dụng đối với chủ thể vi phạm pháp luật", "Sự trả thù của nạn nhân", "Sự lên án của dư luận"],
+        correct: 1,
+        explain: "TNPL là sự phản ứng của Nhà nước, áp dụng chế tài trừng phạt người vi phạm."
+    },
+    {
+        q: "Cơ sở thực tiễn của trách nhiệm pháp lý là?",
+        a: ["Vi phạm pháp luật", "Văn bản luật", "Quyết định của tòa", "Ý chí của vua"],
+        correct: 0,
+        explain: "Phải có vi phạm pháp luật xảy ra trên thực tế thì mới truy cứu trách nhiệm pháp lý."
+    },
+    {
+        q: "Cơ sở pháp lý của trách nhiệm pháp lý là?",
+        a: ["Hành vi vi phạm", "Quyết định áp dụng pháp luật có hiệu lực", "Lời khai của nhân chứng", "Biên bản hiện trường"],
+        correct: 1,
+        explain: "Quyết định của cơ quan có thẩm quyền (Bản án, Quyết định xử phạt) là cơ sở pháp lý để thi hành trách nhiệm."
+    },
+    {
+        q: "Mục đích của trách nhiệm pháp lý là?",
+        a: ["Chỉ để trừng phạt", "Giáo dục, răn đe và phòng ngừa chung", "Thu tiền cho ngân sách", "Làm nhục người vi phạm"],
+        correct: 1,
+        explain: "Mục đích chính là trừng trị kết hợp giáo dục người vi phạm và răn đe người khác."
+    },
+    {
+        q: "Truy cứu trách nhiệm pháp lý phải tuân thủ nguyên tắc?",
+        a: ["Chủ quan, cảm tính", "Pháp chế, công bằng, nhân đạo", "Tùy tiện", "Lợi ích nhóm"],
+        correct: 1,
+        explain: "Nguyên tắc pháp chế: Mọi hành động truy cứu phải đúng luật, công bằng và nhân đạo."
+    },
+
+    // --- LÝ THUYẾT VỀ NGÀNH LUẬT (BÀI 6) ---
+    {
+        q: "Đối tượng điều chỉnh của Luật Hiến pháp là?",
+        a: ["Các quan hệ xã hội cơ bản nhất, quan trọng nhất gắn liền với việc xác định chế độ chính trị, bộ máy nhà nước", "Quan hệ tài sản", "Quan hệ tội phạm", "Quan hệ đất đai"],
+        correct: 0,
+        explain: "Luật Hiến pháp là luật gốc, điều chỉnh những vấn đề cốt lõi nhất của quốc gia."
+    },
+    {
+        q: "Đối tượng điều chỉnh của Luật Hành chính là?",
+        a: ["Quan hệ quản lý nhà nước (chấp hành - điều hành)", "Quan hệ hàng hóa tiền tệ", "Quan hệ lao động", "Quan hệ gia đình"],
+        correct: 0,
+        explain: "Luật Hành chính điều chỉnh hoạt động quản lý của cơ quan nhà nước đối với xã hội."
+    },
+    {
+        q: "Phương pháp điều chỉnh của Luật Hành chính là?",
+        a: ["Bình đẳng thỏa thuận", "Mệnh lệnh - phục tùng (Đơn phương)", "Thương lượng", "Đối thoại"],
+        correct: 1,
+        explain: "Đặc trưng của quản lý là cấp trên ra lệnh, cấp dưới/công dân phải phục tùng."
+    },
+    {
+        q: "Đối tượng điều chỉnh của Luật Hình sự là?",
+        a: ["Quan hệ phát sinh giữa Nhà nước và người phạm tội", "Quan hệ tranh chấp hợp đồng", "Quan hệ ly hôn", "Quan hệ thừa kế"],
+        correct: 0,
+        explain: "Luật Hình sự điều chỉnh quan hệ về Tội phạm và Hình phạt."
+    },
+    {
+        q: "Nguyên tắc cơ bản của Luật Dân sự là?",
+        a: ["Tự do cam kết, thỏa thuận", "Bình đẳng", "Thiện chí, trung thực", "Tất cả các ý trên"],
+        correct: 3,
+        explain: "Đây là các nguyên tắc cốt lõi của Bộ luật Dân sự 2015."
+    },
+    {
+        q: "Chế định 'Quyền nhân thân' thuộc ngành luật nào?",
+        a: ["Luật Dân sự", "Luật Hình sự", "Luật Hành chính", "Luật Thương mại"],
+        correct: 0,
+        explain: "Quyền nhân thân (họ tên, hình ảnh, danh dự...) do Luật Dân sự bảo vệ."
+    },
+    {
+        q: "Luật Lao động điều chỉnh quan hệ nào?",
+        a: ["Quan hệ giữa người làm công ăn lương và người sử dụng lao động", "Quan hệ giữa công chức và nhà nước", "Quan hệ giữa nông dân và đất đai", "Quan hệ vợ chồng"],
+        correct: 0,
+        explain: "Quan hệ lao động làm công ăn lương là đối tượng chính của Luật Lao động."
+    },
+    {
+        q: "Văn bản luật có giá trị pháp lý cao nhất trong một ngành luật thường gọi là?",
+        a: ["Thông tư", "Bộ luật", "Pháp lệnh", "Quyết định"],
+        correct: 1,
+        explain: "Ví dụ: Bộ luật Dân sự, Bộ luật Hình sự, Bộ luật Lao động (tập hợp quy phạm hoàn chỉnh nhất)."
+    },
+    
+    // --- LÝ THUYẾT MỞ RỘNG & SO SÁNH ---
+    {
+        q: "Sự khác biệt giữa Văn bản quy phạm pháp luật và Văn bản áp dụng pháp luật?",
+        a: ["Phạm vi áp dụng (Rộng vs Cụ thể) và Số lần áp dụng (Nhiều lần vs Một lần)", "Người ký ban hành", "Độ dài văn bản", "Màu sắc con dấu"],
+        correct: 0,
+        explain: "VBQPPL áp dụng chung, nhiều lần. VB áp dụng (cá biệt) chỉ dùng 1 lần cho người cụ thể."
+    },
+    {
+        q: "Tại sao nói Nhà nước mang tính xã hội?",
+        a: ["Vì nhà nước giải quyết các công việc chung của xã hội (giao thông, y tế, giáo dục...)", "Vì nhà nước thu thuế", "Vì nhà nước có nhà tù", "Vì nhà nước có quân đội"],
+        correct: 0,
+        explain: "Ngoài tính giai cấp (trấn áp), nhà nước phải phục vụ xã hội để tồn tại."
+    },
+    {
+        q: "Kiểu nhà nước Xã hội chủ nghĩa có đặc điểm gì khác biệt?",
+        a: ["Là nhà nước của số ít trấn áp số đông", "Là nhà nước 'nửa nhà nước', quyền lực thuộc về nhân dân lao động", "Bảo vệ chế độ tư hữu", "Tồn tại vĩnh viễn"],
+        correct: 1,
+        explain: "Nhà nước XHCN hướng tới xóa bỏ giai cấp, quyền lực thuộc về đa số nhân dân."
+    },
+    {
+        q: "Hệ thống chính trị Việt Nam bao gồm?",
+        a: ["Đảng Cộng sản, Nhà nước, Mặt trận Tổ quốc và các đoàn thể chính trị - xã hội", "Chỉ có Nhà nước", "Chỉ có Đảng", "Các công ty đa quốc gia"],
+        correct: 0,
+        explain: "Cấu trúc hệ thống chính trị: Đảng lãnh đạo, Nhà nước quản lý, Nhân dân làm chủ."
+    },
+    {
+        q: "Nguyên tắc 'Quyền lực nhà nước là thống nhất' thể hiện điều gì?",
+        a: ["Không có sự phân chia quyền lực cực đoan", "Tất cả quyền lực tập trung vào một người", "Các cơ quan nhà nước độc lập hoàn toàn", "Mạnh ai nấy làm"],
+        correct: 0,
+        explain: "Ở VN, quyền lực thống nhất ở nơi Nhân dân, Quốc hội là cơ quan đại diện cao nhất, không tam quyền phân lập."
+    },
+    {
+        q: "Vi phạm pháp luật khác vi phạm đạo đức ở điểm nào?",
+        a: ["Vi phạm pháp luật bị áp dụng chế tài nhà nước (cưỡng chế)", "Vi phạm đạo đức bị dư luận lên án", "Cả A và B đều đúng", "Không có gì khác"],
+        correct: 2,
+        explain: "Sự khác biệt nằm ở hậu quả: Cưỡng chế nhà nước (Luật) vs Dư luận xã hội/Lương tâm (Đạo đức)."
+    },
+    {
+        q: "Cấu trúc của Ý thức pháp luật gồm?",
+        a: ["Tâm lý pháp luật và Tư tưởng pháp luật", "Kiến thức và Hành động", "Cảm xúc và Lý trí", "Luật sư và Thẩm phán"],
+        correct: 0,
+        explain: "Tâm lý (cảm nhận sơ khai) và Tư tưởng (hệ thống quan điểm lý luận)."
+    },
+    {
+        q: "Văn hóa pháp luật là gì?",
+        a: ["Là số lượng luật được ban hành", "Là trình độ hiểu biết, thái độ tôn trọng và thói quen xử sự theo pháp luật của các thành viên trong xã hội", "Là văn hóa nghệ thuật về luật", "Là cách trang trí tòa án"],
+        correct: 1,
+        explain: "Văn hóa pháp luật thể hiện ở sự tôn trọng và tự giác tuân thủ pháp luật."
+    },
+    {
+        q: "Pháp chế xã hội chủ nghĩa đòi hỏi điều gì?",
+        a: ["Mọi cơ quan, tổ chức, công dân phải tuân thủ nghiêm chỉnh Hiến pháp và pháp luật", "Chỉ người dân phải tuân thủ", "Nhà nước được đứng trên pháp luật", "Luật pháp thay đổi liên tục"],
+        correct: 0,
+        explain: "Pháp chế là sự thượng tôn pháp luật, mọi chủ thể đều bình đẳng trong việc tuân thủ."
+    },
+    {
+        q: "Thẩm quyền xét xử sơ thẩm vụ án hình sự chủ yếu thuộc về?",
+        a: ["Tòa án nhân dân cấp huyện", "Tòa án nhân dân cấp tỉnh", "Tòa án nhân dân cấp cao", "Tòa án nhân dân tối cao"],
+        correct: 0,
+        explain: "Cấp huyện xét xử sơ thẩm phần lớn các vụ án (trừ các vụ nghiêm trọng, phức tạp thuộc thẩm quyền cấp tỉnh)."
+    },
+    {
+        q: "Hội thẩm nhân dân tham gia xét xử nhằm mục đích gì?",
+        a: ["Đảm bảo quyền làm chủ của nhân dân trong hoạt động tư pháp", "Giúp thẩm phán ghi chép", "Cho đủ đội hình", "Để biểu quyết cho vui"],
+        correct: 0,
+        explain: "Nguyên tắc 'Thực hiện chế độ Hội thẩm nhân dân' đảm bảo tiếng nói của dân trong xét xử."
+    },
+    {
+        q: "Viện kiểm sát nhân dân thực hiện chức năng kiểm sát việc tuân theo pháp luật trong hoạt động nào?",
+        a: ["Hoạt động tư pháp (điều tra, truy tố, xét xử, thi hành án)", "Hoạt động hành chính", "Hoạt động kinh doanh", "Hoạt động tôn giáo"],
+        correct: 0,
+        explain: "VKS kiểm sát hoạt động tư pháp để đảm bảo việc bắt, giam, giữ, xét xử... đúng luật."
+    },
+    {
+        q: "Chế tài dân sự chủ yếu mang tính chất?",
+        a: ["Tài sản (đền bù, bồi thường)", "Trừng phạt thân thể", "Tước quyền tự do", "Khiển trách"],
+        correct: 0,
+        explain: "Luật dân sự hướng tới khôi phục tình trạng tài sản ban đầu cho người bị hại."
+    },
+    {
+        q: "Thời điểm mở thừa kế là khi nào?",
+        a: ["Khi người để lại di sản chết", "Khi chia tài sản", "Khi lập di chúc", "Khi con cái yêu cầu"],
+        correct: 0,
+        explain: "Thời điểm người có tài sản chết là thời điểm mở thừa kế."
+    },
+    {
+        q: "Địa điểm mở thừa kế là ở đâu?",
+        a: ["Nơi cư trú cuối cùng của người để lại di sản", "Nơi có tài sản", "Nơi con cái sống", "Tại Tòa án"],
+        correct: 0,
+        explain: "Xác định địa điểm để biết Tòa án nào/Cơ quan nào có thẩm quyền giải quyết."
+    },
+    {
+        q: "Người thành niên là người?",
+        a: ["Đủ 18 tuổi trở lên", "Đủ 16 tuổi trở lên", "Đủ 21 tuổi trở lên", "Đủ 20 tuổi trở lên"],
+        correct: 0,
+        explain: "Điều 20 Bộ luật Dân sự 2015: Người thành niên là người từ đủ 18 tuổi trở lên."
+    },
+    {
+        q: "Hợp đồng vô hiệu khi nào?",
+        a: ["Vi phạm điều cấm của luật, trái đạo đức xã hội", "Do bị lừa dối, đe dọa", "Người tham gia không có năng lực hành vi dân sự", "Tất cả các trường hợp trên"],
+        correct: 3,
+        explain: "Các điều kiện có hiệu lực của giao dịch dân sự bị vi phạm thì hợp đồng vô hiệu."
+    },
+    {
+        q: "Thế nào là 'Phòng vệ chính đáng'?",
+        a: ["Hành vi chống trả cần thiết và tương xứng đối với người đang có hành vi xâm phạm lợi ích hợp pháp", "Chống trả quá mức", "Trả thù sau khi bị đánh", "Đánh người vô cớ"],
+        correct: 0,
+        explain: "Phòng vệ chính đáng không phải là tội phạm nếu sự chống trả là 'cần thiết'."
+    },
+    {
+        q: "Tội phạm ít nghiêm trọng là tội phạm có mức cao nhất của khung hình phạt là?",
+        a: ["Đến 3 năm tù", "Đến 7 năm tù", "Đến 15 năm tù", "Trên 15 năm tù"],
+        correct: 0,
+        explain: "Phân loại tội phạm: Ít nghiêm trọng (<=3 năm), Nghiêm trọng (3-7 năm), Rất nghiêm trọng (7-15), Đặc biệt nghiêm trọng (>15, Tử hình)."
+    },
+    {
+        q: "Thời hiệu truy cứu trách nhiệm hình sự được tính từ khi nào?",
+        a: ["Từ ngày tội phạm được thực hiện", "Từ ngày bị phát hiện", "Từ ngày ra tòa", "Từ ngày nạn nhân báo cáo"],
+        correct: 0,
+        explain: "Thời hiệu tính từ ngày hành vi phạm tội xảy ra."
+    },
+    {
+        q: "Ai là người đại diện theo pháp luật của pháp nhân?",
+        a: ["Người được điều lệ pháp nhân quy định hoặc quyết định của cơ quan có thẩm quyền", "Bất kỳ nhân viên nào", "Kế toán trưởng", "Bảo vệ"],
+        correct: 0,
+        explain: "Pháp nhân tham gia quan hệ pháp luật thông qua người đại diện theo pháp luật."
+    },
+    {
+        q: "Tài sản bao gồm?",
+        a: ["Vật, tiền, giấy tờ có giá và quyền tài sản", "Chỉ có tiền", "Chỉ có nhà đất", "Chỉ có vàng"],
+        correct: 0,
+        explain: "Định nghĩa tài sản trong Bộ luật Dân sự rất rộng, bao gồm cả quyền tài sản (như quyền đòi nợ, quyền tác giả...)."
+    },
+    {
+        q: "Quyền chiếm hữu là gì?",
+        a: ["Quyền nắm giữ, chi phối tài sản", "Quyền khai thác công dụng", "Quyền bán tài sản", "Quyền cho thuê"],
+        correct: 0,
+        explain: "Chiếm hữu là nắm giữ. Sử dụng là khai thác. Định đoạt là quyết định số phận (bán, tặng...)."
+    },
+    {
+        q: "Di sản thừa kế bao gồm?",
+        a: ["Tài sản riêng của người chết và phần tài sản của họ trong tài sản chung với người khác", "Toàn bộ tài sản gia đình", "Chỉ tài sản riêng", "Chỉ tiền mặt"],
+        correct: 0,
+        explain: "Di sản là những gì thuộc sở hữu của người chết để lại."
+    },
+    {
+        q: "Kết hôn trái pháp luật là gì?",
+        a: ["Việc nam nữ xác lập quan hệ vợ chồng nhưng vi phạm điều kiện kết hôn do Luật định", "Kết hôn không tổ chức đám cưới", "Kết hôn với người nước ngoài", "Kết hôn khi cha mẹ phản đối"],
+        correct: 0,
+        explain: "Ví dụ: Tảo hôn, Kết hôn giả tạo, Lừa dối kết hôn, Vi phạm chế độ một vợ một chồng."
+    },
+    {
+        q: "Ly thân có làm chấm dứt quan hệ vợ chồng về mặt pháp lý không?",
+        a: ["Không", "Có", "Tùy thời gian ly thân", "Coi như đã ly hôn"],
+        correct: 0,
+        explain: "Ly thân chỉ là sống riêng, về mặt pháp lý vẫn là vợ chồng, chưa chấm dứt hôn nhân."
+    },
+    {
+        q: "Người sử dụng lao động có quyền tuyển dụng lao động thế nào?",
+        a: ["Tự do tuyển dụng, không phân biệt đối xử", "Chỉ tuyển nam giới", "Chỉ tuyển người cùng quê", "Phải xin phép UBND xã"],
+        correct: 0,
+        explain: "Quyền tự chủ tuyển dụng nhưng cấm phân biệt đối xử (giới tính, tôn giáo, dân tộc...)."
+    },
+    {
+        q: "Đình công là quyền của ai?",
+        a: ["Của người lao động", "Của chủ doanh nghiệp", "Của nhà nước", "Của khách hàng"],
+        correct: 0,
+        explain: "Đình công là vũ khí đấu tranh cuối cùng của người lao động để đòi quyền lợi."
+    },
+    {
+        q: "Tranh chấp lao động được giải quyết theo nguyên tắc nào?",
+        a: ["Thương lượng, hòa giải, trọng tài, tòa án", "Dùng vũ lực", "Bắt buộc phải ra tòa ngay", "Chủ luôn đúng"],
+        correct: 0,
+        explain: "Khuyến khích thương lượng, hòa giải trước khi đưa ra cơ quan tài phán."
+    },
+    {
+        q: "Công chức khác viên chức ở điểm nào cơ bản?",
+        a: ["Công chức thuộc biên chế nhà nước, hưởng lương từ ngân sách; Viên chức làm việc tại đơn vị sự nghiệp công lập, hưởng lương từ quỹ lương đơn vị", "Công chức làm việc chăm chỉ hơn", "Viên chức lương cao hơn", "Không khác nhau"],
+        correct: 0,
+        explain: "Công chức (làm ở UBND, Bộ...) vs Viên chức (Giáo viên, Bác sĩ bệnh viện công...)."
+    },
+    {
+        q: "Quy tắc xử sự của luật hành chính là?",
+        a: ["Bắt buộc phải làm, Cấm làm, hoặc Cho phép làm", "Khuyên nhủ", "Gợi ý", "Tùy tâm"],
+        correct: 0,
+        explain: "Quy phạm hành chính thường rất cụ thể về nghĩa vụ và quyền hạn."
+    },
+    {
+        q: "Hiến pháp 2013 quy định Đảng Cộng sản Việt Nam là?",
+        a: ["Lực lượng lãnh đạo Nhà nước và xã hội", "Cơ quan hành chính", "Cơ quan xét xử", "Tổ chức kinh tế"],
+        correct: 0,
+        explain: "Điều 4 Hiến pháp 2013 khẳng định vai trò lãnh đạo của Đảng."
+    },
+    {
+        q: "Quyền con người có tính chất gì?",
+        a: ["Tính phổ biến, tính không thể chuyển nhượng", "Tính giai cấp", "Tính vùng miền", "Tính tạm thời"],
+        correct: 0,
+        explain: "Quyền con người là bẩm sinh, vốn có của mọi thành viên trong gia đình nhân loại."
+    },
+    {
+        q: "Nghĩa vụ quân sự là nghĩa vụ của ai?",
+        a: ["Của công dân (nam giới trong độ tuổi)", "Của lính đánh thuê", "Của người thất nghiệp", "Của người nghèo"],
+        correct: 0,
+        explain: "Bảo vệ Tổ quốc là nghĩa vụ thiêng liêng và quyền cao quý của công dân."
+    },
+    {
+        q: "Tại sao nói Hiến pháp là đạo luật gốc?",
+        a: ["Vì mọi văn bản pháp luật khác phải phù hợp với Hiến pháp, không được trái Hiến pháp", "Vì nó dày nhất", "Vì nó ra đời sớm nhất", "Vì nó do Vua ban hành"],
+        correct: 0,
+        explain: "Hiến pháp có hiệu lực pháp lý cao nhất, là nền tảng của hệ thống pháp luật."
+    },
+    {
+        q: "Việc sửa đổi Hiến pháp cần bao nhiêu đại biểu Quốc hội tán thành?",
+        a: ["Ít nhất 2/3 tổng số đại biểu Quốc hội", "Quá bán (trên 50%)", "100%", "Chỉ cần Chủ tịch Quốc hội đồng ý"],
+        correct: 0,
+        explain: "Quy trình sửa Hiến pháp rất chặt chẽ, cần đa số tuyệt đối (2/3)."
+    },
+    {
+        q: "Chủ tịch nước có quyền gì đối với văn bản luật?",
+        a: ["Công bố Hiến pháp, luật, pháp lệnh", "Sửa đổi luật", "Hủy bỏ luật", "Viết lại luật"],
+        correct: 0,
+        explain: "Chủ tịch nước ký lệnh công bố các văn bản luật đã được Quốc hội thông qua."
+    },
+    {
+        q: "Bộ máy nhà nước CHXHCN Việt Nam được tổ chức theo mô hình?",
+        a: ["Nhà nước pháp quyền", "Nhà nước quân quản", "Nhà nước phong kiến", "Nhà nước tư bản"],
+        correct: 0,
+        explain: "Điều 2 Hiến pháp: Nhà nước pháp quyền XHCN của Nhân dân, do Nhân dân, vì Nhân dân."
+    },
+    {
+        q: "Tòa án xét xử độc lập nghĩa là gì?",
+        a: ["Không chịu sự can thiệp của bất kỳ cá nhân, cơ quan nào, chỉ tuân theo pháp luật", "Tòa án muốn làm gì thì làm", "Tòa án không cần luật sư", "Tòa án không cần Viện kiểm sát"],
+        correct: 0,
+        explain: "Đây là nguyên tắc sống còn của tư pháp để đảm bảo công lý."
+    },
+    {
+        q: "Luật sư có vai trò gì trong tố tụng?",
+        a: ["Bảo vệ quyền và lợi ích hợp pháp của đương sự, bị can, bị cáo", "Quyết định bản án", "Bắt giữ tội phạm", "Làm chứng"],
+        correct: 0,
+        explain: "Luật sư tranh tụng, gỡ tội, bảo vệ quyền lợi cho thân chủ."
+    },
+    {
+        q: "Thừa phát lại được làm gì?",
+        a: ["Lập vi bằng, tống đạt văn bản, xác minh điều kiện thi hành án", "Xét xử", "Bắt người", "Ra quyết định khởi tố"],
+        correct: 0,
+        explain: "Thừa phát lại là chế định bổ trợ tư pháp (xã hội hóa thi hành án)."
+    },
+    {
+        q: "Trọng tài thương mại giải quyết tranh chấp trong lĩnh vực nào?",
+        a: ["Thương mại, kinh doanh", "Hôn nhân gia đình", "Hình sự", "Hành chính"],
+        correct: 0,
+        explain: "Trọng tài là phương thức giải quyết tranh chấp phi tòa án trong kinh doanh."
+    },
+
+
+];
+    
+    // --- CÁCH THÊM CÂU HỎI MỚI ---
+    // Bạn chỉ cần copy đoạn dưới đây và dán vào cuối mảng database ở trên (trước dấu đóng ]):
+    /*
+    {
+        q: "Nội dung câu hỏi của bạn?",
+        a: ["Đáp án A", "Đáp án B", "Đáp án C", "Đáp án D"],
+        correct: 0, // 0 là A, 1 là B, 2 là C, 3 là D
+        explain: "Giải thích ngắn gọn"
+    },
+    */
+
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+    let timerInterval;
+    let secondsElapsed = 0;
+
+    const setupScreen = document.getElementById('setup-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const totalQElement = document.getElementById('total-questions');
+    
+    // Init
+    totalQElement.textContent = database.length;
+    document.getElementById('question-count').max = database.length;
+
+    function startQuiz() {
+        const countInput = document.getElementById('question-count');
+        let count = parseInt(countInput.value);
+        
+        if (count > database.length) count = database.length;
+        if (count < 1) count = 1;
+
+        // Randomize and select questions
+        const shuffled = [...database].sort(() => 0.5 - Math.random());
+        currentQuestions = shuffled.slice(0, count);
+        
+        currentIndex = 0;
+        score = 0;
+        userAnswers = new Array(count).fill(null);
+        secondsElapsed = 0;
+
+        setupScreen.style.display = 'none';
+        quizScreen.style.display = 'block';
+        
+        startTimer();
+        loadQuestion(0);
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const minutes = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const seconds = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+        }, 1000);
+    }
+
+    function loadQuestion(index) {
+        const qData = currentQuestions[index];
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const counter = document.getElementById('question-counter');
+        const progressBar = document.getElementById('progress');
+        const nextBtn = document.getElementById('next-btn');
+        const finishBtn = document.getElementById('finish-btn');
+        const feedback = document.getElementById('feedback');
+
+        // Update UI info
+        counter.textContent = `Câu ${index + 1}/${currentQuestions.length}`;
+        progressBar.style.width = `${((index) / currentQuestions.length) * 100}%`;
+        
+        // Render Question
+        questionText.textContent = qData.q;
+        optionsContainer.innerHTML = '';
+        feedback.innerHTML = '';
+        feedback.className = '';
+
+        // Render Options
+        qData.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            
+            // Nếu đã trả lời rồi thì hiển thị lại trạng thái (cho phép xem lại nếu muốn làm tính năng Back)
+            // Ở đây ta làm đơn giản: disable nếu đã chọn
+            if (userAnswers[index] !== null) {
+                btn.disabled = true;
+                if (i === qData.correct) btn.classList.add('correct');
+                if (i === userAnswers[index] && i !== qData.correct) btn.classList.add('incorrect');
+            }
+            
+            optionsContainer.appendChild(btn);
+        });
+
+        // Show navigation buttons
+        if (userAnswers[index] !== null) {
+            // Đã trả lời
+             if (index < currentQuestions.length - 1) {
+                nextBtn.style.display = 'inline-block';
+                finishBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+            }
+            // Show explanation
+            feedback.innerHTML = userAnswers[index] === qData.correct 
+                ? `<span style="color:var(--success-color)">Chính xác!</span> ${qData.explain}`
+                : `<span style="color:var(--error-color)">Sai rồi!</span> Đáp án đúng là: ${qData.a[qData.correct]}. <br> ${qData.explain}`;
+        } else {
+            nextBtn.style.display = 'none';
+            finishBtn.style.display = 'none';
+        }
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        // Ghi nhận đáp án
+        userAnswers[currentIndex] = selectedIndex;
+        
+        const qData = currentQuestions[currentIndex];
+        const options = document.querySelectorAll('.option-btn');
+        
+        options.forEach(opt => opt.disabled = true); // Khóa nút
+        
+        if (selectedIndex === qData.correct) {
+            btnElement.classList.add('correct');
+            score++;
+        } else {
+            btnElement.classList.add('incorrect');
+            options[qData.correct].classList.add('correct'); // Hiện đáp án đúng
+        }
+
+        // Cập nhật giao diện
+        loadQuestion(currentIndex);
+        
+        // Cập nhật thanh tiến trình sau khi trả lời
+        document.getElementById('progress').style.width = `${((currentIndex + 1) / currentQuestions.length) * 100}%`;
+    }
+
+    function nextQuestion() {
+        if (currentIndex < currentQuestions.length - 1) {
+            currentIndex++;
+            loadQuestion(currentIndex);
+        }
+    }
+
+    function finishQuiz() {
+        clearInterval(timerInterval);
+        quizScreen.style.display = 'none';
+        resultScreen.style.display = 'block';
+        
+        // Tính điểm
+        const finalScoreEl = document.getElementById('final-score');
+        finalScoreEl.textContent = `${score}/${currentQuestions.length}`;
+        
+        const percentage = (score / currentQuestions.length) * 100;
+        let message = "";
+        if (percentage >= 90) message = "Xuất sắc! Bạn nắm rất vững kiến thức.";
+        else if (percentage >= 70) message = "Khá tốt! Hãy ôn lại một chút những câu sai.";
+        else if (percentage >= 50) message = "Trung bình. Cần cố gắng hơn nữa.";
+        else message = "Bạn cần ôn tập lại kiến thức cơ bản ngay!";
+        
+        document.getElementById('score-message').textContent = message;
+
+        // Review chi tiết
+        const reviewContainer = document.getElementById('review-container');
+        reviewContainer.innerHTML = '<h3>Xem lại bài làm:</h3>';
+        
+        currentQuestions.forEach((q, index) => {
+            const userAns = userAnswers[index];
+            const isCorrect = userAns === q.correct;
+            
+            const item = document.createElement('div');
+            item.className = `review-item ${isCorrect ? '' : 'wrong'}`;
+            
+            item.innerHTML = `
+                <div><strong>Câu ${index + 1}:</strong> ${q.q}</div>
+                <div style="margin: 5px 0;">
+                    Bạn chọn: <span>${q.a[userAns]}</span> 
+                    ${isCorrect ? '✅' : '❌'}
+                </div>
+                ${!isCorrect ? `<div style="color:var(--success-color)">Đáp án đúng: ${q.a[q.correct]}</div>` : ''}
+                <div class="explanation">Giải thích: ${q.explain}</div>
+            `;
+            reviewContainer.appendChild(item);
+        });
+    }
+
+</script>
+
+</body>
+</html>

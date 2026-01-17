@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Thi Thử Full 40 Câu - NN & PL Đại Cương</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0069d9;
+            --primary-dark: #005cbf;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-bg: #fff3cd;
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding-bottom: 50px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Header & Sticky Bar */
+        .header-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 10px;
+            z-index: 999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--primary-color);
+        }
+
+        .header-info h2 { margin: 0; font-size: 1.2rem; color: var(--primary-color); }
+        .header-info p { margin: 0; font-size: 0.9rem; color: #666; }
+
+        .timer-badge {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            background: var(--danger-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4);
+        }
+
+        /* Progress Bar */
+        .progress-track {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: #e9ecef;
+            z-index: 1000;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--success-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Question Cards */
+        .question-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .topic-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #0d47a1;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .q-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #fafafa;
+            border-color: #ccc;
+        }
+
+        .option-label input {
+            margin-right: 15px;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Styles for Checked/Correct/Wrong */
+        .option-label.checked {
+            border-color: var(--primary-color);
+            background-color: #e8f0fe;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .option-label.correct {
+            border-color: var(--success-color);
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .option-label.wrong {
+            border-color: var(--danger-color);
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Explanation */
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--warning-bg);
+            border-left: 5px solid #ffc107;
+            border-radius: 4px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        /* Buttons */
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(to right, #0069d9, #005cbf);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 40px;
+            box-shadow: 0 5px 15px rgba(0, 105, 217, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .btn-submit:hover { transform: translateY(-2px); }
+
+        /* Modal Result */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        .score-circle {
+            width: 100px; height: 100px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; font-weight: bold;
+            margin: 0 auto 15px;
+        }
+        .btn-close {
+            background: #6c757d; color: white; border: none;
+            padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+
+<div class="container">
+    <div class="header-bar">
+        <div class="header-info">
+            <h2>Đề Thi Kết Thúc Học Phần</h2>
+            <p>THL1057 - Nhà nước & Pháp luật ĐC</p>
+        </div>
+        <div class="timer-badge" id="timer">60:00</div>
+    </div>
+
+    <div id="quiz-container"></div>
+
+    <button class="btn-submit" onclick="submitQuiz()">NỘP BÀI (SUBMIT)</button>
+</div>
+
+<div class="modal-overlay" id="resultModal">
+    <div class="modal-content">
+        <h3>Kết Quả Bài Làm</h3>
+        <div class="score-circle" id="scoreDisplay">0.0</div>
+        <p id="scoreMessage">...</p>
+        <button class="btn-close" onclick="document.getElementById('resultModal').style.display='none'">Xem Đáp Án Chi Tiết</button>
+    </div>
+</div>
+
+<script>
+    // --- DATABASE 40 CÂU HỎI (ĐÃ PHÂN BỔ THEO MA TRẬN) ---
+    const questions = [
+        // --- CHỦ ĐỀ 1: NHÀ NƯỚC PHÁP QUYỀN (6 Câu) ---
+        {
+            topic: "1. NN Pháp quyền XHCN VN",
+            q: "Đặc trưng cơ bản nhất để phân biệt Nhà nước pháp quyền với các hình thức nhà nước khác là gì?",
+            a: ["Nhà nước có quân đội mạnh", "Sự thượng tôn (tối cao) của pháp luật", "Người đứng đầu nhà nước có quyền lực tuyệt đối", "Nhà nước quản lý mọi mặt đời sống"],
+            correct: 1,
+            explain: "Nhà nước pháp quyền là nhà nước mà ở đó pháp luật có hiệu lực tối cao, mọi chủ thể (kể cả nhà nước) đều phải tuân theo pháp luật."
+        },
+        {
+            topic: "1. NN Pháp quyền XHCN VN",
+            q: "Bản chất của Nhà nước Cộng hòa XHCN Việt Nam theo Hiến pháp 2013 là gì?",
+            a: ["Nhà nước của giai cấp công nhân", "Nhà nước của Nhân dân, do Nhân dân, vì Nhân dân", "Nhà nước của tầng lớp trí thức", "Nhà nước phúc lợi chung"],
+            correct: 1,
+            explain: "Điều 2 Hiến pháp 2013 khẳng định: Nhà nước CHXHCN Việt Nam là nhà nước pháp quyền XHCN của Nhân dân, do Nhân dân, vì Nhân dân."
+        },
+        {
+            topic: "1. NN Pháp quyền XHCN VN",
+            q: "Nguyên tắc tổ chức quyền lực nhà nước ở Việt Nam có đặc điểm gì?",
+            a: ["Tam quyền phân lập cứng nhắc", "Quyền lực nhà nước là thống nhất, có sự phân công, phối hợp và kiểm soát", "Tập trung toàn bộ quyền lực vào Chính phủ", "Phân quyền tuyệt đối cho địa phương"],
+            correct: 1,
+            explain: "Quyền lực nhà nước là thống nhất, có sự phân công, phối hợp, kiểm soát giữa các cơ quan nhà nước trong việc thực hiện các quyền lập pháp, hành pháp, tư pháp."
+        },
+        {
+            topic: "1. NN Pháp quyền XHCN VN",
+            q: "Vai trò của Đảng Cộng sản Việt Nam đối với Nhà nước và xã hội là gì?",
+            a: ["Là tổ chức tham vấn chính sách", "Là lực lượng lãnh đạo Nhà nước và xã hội", "Là cơ quan hành pháp", "Là cơ quan xét xử"],
+            correct: 1,
+            explain: "Theo Điều 4 Hiến pháp, Đảng Cộng sản Việt Nam là lực lượng lãnh đạo Nhà nước và xã hội."
+        },
+        {
+            topic: "1. NN Pháp quyền XHCN VN",
+            q: "Trách nhiệm của Nhà nước đối với quyền con người, quyền công dân là:",
+            a: ["Công nhận, tôn trọng, bảo vệ và bảo đảm", "Chỉ cần ghi nhận trong văn bản luật", "Hạn chế tối đa để dễ quản lý", "Chỉ bảo vệ khi công dân có yêu cầu"],
+            correct: 0,
+            explain: "Nhà nước có trách nhiệm công nhận, tôn trọng, bảo vệ và bảo đảm quyền con người, quyền công dân."
+        },
+        {
+            topic: "1. NN Pháp quyền XHCN VN",
+            q: "Mục đích xây dựng Nhà nước pháp quyền XHCN Việt Nam hướng tới điều gì?",
+            a: ["Dân giàu, nước mạnh, dân chủ, công bằng, văn minh", "Tập trung quyền lực cho cá nhân", "Ưu tiên phát triển kinh tế bằng mọi giá", "Xóa bỏ kinh tế tư nhân"],
+            correct: 0,
+            explain: "Đây là mục tiêu tổng quát trong công cuộc xây dựng và phát triển đất nước."
+        },
+
+        // --- CHỦ ĐỀ 2: BỘ MÁY NHÀ NƯỚC (8 Câu) ---
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Cơ quan nào là cơ quan quyền lực nhà nước cao nhất của nước CHXHCN Việt Nam?",
+            a: ["Chính phủ", "Quốc hội", "Chủ tịch nước", "Tòa án nhân dân tối cao"],
+            correct: 1,
+            explain: "Quốc hội là cơ quan đại biểu cao nhất của Nhân dân, cơ quan quyền lực nhà nước cao nhất."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Chức năng chính của Chính phủ là gì?",
+            a: ["Thực hiện quyền lập hiến, lập pháp", "Thực hiện quyền công tố", "Thực hiện quyền hành pháp", "Thực hiện quyền tư pháp"],
+            correct: 2,
+            explain: "Chính phủ là cơ quan hành chính nhà nước cao nhất, thực hiện quyền hành pháp."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Hình thức cấu trúc của Nhà nước Việt Nam là:",
+            a: ["Nhà nước Liên bang", "Nhà nước Liên minh", "Nhà nước Đơn nhất", "Nhà nước Quân chủ"],
+            correct: 2,
+            explain: "Việt Nam là nhà nước đơn nhất, có chủ quyền, lãnh thổ thống nhất, không phân chia thành các tiểu bang."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Người đứng đầu Nhà nước, thay mặt nước CHXHCN Việt Nam về đối nội và đối ngoại là:",
+            a: ["Tổng Bí thư", "Thủ tướng Chính phủ", "Chủ tịch Quốc hội", "Chủ tịch nước"],
+            correct: 3,
+            explain: "Đây là vị trí và vai trò của Chủ tịch nước theo Hiến pháp."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Hội đồng nhân dân các cấp do ai bầu ra?",
+            a: ["Do Chính phủ chỉ định", "Do Ủy ban nhân dân cùng cấp bầu", "Do cử tri ở địa phương đó bầu ra", "Do Quốc hội bổ nhiệm"],
+            correct: 2,
+            explain: "HĐND là cơ quan quyền lực nhà nước ở địa phương, do nhân dân địa phương trực tiếp bầu ra."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Cơ quan nào có chức năng xét xử?",
+            a: ["Viện kiểm sát nhân dân", "Tòa án nhân dân", "Bộ Tư pháp", "Cơ quan điều tra"],
+            correct: 1,
+            explain: "Tòa án nhân dân là cơ quan xét xử của nước CHXHCN Việt Nam, thực hiện quyền tư pháp."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Chức năng của Nhà nước được phân loại theo phạm vi hoạt động bao gồm:",
+            a: ["Chức năng đối nội và chức năng đối ngoại", "Chức năng kinh tế và chức năng xã hội", "Chức năng trấn áp và chức năng bảo vệ", "Chức năng lập pháp và hành pháp"],
+            correct: 0,
+            explain: "Phân loại theo phạm vi hoạt động thì có chức năng đối nội và chức năng đối ngoại."
+        },
+        {
+            topic: "2. Bộ máy Nhà nước",
+            q: "Nhiệm kỳ của mỗi khóa Quốc hội là mấy năm?",
+            a: ["4 năm", "5 năm", "6 năm", "3 năm"],
+            correct: 1,
+            explain: "Nhiệm kỳ của Quốc hội theo Hiến pháp là 5 năm."
+        },
+
+        // --- CHỦ ĐỀ 3: PHÁP LUẬT ĐẠI CƯƠNG (6 Câu) ---
+        {
+            topic: "3. Pháp luật Đại cương",
+            q: "Đâu là đặc tính cơ bản nhất phân biệt Pháp luật với các Quy phạm đạo đức?",
+            a: ["Tính quy phạm phổ biến", "Tính xác định chặt chẽ về hình thức", "Tính cưỡng chế bằng quyền lực nhà nước", "Tính hệ thống"],
+            correct: 2,
+            explain: "Tính quyền lực (cưỡng chế) nhà nước là đặc điểm quan trọng nhất bảo đảm pháp luật được thực thi."
+        },
+        {
+            topic: "3. Pháp luật Đại cương",
+            q: "Văn bản quy phạm pháp luật nào có giá trị pháp lý cao nhất trong hệ thống pháp luật Việt Nam?",
+            a: ["Luật", "Pháp lệnh", "Nghị định", "Hiến pháp"],
+            correct: 3,
+            explain: "Hiến pháp là đạo luật cơ bản, có hiệu lực pháp lý cao nhất."
+        },
+        {
+            topic: "3. Pháp luật Đại cương",
+            q: "Cơ quan nào có thẩm quyền ban hành Luật?",
+            a: ["Chính phủ", "Quốc hội", "Chủ tịch nước", "Tòa án tối cao"],
+            correct: 1,
+            explain: "Chỉ có Quốc hội mới có quyền lập hiến và lập pháp (ban hành Luật)."
+        },
+        {
+            topic: "3. Pháp luật Đại cương",
+            q: "Nguồn pháp luật chủ yếu và quan trọng nhất ở Việt Nam hiện nay là:",
+            a: ["Tập quán pháp", "Án lệ", "Văn bản quy phạm pháp luật", "Học thuyết pháp lý"],
+            correct: 2,
+            explain: "Văn bản quy phạm pháp luật là nguồn cơ bản nhất của pháp luật Việt Nam."
+        },
+        {
+            topic: "3. Pháp luật Đại cương",
+            q: "Chức năng giáo dục của pháp luật thể hiện ở chỗ:",
+            a: ["Bắt buộc mọi người phải làm theo", "Hình thành những chuẩn mực ứng xử, tác động vào ý thức con người", "Trừng trị người vi phạm", "Thu thuế cho nhà nước"],
+            correct: 1,
+            explain: "Pháp luật tác động vào ý thức, giúp con người nhận thức được điều hay lẽ phải, hình thành thói quen sống theo pháp luật."
+        },
+        {
+            topic: "3. Pháp luật Đại cương",
+            q: "Pháp luật KHÔNG điều chỉnh đối tượng nào sau đây?",
+            a: ["Hành vi của cá nhân", "Hoạt động của tổ chức", "Suy nghĩ, tư tưởng của con người", "Quan hệ tài sản"],
+            correct: 2,
+            explain: "Pháp luật chỉ điều chỉnh hành vi biểu hiện ra bên ngoài, không điều chỉnh tư tưởng, suy nghĩ bên trong."
+        },
+
+        // --- CHỦ ĐỀ 4: QUY PHẠM & QUAN HỆ PL (6 Câu) ---
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Cấu trúc của một quy phạm pháp luật đầy đủ gồm 3 bộ phận là:",
+            a: ["Giả định, Quy định, Chế tài", "Mở bài, Thân bài, Kết luận", "Nguyên nhân, Diễn biến, Kết quả", "Chủ thể, Khách thể, Nội dung"],
+            correct: 0,
+            explain: "Giả định (nêu tình huống), Quy định (nêu cách xử sự), Chế tài (nêu hậu quả bất lợi)."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Bộ phận 'Chế tài' trong quy phạm pháp luật có vai trò gì?",
+            a: ["Nêu lên hoàn cảnh, điều kiện áp dụng luật", "Nêu lên quy tắc xử sự (được làm, phải làm, cấm làm)", "Xác định biện pháp cưỡng chế/trừng phạt nhà nước dự kiến áp dụng", "Xác định đối tượng điều chỉnh"],
+            correct: 2,
+            explain: "Chế tài là bộ phận dự liệu những hậu quả pháp lý bất lợi (trừng phạt) nếu chủ thể vi phạm."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Năng lực chủ thể trong quan hệ pháp luật bao gồm:",
+            a: ["Năng lực pháp luật và năng lực tài chính", "Năng lực hành vi và sức khỏe", "Năng lực pháp luật và năng lực hành vi", "Độ tuổi và trình độ văn hóa"],
+            correct: 2,
+            explain: "Để trở thành chủ thể QHPL cần 2 yếu tố: Năng lực pháp luật (nhà nước quy định) và Năng lực hành vi (khả năng thực tế của cá nhân)."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Sự kiện pháp lý là:",
+            a: ["Mọi sự kiện xảy ra trong tự nhiên", "Những sự kiện cụ thể làm phát sinh, thay đổi hoặc chấm dứt quan hệ pháp luật", "Chỉ là hành vi vi phạm pháp luật", "Chỉ là các hợp đồng dân sự"],
+            correct: 1,
+            explain: "Sự kiện pháp lý là cầu nối thực tế để quy phạm pháp luật đi vào đời sống, làm phát sinh/thay đổi/chấm dứt QHPL."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "'Tuân thủ pháp luật' là hình thức thực hiện pháp luật trong đó:",
+            a: ["Chủ thể chủ động thực hiện quyền của mình", "Chủ thể kiềm chế không tiến hành những hành vi mà pháp luật cấm", "Chủ thể thực hiện nghĩa vụ pháp lý", "Cơ quan nhà nước ra quyết định xử lý"],
+            correct: 1,
+            explain: "Tuân thủ pháp luật mang tính chất thụ động (kiềm chế): Không làm điều luật cấm."
+        },
+        {
+            topic: "4. Quy phạm & QHPL",
+            q: "Hình thức 'Áp dụng pháp luật' do chủ thể nào thực hiện?",
+            a: ["Mọi công dân", "Các tổ chức xã hội", "Cơ quan nhà nước, người có thẩm quyền", "Người nước ngoài"],
+            correct: 2,
+            explain: "Áp dụng pháp luật là hoạt động mang tính quyền lực nhà nước, chỉ cơ quan/người có thẩm quyền mới được làm."
+        },
+
+        // --- CHỦ ĐỀ 5: VI PHẠM PL & TNPL (6 Câu) ---
+        {
+            topic: "5. VPPL & Trách nhiệm PL",
+            q: "Dấu hiệu bắt buộc trong mặt chủ quan của mọi vi phạm pháp luật là:",
+            a: ["Động cơ", "Mục đích", "Lỗi", "Hoàn cảnh"],
+            correct: 2,
+            explain: "Lỗi là thái độ tâm lý của người vi phạm đối với hành vi và hậu quả, là yếu tố bắt buộc phải có để quy kết trách nhiệm."
+        },
+        {
+            topic: "5. VPPL & Trách nhiệm PL",
+            q: "Loại trách nhiệm pháp lý nào là nghiêm khắc nhất?",
+            a: ["Trách nhiệm dân sự", "Trách nhiệm hành chính", "Trách nhiệm kỷ luật", "Trách nhiệm hình sự"],
+            correct: 3,
+            explain: "TN Hình sự áp dụng cho tội phạm, có những hình phạt tước tự do, thậm chí tước quyền sống."
+        },
+        {
+            topic: "5. VPPL & Trách nhiệm PL",
+            q: "Cảnh sát giao thông phạt tiền người vượt đèn đỏ. Đây là loại trách nhiệm pháp lý gì?",
+            a: ["Dân sự", "Hình sự", "Hành chính", "Kỷ luật"],
+            correct: 2,
+            explain: "Vượt đèn đỏ là vi phạm quy tắc quản lý nhà nước về giao thông -> Vi phạm hành chính -> Chịu trách nhiệm hành chính."
+        },
+        {
+            topic: "5. VPPL & Trách nhiệm PL",
+            q: "Yếu tố nào KHÔNG thuộc cấu thành của vi phạm pháp luật?",
+            a: ["Mặt khách quan", "Mặt chủ quan", "Nhân thân người vi phạm", "Chủ thể"],
+            correct: 2,
+            explain: "Cấu thành VPPL gồm 4 yếu tố: Mặt khách quan, Mặt chủ quan, Chủ thể, Khách thể. Nhân thân không phải là yếu tố cấu thành."
+        },
+        {
+            topic: "5. VPPL & Trách nhiệm PL",
+            q: "Trách nhiệm kỷ luật áp dụng đối với đối tượng nào?",
+            a: ["Mọi công dân", "Cán bộ, công chức, viên chức, người lao động trong cơ quan/tổ chức", "Người nước ngoài", "Người phạm tội"],
+            correct: 1,
+            explain: "TN Kỷ luật áp dụng trong nội bộ cơ quan, tổ chức khi nhân viên vi phạm quy chế, nội quy."
+        },
+        {
+            topic: "5. VPPL & Trách nhiệm PL",
+            q: "Hành vi phòng vệ chính đáng có bị coi là vi phạm pháp luật không?",
+            a: ["Có, nhưng được giảm nhẹ", "Không bị coi là vi phạm pháp luật", "Tùy trường hợp", "Vẫn phải bồi thường dân sự"],
+            correct: 1,
+            explain: "Phòng vệ chính đáng là trường hợp loại trừ trách nhiệm pháp lý, không bị coi là tội phạm hay vi phạm."
+        },
+
+        // --- CHỦ ĐỀ 6: CÁC NGÀNH LUẬT (8 Câu) ---
+        {
+            topic: "6. Các ngành luật",
+            q: "Luật Dân sự điều chỉnh các quan hệ xã hội nào?",
+            a: ["Quan hệ về tội phạm và hình phạt", "Quan hệ tài sản và quan hệ nhân thân", "Quan hệ quản lý hành chính nhà nước", "Quan hệ giữa các quốc gia"],
+            correct: 1,
+            explain: "Luật Dân sự điều chỉnh các quan hệ tư (tài sản và nhân thân) dựa trên bình đẳng, tự nguyện."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Phương pháp điều chỉnh đặc trưng của Luật Hành chính là:",
+            a: ["Bình đẳng, thỏa thuận", "Mệnh lệnh - phục tùng (Quyền uy)", "Hòa giải", "Tự định đoạt"],
+            correct: 1,
+            explain: "Trong quan hệ hành chính, một bên là cơ quan nhà nước có quyền ra lệnh, bên kia phải phục tùng."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Đối tượng điều chỉnh của Luật Hình sự là:",
+            a: ["Quan hệ phát sinh giữa Nhà nước và người phạm tội", "Quan hệ tranh chấp đất đai", "Quan hệ ly hôn", "Quan hệ mua bán hàng hóa"],
+            correct: 0,
+            explain: "Luật Hình sự quy định về tội phạm và hình phạt, điều chỉnh quan hệ giữa Nhà nước và người thực hiện hành vi nguy hiểm cho xã hội."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Độ tuổi nam, nữ được phép kết hôn theo Luật Hôn nhân và Gia đình Việt Nam là:",
+            a: ["Nam từ đủ 18, nữ từ đủ 18", "Nam từ đủ 20, nữ từ đủ 18", "Nam từ đủ 20, nữ từ đủ 20", "Nam 20, nữ 18 (bước sang tuổi)"],
+            correct: 1,
+            explain: "Nam phải từ đủ 20 tuổi, nữ phải từ đủ 18 tuổi trở lên."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Thẩm quyền tuyên bố một người là có tội thuộc về:",
+            a: ["Cơ quan Công an", "Viện kiểm sát", "Tòa án nhân dân", "Luật sư"],
+            correct: 2,
+            explain: "Chỉ có Tòa án mới có quyền nhân danh Nhà nước tuyên bố một người có tội bằng bản án có hiệu lực pháp luật."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Tranh chấp về thừa kế tài sản thuộc phạm vi điều chỉnh của ngành luật nào?",
+            a: ["Luật Đất đai", "Luật Dân sự", "Luật Kinh doanh", "Luật Hành chính"],
+            correct: 1,
+            explain: "Thừa kế là một chế định quan trọng của Bộ luật Dân sự."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Luật Hiến pháp quy định những vấn đề gì?",
+            a: ["Những vấn đề cơ bản, cốt lõi nhất của quốc gia (chế độ chính trị, quyền con người, bộ máy nhà nước)", "Chi tiết về xử phạt giao thông", "Quy định về hợp đồng mua bán", "Quy định về thuế thu nhập"],
+            correct: 0,
+            explain: "Hiến pháp là đạo luật gốc, quy định các vấn đề nền tảng của chế độ."
+        },
+        {
+            topic: "6. Các ngành luật",
+            q: "Nguyên tắc cơ bản của Luật Dân sự là:",
+            a: ["Cấp dưới phục tùng cấp trên", "Tự do, tự nguyện cam kết, thỏa thuận", "Tập trung dân chủ", "Suy đoán vô tội"],
+            correct: 1,
+            explain: "Tự do ý chí, bình đẳng, tự nguyện thỏa thuận là nguyên tắc xương sống của quan hệ dân sự."
+        }
+    ];
+
+    // --- LOGIC XỬ LÝ TRẮC NGHIỆM ---
+    
+    // Shuffle câu hỏi (nếu muốn đảo thứ tự mỗi lần thi thì bỏ comment dòng dưới)
+    // questions.sort(() => Math.random() - 0.5);
+
+    const quizContainer = document.getElementById('quiz-container');
+    const progressBar = document.getElementById('progressBar');
+    let userAnswers = new Array(questions.length).fill(null);
+
+    function renderQuiz() {
+        let html = '';
+        questions.forEach((item, index) => {
+            let optionsHtml = '';
+            item.a.forEach((opt, i) => {
+                optionsHtml += `
+                    <li class="option-item">
+                        <label class="option-label" id="lbl-${index}-${i}" onclick="selectAnswer(${index}, ${i})">
+                            <input type="radio" name="q${index}" value="${i}">
+                            <span>${opt}</span>
+                        </label>
+                    </li>
+                `;
+            });
+
+            html += `
+                <div class="question-card" id="card-${index}">
+                    <span class="topic-tag">${item.topic}</span>
+                    <div class="q-text">Câu ${index + 1}: ${item.q}</div>
+                    <ul class="options-list">${optionsHtml}</ul>
+                    <div class="explanation" id="explain-${index}"></div>
+                </div>
+            `;
+        });
+        quizContainer.innerHTML = html;
+    }
+
+    function selectAnswer(qIndex, aIndex) {
+        // Lưu đáp án
+        userAnswers[qIndex] = aIndex;
+        
+        // Giao diện: Xóa checked cũ, thêm checked mới
+        const labels = document.querySelectorAll(`#card-${qIndex} .option-label`);
+        labels.forEach(lbl => lbl.classList.remove('checked'));
+        document.getElementById(`lbl-${qIndex}-${aIndex}`).classList.add('checked');
+        
+        // Đánh dấu radio
+        const radio = document.querySelector(`input[name="q${qIndex}"][value="${aIndex}"]`);
+        if(radio) radio.checked = true;
+
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const answeredCount = userAnswers.filter(a => a !== null).length;
+        const percent = (answeredCount / questions.length) * 100;
+        progressBar.style.width = `${percent}%`;
+    }
+
+    function submitQuiz() {
+        // Kiểm tra xem đã làm hết chưa (tùy chọn)
+        const unanswered = userAnswers.filter(a => a === null).length;
+        if(unanswered > 0) {
+            if(!confirm(`Bạn còn ${unanswered} câu chưa làm. Bạn có chắc chắn muốn nộp bài?`)) return;
+        } else {
+            if(!confirm("Bạn có chắc chắn muốn nộp bài?")) return;
+        }
+
+        clearInterval(timerInterval); // Dừng đồng hồ
+        
+        let score = 0;
+        
+        // Chấm điểm và hiện đáp án
+        questions.forEach((item, index) => {
+            const userChoice = userAnswers[index];
+            const explainDiv = document.getElementById(`explain-${index}`);
+            
+            // Hiện giải thích
+            explainDiv.innerHTML = `<strong>Đáp án đúng:</strong> ${item.a[item.correct]}<br><em>Giải thích: ${item.explain}</em>`;
+            explainDiv.style.display = 'block';
+
+            // Tô màu đáp án đúng/sai
+            const correctLbl = document.getElementById(`lbl-${index}-${item.correct}`);
+            if(correctLbl) correctLbl.classList.add('correct');
+
+            if (userChoice === item.correct) {
+                score += 0.25; // Mỗi câu 0.25 điểm
+            } else if (userChoice !== null) {
+                const wrongLbl = document.getElementById(`lbl-${index}-${userChoice}`);
+                if(wrongLbl) wrongLbl.classList.add('wrong');
+            }
+        });
+
+        // Hiển thị kết quả
+        const finalScore = score.toFixed(2); // Làm tròn 2 chữ số
+        document.getElementById('scoreDisplay').innerText = finalScore;
+        
+        const msg = document.getElementById('scoreMessage');
+        if(score >= 9) msg.innerText = "Xuất sắc! Bạn đã nắm rất vững kiến thức.";
+        else if(score >= 7) msg.innerText = "Khá tốt! Tuy nhiên vẫn còn một số lỗi sai.";
+        else if(score >= 5) msg.innerText = "Trung bình. Bạn cần ôn lại các phần lý thuyết cơ bản.";
+        else msg.innerText = "Bạn cần cố gắng nhiều hơn. Hãy xem lại các bài giảng nhé!";
+
+        document.getElementById('resultModal').style.display = 'flex';
+        
+        // Disable các nút chọn để không sửa bài được nữa
+        const inputs = document.querySelectorAll('input[type="radio"]');
+        inputs.forEach(i => i.disabled = true);
+        const labels = document.querySelectorAll('.option-label');
+        labels.forEach(l => l.onclick = null);
+
+        // Cuộn lên đầu trang
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- ĐỒNG HỒ ĐẾM NGƯỢC ---
+    let timeRemaining = 60 * 60; // 60 phút
+    const timerDisplay = document.getElementById('timer');
+    
+    const timerInterval = setInterval(() => {
+        timeRemaining--;
+        const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+        const s = (timeRemaining % 60).toString().padStart(2, '0');
+        timerDisplay.innerText = `${m}:${s}`;
+
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert("Hết giờ làm bài!");
+            submitQuiz();
+        }
+    }, 1000);
+
+    // Khởi chạy
+    renderQuiz();
+
+</script>
+
+</body>
+</html>

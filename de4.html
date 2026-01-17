@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Thi Số 4 - Định Nghĩa & Thuật Ngữ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669; /* Màu xanh ngọc Emerald */
+            --primary-dark: #047857;
+            --secondary: #f0fdf4;
+            --text: #1f2937;
+            --accent: #d97706; /* Màu cam đất cho điểm nhấn */
+        }
+
+        body { font-family: 'Open Sans', sans-serif; background: #f8fafc; color: var(--text); margin: 0; padding-bottom: 80px; }
+        
+        /* Typography cho phần định nghĩa */
+        h1, h2, h3 { family: 'Merriweather', serif; }
+
+        .header {
+            background: white; padding: 1.2rem 2rem;
+            position: sticky; top: 0; z-index: 50;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 5px solid var(--primary);
+        }
+        
+        .timer-box {
+            font-family: 'Merriweather', serif;
+            font-size: 1.3rem; font-weight: bold; color: var(--primary);
+            background: var(--secondary); padding: 5px 15px; border-radius: 8px;
+            border: 1px solid #bbf7d0;
+        }
+
+        .container { max-width: 850px; margin: 2rem auto; padding: 0 15px; }
+
+        /* Card câu hỏi */
+        .q-card {
+            background: white; border-radius: 12px;
+            padding: 2rem; margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border-left: 5px solid #cbd5e1;
+            transition: 0.3s;
+        }
+        .q-card:hover { border-left-color: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+
+        .term-badge {
+            display: inline-block; background: #e0f2fe; color: #0369a1;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 4px; margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .question { font-size: 1.15rem; font-weight: 600; margin-bottom: 1.5rem; line-height: 1.6; }
+        .highlight { color: var(--primary-dark); font-weight: bold; background: #ecfdf5; padding: 0 4px; }
+
+        /* Đáp án */
+        .options { display: grid; gap: 12px; }
+        .opt-label {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 15px; border: 1px solid #e2e8f0;
+            border-radius: 8px; cursor: pointer; transition: 0.2s;
+            font-size: 1rem;
+        }
+        .opt-label:hover { background: #f1f5f9; border-color: #94a3b8; }
+        .opt-label input { width: 18px; height: 18px; accent-color: var(--primary); }
+
+        .opt-label.selected { background: var(--secondary); border-color: var(--primary); font-weight: 600; color: var(--primary-dark); }
+        .opt-label.correct { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+        .opt-label.wrong { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; opacity: 0.7; }
+
+        /* Giải thích */
+        .explain {
+            margin-top: 1.5rem; padding: 1.5rem;
+            background: #fff7ed; border: 1px dashed var(--accent);
+            border-radius: 8px; color: #9a3412;
+            display: none; font-size: 0.95rem; line-height: 1.5;
+        }
+        .explain strong { text-decoration: underline; text-decoration-color: var(--accent); }
+
+        /* Nút nộp bài */
+        .btn-submit {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--primary); color: white;
+            padding: 15px 30px; border-radius: 50px;
+            font-size: 1.1rem; font-weight: bold; border: none;
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.4);
+            cursor: pointer; transition: 0.3s; z-index: 100;
+        }
+        .btn-submit:hover { background: var(--primary-dark); transform: scale(1.05); }
+
+        /* Kết quả */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; padding: 3rem; border-radius: 15px;
+            text-align: center; max-width: 450px; width: 90%;
+        }
+        .score { font-size: 4rem; font-family: 'Merriweather', serif; color: var(--primary); font-weight: 900; margin: 0; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h2 style="margin:0;">ĐỀ SỐ 04</h2>
+        <small style="color: #64748b;">Chuyên đề: Định nghĩa & Thuật ngữ pháp lý</small>
+    </div>
+    <div class="timer-box" id="timer">60:00</div>
+</div>
+
+<div class="container" id="quiz-container">
+    </div>
+
+<button class="btn-submit" onclick="submitQuiz()">NỘP BÀI</button>
+
+<div class="modal" id="resultModal">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color:#64748b">KẾT QUẢ CỦA BẠN</h3>
+        <p class="score" id="scoreDisplay">0.0</p>
+        <p id="feedback">...</p>
+        <button onclick="closeModal()" style="padding:10px 20px; background:#e2e8f0; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Xem lại đáp án</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // --- CHỦ ĐỀ 1: NHÀ NƯỚC (6 Câu) ---
+        {
+            tag: "Thuật ngữ Nhà nước",
+            q: "Thuật ngữ <span class='highlight'>'Chủ quyền quốc gia'</span> được hiểu chính xác nhất là gì?",
+            a: [
+                "Là quyền lực tuyệt đối của người đứng đầu nhà nước.",
+                "Là quyền tối cao của quốc gia trong phạm vi lãnh thổ và quyền độc lập trong quan hệ quốc tế.",
+                "Là quyền được tự do xâm chiếm các vùng đất vô chủ.",
+                "Là quyền ban hành pháp luật của nhà nước."
+            ],
+            c: 1,
+            e: "Chủ quyền quốc gia có 2 thuộc tính: Tối cao (bên trong lãnh thổ) và Độc lập (bên ngoài lãnh thổ)."
+        },
+        {
+            tag: "Thuật ngữ Nhà nước",
+            q: "<span class='highlight'>'Bản chất giai cấp'</span> của nhà nước nghĩa là gì?",
+            a: [
+                "Nhà nước là công cụ để giai cấp thống trị duy trì trật tự xã hội có lợi cho mình.",
+                "Nhà nước bao gồm nhiều giai cấp khác nhau cùng chung sống.",
+                "Nhà nước luôn bảo vệ người nghèo.",
+                "Nhà nước phân chia xã hội thành người giàu và người nghèo."
+            ],
+            c: 0,
+            e: "Bản chất giai cấp thể hiện ý chí và sự thống trị của giai cấp nắm quyền lực kinh tế và chính trị."
+        },
+        {
+            tag: "Thuật ngữ Nhà nước",
+            q: "Khái niệm <span class='highlight'>'Nhà nước pháp quyền'</span> (Rule of Law) đặt yếu tố nào lên vị trí cao nhất?",
+            a: [
+                "Ý chí của nhà lãnh đạo.",
+                "Sức mạnh của quân đội.",
+                "Hiến pháp và pháp luật.",
+                "Đạo đức và phong tục."
+            ],
+            c: 2,
+            e: "Thượng tôn pháp luật (Supremacy of Law) là cốt lõi của nhà nước pháp quyền."
+        },
+        {
+            tag: "Thuật ngữ Nhà nước",
+            q: "Trong thuật ngữ 'Nhà nước của Nhân dân, do Nhân dân, vì Nhân dân', cụm từ <span class='highlight'>'do Nhân dân'</span> nghĩa là gì?",
+            a: [
+                "Nhà nước phục vụ lợi ích của nhân dân.",
+                "Nhân dân lập ra, quản lý và kiểm tra, giám sát hoạt động của nhà nước.",
+                "Tất cả của cải của nhà nước là của nhân dân.",
+                "Nhà nước ban phát quyền lợi cho nhân dân."
+            ],
+            c: 1,
+            e: "'Do dân' nhấn mạnh nguồn gốc quyền lực và chủ thể thực hiện quyền lực là nhân dân (dân bầu, dân kiểm tra)."
+        },
+        {
+            tag: "Thuật ngữ Nhà nước",
+            q: "Thuật ngữ <span class='highlight'>'Quyền lực công'</span> (Public Power) dùng để chỉ đặc điểm nào của nhà nước?",
+            a: [
+                "Nhà nước có lớp người tách ra khỏi đời sống sản xuất để chuyên làm nhiệm vụ quản lý.",
+                "Quyền lực của các công ty lớn.",
+                "Quyền lực của báo chí.",
+                "Sức mạnh của dư luận xã hội."
+            ],
+            c: 0,
+            e: "Quyền lực công đặc biệt là sự tách biệt của bộ máy cai trị khỏi xã hội để thực thi quyền lực (quân đội, cảnh sát, nhà tù...)."
+        },
+        {
+            tag: "Thuật ngữ Nhà nước",
+            q: "Cụm từ <span class='highlight'>'Hệ thống chính trị'</span> ở Việt Nam bao gồm những thành tố nào?",
+            a: [
+                "Chỉ có Đảng Cộng sản và Nhà nước.",
+                "Đảng Cộng sản, Nhà nước và các Tổ chức chính trị - xã hội (Mặt trận, Công đoàn...).",
+                "Quốc hội, Chính phủ và Tòa án.",
+                "Toàn bộ người dân Việt Nam."
+            ],
+            c: 1,
+            e: "Hệ thống chính trị gồm 3 bộ phận: Đảng (lãnh đạo), Nhà nước (quản lý), Mặt trận & Đoàn thể (làm chủ/giám sát)."
+        },
+
+        // --- CHỦ ĐỀ 2: BỘ MÁY (8 Câu) ---
+        {
+            tag: "Thuật ngữ Bộ máy",
+            q: "Thuật ngữ <span class='highlight'>'Lập pháp'</span> dùng để chỉ chức năng gì?",
+            a: [
+                "Tổ chức thi hành pháp luật.",
+                "Xây dựng, ban hành và sửa đổi Hiến pháp, Luật.",
+                "Xét xử các hành vi vi phạm pháp luật.",
+                "Kiểm sát việc tuân theo pháp luật."
+            ],
+            c: 1,
+            e: "Lập pháp = Làm luật (Setting the laws)."
+        },
+        {
+            tag: "Thuật ngữ Bộ máy",
+            q: "<span class='highlight'>'Hành pháp'</span> (Executive) là hoạt động chủ yếu của cơ quan nào?",
+            a: [
+                "Quốc hội.",
+                "Chính phủ và hệ thống cơ quan hành chính các cấp.",
+                "Tòa án nhân dân.",
+                "Viện kiểm sát nhân dân."
+            ],
+            c: 1,
+            e: "Hành pháp = Chấp hành và điều hành (Thực thi luật pháp)."
+        },
+        {
+            tag: "Thuật ngữ Bộ máy",
+            q: "Thuật ngữ <span class='highlight'>'Tư pháp'</span> (Judiciary) ở Việt Nam thường được dùng để chỉ hoạt động của cơ quan nào?",
+            a: [
+                "Bộ Tư pháp.",
+                "Các cơ quan điều tra.",
+                "Hệ thống Tòa án (xét xử).",
+                "Các văn phòng luật sư."
+            ],
+            c: 2,
+            e: "Quyền Tư pháp theo Hiến pháp 2013 là quyền xét xử, thuộc về Tòa án nhân dân."
+        },
+        {
+            tag: "Thuật ngữ Bộ máy",
+            q: "Hoạt động <span class='highlight'>'Chất vấn'</span> của Đại biểu Quốc hội là gì?",
+            a: [
+                "Là việc đại biểu hỏi người dân về nguyện vọng.",
+                "Là quyền của đại biểu yêu cầu những người đứng đầu cơ quan nhà nước trả lời về những vấn đề thuộc trách nhiệm của họ.",
+                "Là việc đại biểu tranh luận với nhau.",
+                "Là việc bỏ phiếu tín nhiệm."
+            ],
+            c: 1,
+            e: "Chất vấn là hình thức giám sát trực tiếp, buộc người bị chất vấn phải giải trình trách nhiệm."
+        },
+        {
+            tag: "Thuật ngữ Bộ máy",
+            q: "Thuật ngữ <span class='highlight'>'Giám đốc thẩm'</span> có nghĩa là gì?",
+            a: [
+                "Giám đốc đi thẩm tra công việc.",
+                "Xét xử lại bản án chưa có hiệu lực pháp luật.",
+                "Xét lại bản án, quyết định đã có hiệu lực pháp luật nhưng bị kháng nghị vì có vi phạm pháp luật nghiêm trọng trong tố tụng.",
+                "Xét lại bản án khi có tình tiết mới."
+            ],
+            c: 2,
+            e: "Giám đốc thẩm = Xem xét lại (Review) bản án đã có hiệu lực vì có sai lầm về luật pháp (Error of law)."
+        },
+        {
+            tag: "Thuật ngữ Bộ máy",
+            q: "Thuật ngữ <span class='highlight'>'Tái thẩm'</span> khác Giám đốc thẩm ở điểm nào?",
+            a: [
+                "Tái thẩm là xét lại khi phát hiện tình tiết mới làm thay đổi cơ bản nội dung vụ án mà trước đó không biết.",
+                "Tái thẩm là xét xử lần 2.",
+                "Tái thẩm do Tòa án cấp dưới thực hiện.",
+                "Tái thẩm áp dụng cho vụ án dân sự, Giám đốc thẩm áp dụng cho hình sự."
+            ],
+            c: 0,
+            e: "Tái thẩm = Xét lại vì tình tiết mới (New evidence/facts)."
+        },
+        {
+            tag: "Thuật ngữ Bộ máy",
+            q: "<span class='highlight'>'Quyền công tố'</span> là quyền gì?",
+            a: [
+                "Quyền công bố bản án.",
+                "Quyền buộc tội, truy tố người phạm tội ra trước tòa án.",
+                "Quyền xét xử công khai.",
+                "Quyền bào chữa cho bị can."
+            ],
+            c: 1,
+            e: "Quyền công tố thuộc về Viện Kiểm sát, đại diện cho Nhà nước để buộc tội."
+        },
+        {
+            tag: "Thuật ngữ Bộ máy",
+            q: "Khái niệm <span class='highlight'>'Nhiệm kỳ'</span> của cơ quan nhà nước được hiểu là gì?",
+            a: [
+                "Thời gian làm việc trong một ngày.",
+                "Khoảng thời gian hoạt động của cơ quan đó được quy định từ khi thành lập/bầu ra đến khi kết thúc.",
+                "Thời gian nghỉ hưu.",
+                "Thời gian thử việc."
+            ],
+            c: 1,
+            e: "Ví dụ: Nhiệm kỳ Quốc hội là 5 năm."
+        },
+
+        // --- CHỦ ĐỀ 3: PL ĐẠI CƯƠNG (6 Câu) ---
+        {
+            tag: "Thuật ngữ Pháp luật",
+            q: "Định nghĩa nào đúng nhất về <span class='highlight'>'Pháp luật'</span>?",
+            a: [
+                "Là những lời khuyên đạo đức.",
+                "Là hệ thống quy tắc xử sự chung, do Nhà nước ban hành/thừa nhận và bảo đảm thực hiện bằng quyền lực nhà nước.",
+                "Là thói quen sinh hoạt của cộng đồng.",
+                "Là điều lệ của các đảng phái."
+            ],
+            c: 1,
+            e: "3 yếu tố cốt lõi: Quy tắc chung + Nhà nước ban hành + Đảm bảo bằng cưỡng chế."
+        },
+        {
+            tag: "Thuật ngữ Pháp luật",
+            q: "Thuật ngữ <span class='highlight'>'Quy phạm pháp luật'</span> (Legal Norm) là gì?",
+            a: [
+                "Là một văn bản luật dày cộp.",
+                "Là một cuốn sách luật.",
+                "Là tế bào nhỏ nhất của hệ thống pháp luật, là một quy tắc xử sự cụ thể.",
+                "Là một ngành luật."
+            ],
+            c: 2,
+            e: "Quy phạm pháp luật là 'tế bào', là đơn vị cấu thành nhỏ nhất, chứa đựng một quy tắc ứng xử cụ thể."
+        },
+        {
+            tag: "Thuật ngữ Pháp luật",
+            q: "<span class='highlight'>'Hiệu lực hồi tố'</span> (Retroactivity) nghĩa là gì?",
+            a: [
+                "Văn bản pháp luật hết hiệu lực.",
+                "Văn bản pháp luật có hiệu lực áp dụng đối với những hành vi xảy ra trước thời điểm văn bản đó có hiệu lực.",
+                "Văn bản pháp luật chỉ áp dụng cho tương lai.",
+                "Văn bản bị đình chỉ thi hành."
+            ],
+            c: 1,
+            e: "Hồi tố = Quay ngược lại quá khứ (áp dụng cho cái đã xảy ra trước khi luật ra đời)."
+        },
+        {
+            tag: "Thuật ngữ Pháp luật",
+            q: "Thuật ngữ <span class='highlight'>'Văn bản dưới luật'</span> dùng để chỉ các văn bản nào?",
+            a: [
+                "Văn bản có giá trị pháp lý thấp hơn Luật, do các cơ quan nhà nước có thẩm quyền ban hành để hướng dẫn thi hành Luật.",
+                "Văn bản do người dân tự viết.",
+                "Văn bản trái pháp luật.",
+                "Văn bản đã hết hiệu lực."
+            ],
+            c: 0,
+            e: "Ví dụ: Nghị định, Thông tư là văn bản dưới luật (Sub-law documents)."
+        },
+        {
+            tag: "Thuật ngữ Pháp luật",
+            q: "<span class='highlight'>'Tập quán pháp'</span> là gì?",
+            a: [
+                "Những thói quen xấu của xã hội.",
+                "Những tập quán lưu truyền trong xã hội được Nhà nước thừa nhận và nâng lên thành luật.",
+                "Luật pháp do các tù trưởng ban hành.",
+                "Các quy định của tôn giáo."
+            ],
+            c: 1,
+            e: "Tập quán pháp = Tập quán + Sự thừa nhận của Nhà nước."
+        },
+        {
+            tag: "Thuật ngữ Pháp luật",
+            q: "Khái niệm <span class='highlight'>'Hệ thống pháp luật'</span> (Legal System) bao gồm?",
+            a: [
+                "Tất cả các tòa án và nhà tù.",
+                "Tổng thể các quy phạm pháp luật có mối liên hệ thống nhất, được phân định thành các chế định và ngành luật.",
+                "Tất cả cảnh sát và luật sư.",
+                "Sách giáo khoa luật."
+            ],
+            c: 1,
+            e: "Hệ thống pháp luật là cấu trúc bên trong (nội dung) gồm các ngành luật, chế định luật..."
+        },
+
+        // --- CHỦ ĐỀ 4: QUY PHẠM & QHPL (6 Câu) ---
+        {
+            tag: "Thuật ngữ QPPL",
+            q: "Bộ phận <span class='highlight'>'Giả định'</span> trong quy phạm pháp luật trả lời cho câu hỏi nào?",
+            a: [
+                "Chủ thể phải chịu hậu quả gì?",
+                "Chủ thể phải làm gì?",
+                "Ai? Khi nào? Trong hoàn cảnh nào?",
+                "Tại sao?"
+            ],
+            c: 2,
+            e: "Giả định nêu lên bối cảnh, điều kiện, chủ thể chịu sự tác động của quy phạm."
+        },
+        {
+            tag: "Thuật ngữ QPPL",
+            q: "Bộ phận <span class='highlight'>'Chế tài'</span> (Sanction) là gì?",
+            a: [
+                "Là phần thưởng cho người làm tốt.",
+                "Là biện pháp tác động (thường là trừng phạt) mà Nhà nước dự kiến áp dụng đối với chủ thể không thực hiện đúng quy định.",
+                "Là lời khuyên răn.",
+                "Là quy tắc xử sự."
+            ],
+            c: 1,
+            e: "Chế tài là hậu quả pháp lý bất lợi."
+        },
+        {
+            tag: "Thuật ngữ QHPL",
+            q: "<span class='highlight'>'Năng lực pháp luật'</span> (Legal Capacity) là gì?",
+            a: [
+                "Khả năng thực tế của cá nhân bằng hành vi của mình xác lập quyền.",
+                "Khả năng hưởng quyền và gánh vác nghĩa vụ do Nhà nước quy định cho các chủ thể (là điều kiện cần, có từ khi sinh ra).",
+                "Khả năng chịu trách nhiệm hình sự.",
+                "Sức khỏe của con người."
+            ],
+            c: 1,
+            e: "Năng lực pháp luật là tư cách chủ thể 'tiềm năng' do nhà nước trao (ví dụ: đứa bé mới sinh đã có quyền thừa kế)."
+        },
+        {
+            tag: "Thuật ngữ QHPL",
+            q: "<span class='highlight'>'Năng lực hành vi'</span> (Act Capacity) là gì?",
+            a: [
+                "Khả năng của Nhà nước.",
+                "Khả năng của chủ thể bằng chính hành vi của mình để xác lập, thực hiện quyền và nghĩa vụ pháp lý.",
+                "Khả năng ban hành văn bản.",
+                "Khả năng đi lại."
+            ],
+            c: 1,
+            e: "Năng lực hành vi gắn với khả năng nhận thức và điều khiển hành vi (phụ thuộc độ tuổi, trạng thái tinh thần)."
+        },
+        {
+            tag: "Thuật ngữ QHPL",
+            q: "<span class='highlight'>'Sự kiện pháp lý'</span> được định nghĩa là gì?",
+            a: [
+                "Những sự kiện xảy ra trên tivi.",
+                "Những tình tiết, sự kiện thực tế mà sự xuất hiện hay mất đi của chúng được pháp luật gắn với việc phát sinh, thay đổi, chấm dứt quan hệ pháp luật.",
+                "Các vụ án hình sự nghiêm trọng.",
+                "Lễ kỷ niệm ngày thành lập ngành tư pháp."
+            ],
+            c: 1,
+            e: "Là 'cái cớ' thực tế để pháp luật kích hoạt."
+        },
+        {
+            tag: "Thuật ngữ Thực hiện PL",
+            q: "Thuật ngữ <span class='highlight'>'Áp dụng pháp luật'</span> đặc trưng bởi yếu tố nào?",
+            a: [
+                "Do mọi công dân thực hiện.",
+                "Là hoạt động mang tính quyền lực nhà nước, do cơ quan/người có thẩm quyền thực hiện.",
+                "Là việc không làm điều cấm.",
+                "Là việc thực hiện nghĩa vụ công dân."
+            ],
+            c: 1,
+            e: "Áp dụng pháp luật luôn gắn với chủ thể quyền lực (ra bản án, ra quyết định xử phạt, cấp giấy phép...)."
+        },
+
+        // --- CHỦ ĐỀ 5: VI PHẠM & TNPL (6 Câu) ---
+        {
+            tag: "Thuật ngữ Vi phạm",
+            q: "Yếu tố <span class='highlight'>'Lỗi'</span> trong vi phạm pháp luật thể hiện điều gì?",
+            a: [
+                "Hành vi trái pháp luật.",
+                "Thiệt hại thực tế xảy ra.",
+                "Thái độ tâm lý chủ quan của người vi phạm đối với hành vi và hậu quả (cố ý hoặc vô ý).",
+                "Năng lực trách nhiệm pháp lý."
+            ],
+            c: 2,
+            e: "Lỗi thuộc về mặt chủ quan (bên trong suy nghĩ)."
+        },
+        {
+            tag: "Thuật ngữ Vi phạm",
+            q: "Định nghĩa về <span class='highlight'>'Vi phạm hành chính'</span> là gì?",
+            a: [
+                "Là hành vi nguy hiểm cho xã hội bị coi là tội phạm.",
+                "Là hành vi có lỗi, vi phạm quy định quản lý nhà nước mà không phải là tội phạm.",
+                "Là hành vi vi phạm hợp đồng.",
+                "Là hành vi vi phạm kỷ luật cơ quan."
+            ],
+            c: 1,
+            e: "Từ khóa: Vi phạm quản lý nhà nước, mức độ nguy hiểm thấp hơn tội phạm."
+        },
+        {
+            tag: "Thuật ngữ Vi phạm",
+            q: "<span class='highlight'>'Tội phạm'</span> (Crime) là khái niệm chỉ dùng trong ngành luật nào?",
+            a: [
+                "Luật Hành chính.",
+                "Luật Dân sự.",
+                "Luật Hình sự.",
+                "Luật Quốc tế."
+            ],
+            c: 2,
+            e: "Chỉ Luật Hình sự mới quy định về Tội phạm."
+        },
+        {
+            tag: "Thuật ngữ Vi phạm",
+            q: "Khái niệm <span class='highlight'>'Phòng vệ chính đáng'</span> là gì?",
+            a: [
+                "Hành vi tấn công người khác trước.",
+                "Hành vi chống trả cần thiết và tương xứng đối với người đang có hành vi xâm phạm lợi ích hợp pháp.",
+                "Hành vi trả thù sau khi bị đánh.",
+                "Hành vi bỏ chạy."
+            ],
+            c: 1,
+            e: "Phòng vệ chính đáng không phải là vi phạm pháp luật."
+        },
+        {
+            tag: "Thuật ngữ TNPL",
+            q: "<span class='highlight'>'Trách nhiệm pháp lý'</span> là gì?",
+            a: [
+                "Nghĩa vụ đạo đức.",
+                "Hậu quả bất lợi (sự gánh chịu các biện pháp cưỡng chế) mà chủ thể phải gánh chịu do thực hiện hành vi vi phạm pháp luật.",
+                "Trách nhiệm hứa hẹn.",
+                "Trách nhiệm chăm sóc con cái."
+            ],
+            c: 1,
+            e: "Trách nhiệm pháp lý là sự phản ứng của Nhà nước đối với vi phạm."
+        },
+        {
+            tag: "Thuật ngữ Vi phạm",
+            q: "Thuật ngữ <span class='highlight'>'Thời hiệu'</span> trong pháp luật nghĩa là gì?",
+            a: [
+                "Thời gian hiệu lực của văn bản.",
+                "Thời hạn do luật định mà khi kết thúc thời hạn đó thì phát sinh hậu quả pháp lý (như miễn trách nhiệm, mất quyền khởi kiện...).",
+                "Thời gian làm việc.",
+                "Thời gian xét xử."
+            ],
+            c: 1,
+            e: "Ví dụ: Hết thời hiệu truy cứu TNHS thì không bị đi tù nữa."
+        },
+
+        // --- CHỦ ĐỀ 6: NGÀNH LUẬT (8 Câu) ---
+        {
+            tag: "Thuật ngữ Dân sự",
+            q: "<span class='highlight'>'Pháp nhân'</span> là gì?",
+            a: [
+                "Một cá nhân am hiểu pháp luật.",
+                "Một tổ chức được Nhà nước công nhận có tư cách pháp lý độc lập để tham gia các quan hệ pháp luật (có tài sản riêng, tự chịu trách nhiệm...).",
+                "Một người làm nghề luật sư.",
+                "Người đứng đầu công ty."
+            ],
+            c: 1,
+            e: "Pháp nhân là 'con người pháp lý' (Artificial person), là tổ chức có tư cách độc lập."
+        },
+        {
+            tag: "Thuật ngữ Dân sự",
+            q: "Quyền <span class='highlight'>'Chiếm hữu'</span> trong quyền sở hữu tài sản nghĩa là gì?",
+            a: [
+                "Quyền bán tài sản.",
+                "Quyền khai thác công dụng của tài sản.",
+                "Quyền nắm giữ, quản lý tài sản.",
+                "Quyền phá hủy tài sản."
+            ],
+            c: 2,
+            e: "Quyền sở hữu gồm 3 quyền năng: Chiếm hữu (nắm giữ), Sử dụng (khai thác), Định đoạt (quyết định số phận)."
+        },
+        {
+            tag: "Thuật ngữ Hình sự",
+            q: "<span class='highlight'>'Đồng phạm'</span> là gì?",
+            a: [
+                "Phạm tội 2 lần trở lên.",
+                "Trường hợp có hai người trở lên cố ý cùng thực hiện một tội phạm.",
+                "Phạm tội đối với nhiều người.",
+                "Phạm tội giống người khác."
+            ],
+            c: 1,
+            e: "Đồng phạm đòi hỏi 2 yếu tố: Có từ 2 người trở lên + Cùng cố ý."
+        },
+        {
+            tag: "Thuật ngữ Hình sự",
+            q: "Nguyên tắc <span class='highlight'>'Suy đoán vô tội'</span> nghĩa là gì?",
+            a: [
+                "Người bị buộc tội được coi là không có tội cho đến khi được chứng minh theo trình tự luật định và có bản án kết tội của Tòa án.",
+                "Người bị bắt đương nhiên là có tội.",
+                "Công an có quyền tuyên bố ai có tội.",
+                "Tòa án phải chứng minh bị cáo vô tội."
+            ],
+            c: 0,
+            e: "Nghĩa vụ chứng minh tội phạm thuộc về cơ quan tố tụng, bị cáo có quyền nhưng không buộc phải chứng minh mình vô tội."
+        },
+        {
+            tag: "Thuật ngữ Hôn nhân",
+            q: "<span class='highlight'>'Chế độ tài sản chung hợp nhất'</span> của vợ chồng nghĩa là gì?",
+            a: [
+                "Vợ chồng không có tài sản riêng.",
+                "Tài sản chung thuộc sở hữu chung không phân chia phần, cả hai có quyền ngang nhau.",
+                "Tài sản của ai người nấy giữ.",
+                "Chồng có quyền quyết định tất cả."
+            ],
+            c: 1,
+            e: "Sở hữu chung hợp nhất là đặc trưng của hôn nhân (không chia theo % như góp vốn làm ăn)."
+        },
+        {
+            tag: "Thuật ngữ Lao động",
+            q: "<span class='highlight'>'Hợp đồng lao động'</span> là sự thỏa thuận về vấn đề gì?",
+            a: [
+                "Mua bán sức lao động.",
+                "Việc làm có trả công, điều kiện lao động, quyền và nghĩa vụ của mỗi bên trong quan hệ lao động.",
+                "Việc hợp tác kinh doanh.",
+                "Việc đào tạo nghề."
+            ],
+            c: 1,
+            e: "Định nghĩa chuẩn trong Bộ luật Lao động."
+        },
+        {
+            tag: "Thuật ngữ Hành chính",
+            q: "<span class='highlight'>'Quyết định hành chính'</span> là gì?",
+            a: [
+                "Bản án của Tòa án.",
+                "Văn bản áp dụng pháp luật do cơ quan hành chính ban hành để giải quyết công việc cụ thể (ví dụ: Quyết định xử phạt, Quyết định bổ nhiệm).",
+                "Luật do Quốc hội ban hành.",
+                "Hợp đồng kinh tế."
+            ],
+            c: 1,
+            e: "Quyết định hành chính là văn bản cá biệt, mang tính mệnh lệnh đơn phương của cơ quan quản lý."
+        },
+        {
+            tag: "Thuật ngữ Dân sự",
+            q: "Sự kiện <span class='highlight'>'Bất khả kháng'</span> (Force Majeure) phải hội tụ đủ các yếu tố nào?",
+            a: [
+                "Sự kiện xảy ra khách quan.",
+                "Không thể lường trước được.",
+                "Không thể khắc phục được mặc dù đã áp dụng mọi biện pháp cần thiết.",
+                "Cả 3 yếu tố trên."
+            ],
+            c: 3,
+            e: "Bất khả kháng = Khách quan + Không lường trước + Không thể khắc phục (Ví dụ: Thiên tai, dịch bệnh bất ngờ)."
+        }
+    ];
+
+    // --- LOGIC XỬ LÝ ---
+    const quizContainer = document.getElementById('quiz-container');
+    let userAnswers = new Array(questions.length).fill(null);
+
+    // 1. Render câu hỏi
+    function render() {
+        quizContainer.innerHTML = questions.map((item, idx) => `
+            <div class="q-card" id="card-${idx}">
+                <span class="term-badge">${item.tag}</span>
+                <div class="question">Câu ${idx + 1}: ${item.q}</div>
+                <div class="options">
+                    ${item.a.map((opt, optIdx) => `
+                        <label class="opt-label" id="lbl-${idx}-${optIdx}" onclick="selectAns(${idx}, ${optIdx})">
+                            <input type="radio" name="q${idx}" value="${optIdx}">
+                            <span>${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explain" id="explain-${idx}"></div>
+            </div>
+        `).join('');
+    }
+
+    // 2. Chọn đáp án
+    window.selectAns = (qIdx, optIdx) => {
+        userAnswers[qIdx] = optIdx;
+        
+        // UI Update
+        document.querySelectorAll(`#card-${qIdx} .opt-label`).forEach(l => l.classList.remove('selected'));
+        document.getElementById(`lbl-${qIdx}-${optIdx}`).classList.add('selected');
+        
+        // Auto check radio
+        document.querySelector(`input[name="q${qIdx}"][value="${optIdx}"]`).checked = true;
+    }
+
+    // 3. Nộp bài
+    window.submitQuiz = () => {
+        if(!confirm("Bạn chắc chắn muốn nộp bài chứ?")) return;
+
+        // Dừng giờ (nếu có logic dừng)
+        let score = 0;
+
+        questions.forEach((q, idx) => {
+            const userChoice = userAnswers[idx];
+            const explainDiv = document.getElementById(`explain-${idx}`);
+            
+            // Hiện giải thích
+            explainDiv.innerHTML = `<strong>📖 Giải nghĩa:</strong> ${q.e}`;
+            explainDiv.style.display = 'block';
+
+            // Xử lý màu sắc
+            const correctLbl = document.getElementById(`lbl-${idx}-${q.c}`);
+            if(correctLbl) correctLbl.classList.add('correct');
+
+            if(userChoice === q.c) {
+                score += 0.25; 
+            } else if (userChoice !== null) {
+                document.getElementById(`lbl-${idx}-${userChoice}`).classList.add('wrong');
+            }
+        });
+
+        // Hiện kết quả
+        const finalScore = score.toFixed(2);
+        document.getElementById('scoreDisplay').innerText = finalScore;
+        
+        let msg = "";
+        if(score >= 9) msg = "Tuyệt vời! Bạn nắm vững thuật ngữ như một luật gia.";
+        else if(score >= 7) msg = "Rất tốt. Bạn hiểu rõ các khái niệm cơ bản.";
+        else if(score >= 5) msg = "Đạt yêu cầu. Hãy xem lại các định nghĩa bị nhầm lẫn.";
+        else msg = "Cần cố gắng! Các thuật ngữ pháp lý đòi hỏi sự chính xác cao.";
+        
+        document.getElementById('feedback').innerText = msg;
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+
+    window.closeModal = () => {
+        document.getElementById('resultModal').style.display = 'none';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    // 4. Timer
+    let time = 60 * 60;
+    const timerElem = document.getElementById('timer');
+    setInterval(() => {
+        if(time <= 0) return;
+        time--;
+        const m = Math.floor(time / 60).toString().padStart(2, '0');
+        const s = (time % 60).toString().padStart(2, '0');
+        timerElem.innerText = `${m}:${s}`;
+    }, 1000);
+
+    // Start
+    render();
+
+</script>
+
+</body>
+</html>
